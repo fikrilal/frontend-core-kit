@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+
+if [ ! -d node_modules ]; then
+  echo "commit-msg: node_modules missing; run pnpm install before committing." >&2
+  exit 1
+fi
+
+pnpm exec commitlint --edit "$1"
