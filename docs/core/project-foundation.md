@@ -1,8 +1,8 @@
-# Burnly Web Project Foundation
+# Lamara Web Project Foundation
 
 ## Purpose
 
-This document defines the initial repository foundation for Burnly Web.
+This document defines the initial repository foundation for Lamara Web.
 
 It covers scaffolding choices, baseline tooling, verification commands, and
 early engineering guardrails.
@@ -15,18 +15,18 @@ deployment workflows, or product roadmap.
 - Create a production-shaped web repo without overbuilding the first version.
 - Ship the landing and download pages quickly.
 - Keep the repo ready for authenticated app surfaces later.
-- Match Burnly's existing engineering discipline: strict typing, clear
+- Match Lamara's existing engineering discipline: strict typing, clear
   boundaries, deterministic checks, and documented decisions.
 - Avoid monorepo and package extraction until reuse is proven.
 
 ## Initial Repository Shape
 
-Burnly Web starts as a single Next.js application repository.
+Lamara Web starts as a single Next.js application repository.
 
 Initial shape:
 
 ```text
-burnly-web/
+lamara-web/
 ├── docs/
 ├── public/
 ├── src/
@@ -76,10 +76,10 @@ Use `pnpm`.
 
 Reasons:
 
-- matches the Burnly desktop repo,
+- matches the Lamara desktop repo,
 - supports deterministic installs,
 - supports future workspace growth,
-- avoids mixing package managers across Burnly frontend work.
+- avoids mixing package managers across Lamara frontend work.
 
 ## TypeScript Policy
 
@@ -108,7 +108,7 @@ Initial global styling should include:
 
 Do not add a large component framework.
 
-Burnly-owned UI primitives should wrap Radix primitives when behavior is
+Lamara-owned UI primitives should wrap Radix primitives when behavior is
 non-trivial.
 
 ## Fonts And Assets
@@ -119,7 +119,7 @@ practical.
 Initial recommended direction:
 
 - Geist or Inter for product/body text,
-- a restrained display treatment only if it supports the Burnly brand,
+- a restrained display treatment only if it supports the Lamara brand,
 - actual product imagery or generated visual assets for the landing page,
 - real platform/download signals for the download page.
 
@@ -260,7 +260,7 @@ Recommended sequence after this foundation is approved:
 
 ## Decision Status
 
-Approved for the initial Burnly Web foundation.
+Approved for the initial Lamara Web foundation.
 
-Revisit this document if Burnly Web becomes a monorepo, adds a second frontend
+Revisit this document if Lamara Web becomes a monorepo, adds a second frontend
 surface, or extracts shared packages.

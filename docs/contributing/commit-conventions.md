@@ -1,6 +1,6 @@
 # Commit Conventions
 
-Burnly Web uses semantic scoped commit messages for maintainability, review
+Lamara Web uses semantic scoped commit messages for maintainability, review
 clarity, and agent coordination.
 
 ## Format

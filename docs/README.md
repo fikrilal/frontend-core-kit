@@ -1,6 +1,6 @@
-# Burnly Web — Documentation
+# Lamara Web — Documentation
 
-Docs are the source of truth for Burnly Web decisions. Code should follow these
+Docs are the source of truth for Lamara Web decisions. Code should follow these
 docs; if code and docs diverge, fix the mismatch.
 
 ## Navigation
@@ -31,7 +31,7 @@ Visual direction and UI system rules.
 
 ### Engineering
 
-How we build, verify, and integrate with Burnly API.
+How we build, verify, and integrate with Lamara API.
 
 - `docs/engineering/README.md`
 - `docs/engineering/harness.md`

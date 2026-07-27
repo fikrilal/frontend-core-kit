@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("renders the landing page", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("link", { name: "Burnly home" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Lamara home" })).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: /Track AI coding-tool tokens from your tray/i,
@@ -20,6 +20,6 @@ test("renders the landing page", async ({ page }) => {
 test("renders the initial public pages", async ({ page }) => {
   await page.goto("/download");
   await expect(
-    page.getByRole("heading", { name: /Install Burnly/i }),
+    page.getByRole("heading", { name: /Install Lamara/i }),
   ).toBeVisible();
 });

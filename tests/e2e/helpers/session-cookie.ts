@@ -1,5 +1,5 @@
 /**
- * Build a sealed Burnly session cookie for Playwright.
+ * Build a sealed Lamara session cookie for Playwright.
  * Sealing matches `src/server/auth/seal.ts` (JWE dir + A256GCM, SHA-256 key).
  * Must use the same SESSION_SECRET / cookie name as the Next app under test.
  */
@@ -9,10 +9,10 @@ import type { BrowserContext } from "@playwright/test";
 
 /** Same default as `src/server/config/env.ts` when SESSION_SECRET is unset. */
 export const E2E_DEFAULT_SESSION_SECRET =
-  "local-dev-only-burnly-session-secret-key!!";
+  "local-dev-only-lamara-session-secret-key!!";
 
 export const E2E_SESSION_COOKIE_NAME =
-  process.env.SESSION_COOKIE_NAME ?? "burnly_session";
+  process.env.SESSION_COOKIE_NAME ?? "lamara_session";
 
 export function e2eSessionSecret(): string {
   return process.env.SESSION_SECRET ?? E2E_DEFAULT_SESSION_SECRET;

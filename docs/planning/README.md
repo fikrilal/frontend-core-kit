@@ -13,5 +13,5 @@ Drafts may also live temporarily in `_WIP/` at the repo root. Prefer
 ## Active handoffs
 
 - `docs/planning/desktop-auth-web-handoff.md` — **web slice shipped**; desktop signs in on web (Google), then deep-link return
-- `docs/planning/desktop-auth-web-implementation-plan.md` — big-view plan for burnly-web (historical phases 1–3 done)
-- **Next (desktop repo):** burnly `docs/planning/desktop-auth-via-web-handoff.md` — PKCE, browser open, callback, token exchange, keychain
+- `docs/planning/desktop-auth-web-implementation-plan.md` — big-view plan for lamara-web (historical phases 1–3 done)
+- **Next (desktop repo):** lamara `docs/planning/desktop-auth-via-web-handoff.md` — PKCE, browser open, callback, token exchange, keychain

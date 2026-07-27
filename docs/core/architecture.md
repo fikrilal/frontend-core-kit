@@ -1,8 +1,8 @@
-# Burnly Web Architecture
+# Lamara Web Architecture
 
 ## Purpose
 
-This document defines the application architecture for Burnly Web.
+This document defines the application architecture for Lamara Web.
 
 It covers structure, module ownership, dependency rules, data-flow principles,
 and long-term growth direction.
@@ -13,7 +13,7 @@ separate documents.
 
 ## Product Context
 
-Burnly Web begins as Burnly's public web presence:
+Lamara Web begins as Lamara's public web presence:
 
 - landing page,
 - download page,
@@ -34,7 +34,7 @@ into the first marketing and download pages.
 
 ## Architecture Style
 
-Burnly Web uses a vertical-slice Next.js architecture with thin routes,
+Lamara Web uses a vertical-slice Next.js architecture with thin routes,
 feature-owned modules, server-only integration adapters, and shared UI
 primitives.
 
@@ -47,7 +47,7 @@ In practical terms:
 - `src/contracts/` owns generated and validated external contracts.
 - `src/lib/` owns small product-agnostic utilities.
 
-Burnly Web uses one consistent boundary model, not one mandatory folder depth.
+Lamara Web uses one consistent boundary model, not one mandatory folder depth.
 Simple features stay simple. Complex features add layers only when those layers
 hide real complexity.
 
@@ -196,7 +196,7 @@ Rules:
 - UI primitives do not call APIs.
 - UI primitives do not read environment variables.
 - UI primitives do not import features.
-- UI primitives do not know Burnly product rules.
+- UI primitives do not know Lamara product rules.
 - Radix primitives are wrapped here instead of being scattered through feature
   code.
 
@@ -281,7 +281,7 @@ primitive or global token.
 
 ## Progressive Feature Depth
 
-Burnly Web uses progressive feature architecture.
+Lamara Web uses progressive feature architecture.
 
 Features grow internally by complexity. Not every feature needs the same folder
 depth.
@@ -423,7 +423,7 @@ Routes should not own:
 
 ## Server And API Boundary
 
-Burnly Web should not become the primary backend.
+Lamara Web should not become the primary backend.
 
 Next.js server capabilities may be used for web-owned concerns:
 
@@ -445,13 +445,13 @@ Backend-owned concerns should live in a separate backend service:
 - durable business rules,
 - admin workflows.
 
-When Burnly Web integrates with Burnly API, the default path is:
+When Lamara Web integrates with Lamara API, the default path is:
 
 ```text
 page/server component
   -> feature server loader
   -> server API adapter or generated client
-  -> Burnly API
+  -> Lamara API
 ```
 
 No raw `fetch` should be scattered through UI components.
@@ -483,7 +483,7 @@ data as props when possible.
 
 ## State Management
 
-Burnly Web should not start with a global client state library.
+Lamara Web should not start with a global client state library.
 
 Default state ownership:
 
@@ -511,7 +511,7 @@ features/downloads/install-commands.ts
 
 Do not introduce a CMS for the first landing and download pages.
 
-If Burnly later adds a substantial blog, changelog, documentation library, or
+If Lamara later adds a substantial blog, changelog, documentation library, or
 editorial workflow, a content system can be introduced with a separate decision.
 
 ## Download Data Strategy
@@ -630,7 +630,7 @@ source-of-truth documentation.
 
 ## Decision Status
 
-This architecture is approved for the initial Burnly Web foundation.
+This architecture is approved for the initial Lamara Web foundation.
 
-It should be revisited when Burnly Web adds authenticated app surfaces, backend
+It should be revisited when Lamara Web adds authenticated app surfaces, backend
 API integration, or a second deployable frontend surface.

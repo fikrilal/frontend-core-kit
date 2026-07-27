@@ -16,7 +16,7 @@ test.describe("auth smoke (guest)", () => {
     await page.goto("/dashboard");
     await expect(page).toHaveURL(/\/login/);
     // CardTitle is a div, not a heading role
-    await expect(page.getByText("Sign in to Burnly")).toBeVisible();
+    await expect(page.getByText("Sign in to Lamara")).toBeVisible();
   });
 
   test("unauthenticated /reports redirects to /login", async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe("auth smoke (guest)", () => {
 
   test("login page renders social auth chrome", async ({ page }) => {
     await page.goto("/login");
-    await expect(page.getByText("Sign in to Burnly")).toBeVisible();
+    await expect(page.getByText("Sign in to Lamara")).toBeVisible();
     // Google button (enabled or disabled) and disabled GitHub
     await expect(page.getByRole("button", { name: /Google/i })).toBeVisible();
     await expect(

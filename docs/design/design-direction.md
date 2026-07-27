@@ -1,9 +1,9 @@
-# Burnly Web Design Direction
+# Lamara Web Design Direction
 
 ## Purpose
 
 This document defines the initial visual and product-design direction for
-Burnly Web.
+Lamara Web.
 
 It covers brand tone, page composition, asset strategy, content density, and UI
 guardrails for the first public web release.
@@ -13,7 +13,7 @@ design system.
 
 ## Product Design Positioning
 
-Burnly Web should present Burnly as:
+Lamara Web should present Lamara as:
 
 - a developer utility,
 - a local-first privacy-conscious product,
@@ -21,7 +21,7 @@ Burnly Web should present Burnly as:
 - a practical token usage tracker,
 - a product for people who use AI coding tools daily.
 
-Burnly Web should not feel like:
+Lamara Web should not feel like:
 
 - a generic SaaS analytics dashboard,
 - an enterprise reporting suite,
@@ -52,7 +52,7 @@ purely decorative visuals.
 The landing page should answer this quickly:
 
 ```text
-What is Burnly?
+What is Lamara?
 Why should a developer install it?
 Why is it safe to trust locally?
 ```
@@ -60,7 +60,7 @@ Why is it safe to trust locally?
 Initial message:
 
 ```text
-Burnly is a local tray app for tracking AI coding-tool token usage.
+Lamara is a local tray app for tracking AI coding-tool token usage.
 ```
 
 Primary value:
@@ -73,13 +73,13 @@ a dashboard.
 Supportive message:
 
 ```text
-Burnly reads local usage from supported tools, stores data on your machine, and
+Lamara reads local usage from supported tools, stores data on your machine, and
 keeps prompt, response, source code, and file content out of collection.
 ```
 
 ## Visual System Direction
 
-Burnly should use a restrained product palette.
+Lamara should use a restrained product palette.
 
 Recommended direction:
 
@@ -122,7 +122,7 @@ Text hierarchy should match the surface:
 
 ## Hero Direction
 
-The first viewport must make Burnly the primary signal.
+The first viewport must make Lamara the primary signal.
 
 Recommended hero elements:
 
@@ -140,7 +140,7 @@ Avoid:
 - split hero where one side is a decorative card and the other side is text,
 - purely gradient hero backgrounds,
 - large abstract illustration as the main product signal,
-- marketing copy that hides what Burnly actually does.
+- marketing copy that hides what Lamara actually does.
 
 ## Asset Strategy
 
@@ -148,7 +148,7 @@ Use product-real or product-faithful visuals.
 
 Preferred assets:
 
-- actual tray panel screenshots from Burnly desktop,
+- actual tray panel screenshots from Lamara desktop,
 - polished product mockups derived from the real tray UI,
 - platform download visuals,
 - small status/source visuals based on real product states.
@@ -161,7 +161,7 @@ Acceptable supporting assets:
 Avoid:
 
 - generic stock imagery,
-- fake analytics dashboards unrelated to Burnly's actual UI,
+- fake analytics dashboards unrelated to Lamara's actual UI,
 - dark blurred screenshots that cannot be inspected,
 - SVG illustrations where real product visuals would communicate better.
 
@@ -180,7 +180,7 @@ Supported Sources Preview
   Supported and experimental tool signals
 
 Local-First Privacy
-  Clear statement of what Burnly does and does not collect
+  Clear statement of what Lamara does and does not collect
 
 Download CTA
   Platform-aware or direct link to download page
@@ -341,7 +341,7 @@ component needs.
 
 ## Content Voice
 
-Burnly copy should be:
+Lamara copy should be:
 
 - direct,
 - specific,
@@ -360,7 +360,7 @@ Avoid:
 Good example:
 
 ```text
-Burnly reads local usage data from supported AI coding tools and stores usage
+Lamara reads local usage data from supported AI coding tools and stores usage
 summaries on your machine.
 ```
 
@@ -372,7 +372,7 @@ Unlock unparalleled AI productivity insights with next-generation analytics.
 
 ## Decision Status
 
-Approved for the initial Burnly Web visual direction.
+Approved for the initial Lamara Web visual direction.
 
 Revisit this document after the first landing and download page implementation
 is visually reviewed on mobile and desktop.

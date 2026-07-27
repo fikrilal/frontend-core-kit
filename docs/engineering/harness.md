@@ -1,8 +1,8 @@
-# Burnly Web Harness
+# Lamara Web Harness
 
 ## Purpose
 
-This document defines the engineering harness for Burnly Web.
+This document defines the engineering harness for Lamara Web.
 
 The harness is the set of repository-local docs, scripts, tests, and workflows
 that make changes safe, reviewable, and repeatable for both humans and coding

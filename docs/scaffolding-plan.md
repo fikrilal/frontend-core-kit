@@ -1,10 +1,10 @@
-# Frontend Scaffolding Plan (burnly-web as reference)
+# Frontend Scaffolding Plan (lamara-web as reference)
 
-This document outlines the plan for building the `lamara-frontend` core kit, using `burnly-web` as our blueprint. The goal is to establish a rigorous, feature-driven, and highly maintainable Next.js foundation that matches the standards of `lamara-backend`.
+This document outlines the plan for building the `lamara-frontend` core kit, using `lamara-web` as our blueprint. The goal is to establish a rigorous, feature-driven, and highly maintainable Next.js foundation that matches the standards of `lamara-backend`.
 
-## 1. What to Port from `burnly-web`
+## 1. What to Port from `lamara-web`
 
-We will copy and adapt the following foundational elements from `burnly-web`:
+We will copy and adapt the following foundational elements from `lamara-web`:
 
 ### 1.1 Core Stack & Dependencies
 - **Framework:** Next.js 16 (App Router) + React 19.
@@ -50,7 +50,7 @@ While the foundation is ported, the product itself needs to be uniquely scaffold
 
 ### 2.3 Initial Routes & Layouts
 - **Root Layout:** `src/app/layout.tsx` with Lamara's font (e.g., Inter/Geist) and core providers.
-- **Initial Pages:** A basic landing page (`/`) and a dashboard/auth placeholder, rather than porting Burnly's specific product pages.
+- **Initial Pages:** A basic landing page (`/`) and a dashboard/auth placeholder, rather than porting Lamara's specific product pages.
 
 ## 3. Execution Plan
 

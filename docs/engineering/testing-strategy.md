@@ -1,8 +1,8 @@
-# Burnly Web Testing Strategy
+# Lamara Web Testing Strategy
 
 ## Purpose
 
-This document defines how Burnly Web tests behavior.
+This document defines how Lamara Web tests behavior.
 
 Tests should reduce the cost of change without coupling the codebase to
 implementation details.

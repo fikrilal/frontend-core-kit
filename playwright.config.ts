@@ -39,7 +39,7 @@ loadEnvFiles();
 
 /** Match `env.ts` default when SESSION_SECRET is unset. */
 const e2eSessionSecret =
-  process.env.SESSION_SECRET ?? "local-dev-only-burnly-session-secret-key!!";
+  process.env.SESSION_SECRET ?? "local-dev-only-lamara-session-secret-key!!";
 
 export default defineConfig({
   testDir: "./tests/e2e",

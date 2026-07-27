@@ -1,8 +1,8 @@
-# Burnly Web Technology Stack
+# Lamara Web Technology Stack
 
 ## Purpose
 
-This document records the technologies selected for Burnly Web.
+This document records the technologies selected for Lamara Web.
 
 It does not define application architecture, folder structure, route ownership,
 data flow, backend contracts, deployment topology, or product roadmap. Those
@@ -10,7 +10,7 @@ decisions belong in separate documents.
 
 ## Product Scope
 
-Burnly Web starts as the public web presence for Burnly:
+Lamara Web starts as the public web presence for Lamara:
 
 - landing page,
 - download page,
@@ -26,12 +26,12 @@ including detailed reports, account settings, sync status, and leaderboards.
 
 Next.js App Router will provide the web application framework.
 
-It was selected because Burnly Web needs strong support for public SEO-oriented
+It was selected because Lamara Web needs strong support for public SEO-oriented
 pages now and authenticated product surfaces later. App Router provides
 file-based routing, nested layouts, metadata support, server rendering, React
 Server Components, and clear deployment support on Vercel.
 
-Burnly Web should default to Server Components for route composition and static
+Lamara Web should default to Server Components for route composition and static
 or server-rendered content. Client Components should be used only when the UI
 needs browser APIs, local interaction state, event handlers, or client-side
 data refresh.
@@ -40,12 +40,12 @@ data refresh.
 
 React will be used for UI composition.
 
-It aligns with the existing Burnly desktop frontend and keeps the future web app
+It aligns with the existing Lamara desktop frontend and keeps the future web app
 surface close to the interaction model already used in the product.
 
 ### TypeScript
 
-TypeScript will be the primary language for Burnly Web.
+TypeScript will be the primary language for Lamara Web.
 
 The project should use strict TypeScript settings. Runtime boundary data must be
 validated instead of trusted only through compile-time types.
@@ -56,13 +56,13 @@ validated instead of trusted only through compile-time types.
 
 Tailwind CSS will provide styling utilities and design-token application.
 
-It is a good fit for Burnly's product UI because it supports fast iteration,
+It is a good fit for Lamara's product UI because it supports fast iteration,
 responsive layouts, and a small owned design system without adopting a large
 component framework.
 
 ### UI component sources
 
-Burnly Web owns UI in-repo via a **shadcn-compatible** local model. Primary
+Lamara Web owns UI in-repo via a **shadcn-compatible** local model. Primary
 sources (configured in `components.json`):
 
 | Source                  | Use for                                                 |
@@ -79,14 +79,14 @@ Radix UI will provide accessible, unstyled primitives where behavior is
 non-trivial, such as dialogs, popovers, dropdown menus, tooltips, tabs, and
 switches.
 
-Burnly Web should wrap Radix primitives in Burnly-owned UI components rather
+Lamara Web should wrap Radix primitives in Lamara-owned UI components rather
 than exposing Radix usage throughout feature code.
 
 ### Lucide
 
 Lucide will provide interface icons.
 
-It matches the existing Burnly desktop icon direction and is suitable for
+It matches the existing Lamara desktop icon direction and is suitable for
 product UI, marketing affordances, navigation, and download actions.
 
 ### Motion
@@ -107,11 +107,11 @@ metadata.
 
 ### OpenAPI-Generated API Client
 
-When Burnly Web integrates with a backend, API types and client helpers should
+When Lamara Web integrates with a backend, API types and client helpers should
 be generated from the backend OpenAPI contract.
 
 Handwritten fetch shapes should not become the long-term integration model.
-Generated contracts reduce drift between Burnly Web and Burnly API.
+Generated contracts reduce drift between Lamara Web and Lamara API.
 
 ## Data Fetching And State
 
@@ -147,7 +147,7 @@ component tree.
 
 Apache ECharts will provide charts for future reports and leaderboard surfaces.
 
-It aligns with Burnly desktop's selected visualization direction and supports
+It aligns with Lamara desktop's selected visualization direction and supports
 the interactive charts likely needed for token usage reports.
 
 ### TanStack Table
@@ -186,7 +186,7 @@ basic navigation, and important responsive breakpoints.
 ESLint will enforce TypeScript, React, accessibility, import, and architectural
 rules.
 
-Burnly Web should add local architecture checks where ESLint alone is not
+Lamara Web should add local architecture checks where ESLint alone is not
 enough, especially around generated contracts, server-only modules, UI-only
 components, and feature boundaries.
 
@@ -208,20 +208,20 @@ errors.
 
 pnpm will manage JavaScript and TypeScript dependencies.
 
-It aligns with the existing Burnly desktop repository and supports a future
-workspace layout if Burnly Web later needs local packages.
+It aligns with the existing Lamara desktop repository and supports a future
+workspace layout if Lamara Web later needs local packages.
 
 ## Deployment
 
 ### Vercel
 
-Vercel will be the default deployment target for Burnly Web.
+Vercel will be the default deployment target for Lamara Web.
 
 It is the lowest-friction deployment path for Next.js and supports preview
 deployments, production deployments, edge caching, and future server-rendered
 web app surfaces.
 
-The backend API should remain separately deployable. Burnly Web should not
+The backend API should remain separately deployable. Lamara Web should not
 depend on colocating backend business logic inside Next.js route handlers.
 
 ## Explicitly Not Selected
@@ -231,7 +231,7 @@ depend on colocating backend business logic inside Next.js route handlers.
 Astro is not selected as the primary framework.
 
 It is excellent for content-heavy sites and low-JavaScript marketing pages, but
-Burnly Web is expected to grow into authenticated reports, leaderboard, account,
+Lamara Web is expected to grow into authenticated reports, leaderboard, account,
 and sync surfaces. Starting with Next.js avoids introducing a second app
 framework when the product becomes more interactive.
 
@@ -239,12 +239,12 @@ framework when the product becomes more interactive.
 
 A Vite single-page React app is not selected as the primary framework.
 
-It is a strong choice for fully client-rendered applications, but Burnly Web
+It is a strong choice for fully client-rendered applications, but Lamara Web
 needs SEO, metadata, server rendering, and public landing pages from the start.
 
 ### React Router Framework Mode
 
-React Router Framework Mode is not selected for the initial Burnly Web stack.
+React Router Framework Mode is not selected for the initial Lamara Web stack.
 
 It is viable, but Next.js currently provides a more complete default for the
 combination of public website, authenticated app, metadata, deployment, and
@@ -254,21 +254,21 @@ server-rendered product surfaces.
 
 Large component frameworks such as Material UI or Ant Design are not selected.
 
-Burnly should own its product feel and interface density. Accessible primitives
-plus Burnly-owned components are a better fit than adopting a broad visual
+Lamara should own its product feel and interface density. Accessible primitives
+plus Lamara-owned components are a better fit than adopting a broad visual
 framework.
 
 ### Next.js Route Handlers As The Main Backend
 
 Next.js route handlers are not selected as the primary backend architecture.
 
-They may be used for narrow web-owned concerns when appropriate, but Burnly's
+They may be used for narrow web-owned concerns when appropriate, but Lamara's
 future sync, account, report, and leaderboard backend should live in a separate
 backend service with explicit contracts.
 
 ## Decision Status
 
-These choices are approved for the initial Burnly Web foundation.
+These choices are approved for the initial Lamara Web foundation.
 
 They may be revisited when product requirements reveal a concrete limitation.
 Changes should be based on measured needs rather than speculative future

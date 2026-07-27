@@ -1,15 +1,15 @@
-# Burnly Web API Integration
+# Lamara Web API Integration
 
 ## Purpose
 
-This document is the durable source of truth for how Burnly Web talks to Burnly
+This document is the durable source of truth for how Lamara Web talks to Lamara
 API.
 
 It covers ownership, network contracts, session/auth core, environment variables,
 and how features should call the API.
 
 It does not define login/register product UI details or usage report read APIs
-(those must exist on burnly-api first).
+(those must exist on lamara-api first).
 
 Desktop sign-in is web-mediated (browser login → deep link → desktop token
 exchange). Implementer plan: `docs/planning/desktop-auth-web-handoff.md`.
@@ -35,7 +35,7 @@ Completed execution plans:
 src/server/config/     # validated env (including API + session secrets)
 src/server/api/        # HTTP client, envelope/problem parsing, health smoke
 src/server/auth/       # session store, refresh, auth adapters
-src/contracts/         # paths + Zod schemas for Burnly API payloads
+src/contracts/         # paths + Zod schemas for Lamara API payloads
 src/features/*/server/ # feature loaders that call server auth/api (when added)
 src/app/               # thin routes only
 ```
@@ -47,7 +47,7 @@ route / feature server loader
   -> src/server/auth (session helpers, auth adapters)
   -> src/server/api (HTTP client)
   -> src/contracts (paths + schemas)
-  -> Burnly API
+  -> Lamara API
 ```
 
 Forbidden:
@@ -61,7 +61,7 @@ Forbidden:
 
 Architecture background: `docs/core/architecture.md`.
 
-## Network contract (aligned with burnly-api)
+## Network contract (aligned with lamara-api)
 
 | Topic       | Rule                                                       |
 | ----------- | ---------------------------------------------------------- |
@@ -75,10 +75,10 @@ Architecture background: `docs/core/architecture.md`.
 
 API sources:
 
-- OpenAPI: burnly-api `docs/openapi/openapi.yaml`
-- Response standard: burnly-api `docs/standards/api-response-standard.md`
-- Auth standard: burnly-api `docs/standards/authentication.md`
-- Refresh/retry: burnly-api `docs/engineering/auth/token-refresh-and-request-retry.md`
+- OpenAPI: lamara-api `docs/openapi/openapi.yaml`
+- Response standard: lamara-api `docs/standards/api-response-standard.md`
+- Auth standard: lamara-api `docs/standards/authentication.md`
+- Refresh/retry: lamara-api `docs/engineering/auth/token-refresh-and-request-retry.md`
 
 ## Phase 1 — API client
 
@@ -86,7 +86,7 @@ Location: `src/server/api/`
 
 Public surface (via `src/server/api/index.ts`):
 
-- `createBurnlyApiClient` / `getBurnlyApiClient`
+- `createLamaraApiClient` / `getLamaraApiClient`
 - `getJson` / `postJson` / `putJson` / `patchJson` / `deleteJson`
 - `parseEnvelope` / `parseProblem`
 - `getApiHealth` (raw JSON, `envelope: false`)
@@ -97,7 +97,7 @@ or failure `{ ok: false, error: ApiProblem, status, traceId }`.
 Options include `accessToken`, `idempotencyKey`, `requestId`, `envelope`
 (default `true`), and optional `parse` for Zod or other validation.
 
-Paths: `src/contracts/burnly-api/paths.ts`.
+Paths: `src/contracts/lamara-api/paths.ts`.
 
 ## Phase 2 — Session and auth core
 
@@ -109,7 +109,7 @@ Location: `src/server/auth/`
 Browser
   -> httpOnly sealed session cookie
   -> Next.js server (session helpers + API client)
-  -> Burnly API (Bearer access token)
+  -> Lamara API (Bearer access token)
 ```
 
 - Default store: sealed JWE cookie (`jose`, `dir` + `A256GCM`)
@@ -159,7 +159,7 @@ After Google OIDC establishes the web session cookie:
 
 Already signed-in users who open a valid `/login?client=desktop&…` link skip Google and run handoff immediately.
 
-Contracts: `src/contracts/burnly-api/auth.ts`, `src/contracts/burnly-api/me.ts`.
+Contracts: `src/contracts/lamara-api/auth.ts`, `src/contracts/lamara-api/me.ts`.
 
 ### Refresh rules
 
@@ -176,15 +176,15 @@ Configured in `src/server/config/env.ts` and documented in `.env.example`:
 
 | Variable                       | Purpose                                                  |
 | ------------------------------ | -------------------------------------------------------- |
-| `BURNLY_API_BASE_URL`          | Burnly API origin (default `http://127.0.0.1:4000`)      |
+| `BURNLY_API_BASE_URL`          | Lamara API origin (default `http://127.0.0.1:4000`)      |
 | `NEXT_PUBLIC_SITE_URL`         | Public site origin for metadata                          |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Google GIS web client ID (optional; enables Google UI)   |
 | `SESSION_SECRET`               | Sealed cookie key (min 32 chars; required in production) |
-| `SESSION_COOKIE_NAME`          | Optional cookie name (default `burnly_session`)          |
+| `SESSION_COOKIE_NAME`          | Optional cookie name (default `lamara_session`)          |
 | `ACCESS_TOKEN_SKEW_SECONDS`    | Refresh this many seconds before JWT exp (default 30)    |
 
 `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is public by design (browser GIS). The same ID
-must be listed in burnly-api `AUTH_OIDC_GOOGLE_CLIENT_IDS`. Never put secrets in
+must be listed in lamara-api `AUTH_OIDC_GOOGLE_CLIENT_IDS`. Never put secrets in
 `NEXT_PUBLIC_*`.
 
 ## How features should call the API
@@ -214,7 +214,7 @@ await auth.logout();
 ```
 
 For unit tests, inject `createMemorySessionStore()` and
-`createBurnlyApiClient({ fetch: mockFetch, baseUrl })`.
+`createLamaraApiClient({ fetch: mockFetch, baseUrl })`.
 
 ## Google sign-in flow (web)
 

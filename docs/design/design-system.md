@@ -1,10 +1,10 @@
-# Burnly Web Design System
+# Lamara Web Design System
 
 ## Purpose
 
-This document defines how Burnly Web should build its UI foundation.
+This document defines how Lamara Web should build its UI foundation.
 
-Burnly uses a **shadcn-compatible local component model**, with selective
+Lamara uses a **shadcn-compatible local component model**, with selective
 adoption from **chanhdai** and **beUI** registries. Components are copied into
 the repo and owned locally — not loaded as a remote UI runtime.
 
@@ -13,9 +13,9 @@ components safely while the product surface is still small.
 
 ## Local UI codebases (identical style)
 
-Burnly Web must look and feel **identical** to these checked-out repos on this
+Lamara Web must look and feel **identical** to these checked-out repos on this
 machine. Agents and humans should open them when implementing UI — do not invent
-a separate Burnly-only aesthetic.
+a separate Lamara-only aesthetic.
 
 | Role                          | Path                                        | Notes                                              |
 | ----------------------------- | ------------------------------------------- | -------------------------------------------------- |
@@ -28,7 +28,7 @@ Also pinned in `AGENTS.md` under **UI Style Reference**.
 
 Execution plan: `docs/exec-plans/completed/2026-07-22_ui-foundation-match-references.md`.
 
-| Layer                          | Aligned to                                                 | Burnly notes                                                                              |
+| Layer                          | Aligned to                                                 | Lamara notes                                                                              |
 | ------------------------------ | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | Tokens (`src/app/globals.css`) | code-alchemy oklch neutrals + soft `--line`; `.dark` class | Keep `--ember`, `--surface`, `--success`, `--warning`                                     |
 | Theme                          | code-alchemy class dark + localStorage                     | `ThemeScript`/`ThemeSync` + `ThemeToggle`; pref `light`\|`dark`\|`system` (default light) |
@@ -46,7 +46,7 @@ opening the reference repos when redesigning product pages on top of this base.
 
 ## UI Sources (do not forget)
 
-These are the canonical registry sources for Burnly Web. Prefer them (in order)
+These are the canonical registry sources for Lamara Web. Prefer them (in order)
 when you need a new primitive or interaction pattern — then match the local
 repos above for how those primitives are composed on the page.
 
@@ -82,17 +82,17 @@ pnpm dlx shadcn@latest add @beui/button-base
 
 - Always generate/copy into local source under `src/components/**` (or feature
   folders). Never depend on a live remote component package at runtime.
-- After install: review, strip unused variants, adapt tokens to Burnly
+- After install: review, strip unused variants, adapt tokens to Lamara
   (`accent`, `surface`, `border`, …), keep press/motion subtle and
   `prefers-reduced-motion` safe.
-- Do not overwrite Burnly-tuned primitives (e.g. button, separator) without
+- Do not overwrite Lamara-tuned primitives (e.g. button, separator) without
   re-applying product styles and checking marketing/auth surfaces.
 - chanhdai and beUI are **references and registries**, not product direction.
-  Product copy, layout, and brand stay Burnly-owned.
+  Product copy, layout, and brand stay Lamara-owned.
 
 ## Decision
 
-Burnly Web should use:
+Lamara Web should use:
 
 - local React components,
 - Tailwind CSS v4,
@@ -102,7 +102,7 @@ Burnly Web should use:
 - selective components from **shadcn**, **chanhdai (`@ncdai`)**, and
   **beUI (`@beui`)**.
 
-Burnly Web should not use:
+Lamara Web should not use:
 
 - a large external UI kit runtime,
 - a copied portfolio website structure,
@@ -128,9 +128,9 @@ Burnly Web should not use:
 Use both as references for interaction quality and component craft, not as a
 source of product direction.
 
-## Burnly Fit
+## Lamara Fit
 
-The following component families fit Burnly well:
+The following component families fit Lamara well:
 
 - command/code blocks for install instructions,
 - compact navigation,
@@ -155,7 +155,7 @@ Use these folders by default:
 
 ```text
 src/components/ui/
-  Generic primitives with no Burnly business language.
+  Generic primitives with no Lamara business language.
 
 src/components/layout/
   Cross-page layout components.
@@ -167,7 +167,7 @@ src/features/<feature>/
   Feature-owned content, page modules, and product-specific components.
 ```
 
-Generic primitives must not know about Burnly-specific sources, reports,
+Generic primitives must not know about Lamara-specific sources, reports,
 downloads, privacy copy, users, or pricing.
 
 ## Adoption Rules
@@ -184,7 +184,7 @@ When adopting a component from a registry or public codebase:
 8. Run local verification before treating it as accepted.
 
 Do not keep a component just because it looks polished. It must serve a current
-Burnly page or workflow.
+Lamara page or workflow.
 
 ## Initial Component Priorities
 
@@ -226,7 +226,7 @@ The registry-compatible alias is:
 src/lib/utils.ts
 ```
 
-Use `src/lib/cn.ts` directly in hand-written Burnly code. Keep `src/lib/utils.ts`
+Use `src/lib/cn.ts` directly in hand-written Lamara code. Keep `src/lib/utils.ts`
 for generated or registry-imported components that expect `@/lib/utils`.
 
 ## Quality Bar
