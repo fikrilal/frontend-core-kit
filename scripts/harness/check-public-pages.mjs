@@ -9,18 +9,8 @@ const root = process.cwd();
 const publicPages = [
   {
     route: "/",
-    file: "src/app/(marketing)/page.tsx",
+    file: "src/app/page.tsx",
     metadata: "inherited",
-  },
-  {
-    route: "/download",
-    file: "src/app/(marketing)/download/page.tsx",
-    metadata: "required",
-  },
-  {
-    route: "/leaderboard",
-    file: "src/app/leaderboard/page.tsx",
-    metadata: "required",
   },
 ];
 

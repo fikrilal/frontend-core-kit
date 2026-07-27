@@ -7,6 +7,7 @@ This document outlines the plan for building the `lamara-frontend` core kit, usi
 We will copy and adapt the following foundational elements from `lamara-web`:
 
 ### 1.1 Core Stack & Dependencies
+
 - **Framework:** Next.js 16 (App Router) + React 19.
 - **Styling:** Tailwind CSS v4, `shadcn/ui`, Radix UI primitives.
 - **Motion:** Framer Motion (`motion` package).
@@ -14,6 +15,7 @@ We will copy and adapt the following foundational elements from `lamara-web`:
 - **Testing:** Vitest (Unit) and Playwright (E2E).
 
 ### 1.2 Configuration Files
+
 - `package.json` (Scripts, dependencies, and devDependencies).
 - `tsconfig.json` (Strict TypeScript compiler options).
 - `eslint.config.mjs` & `prettier.config.mjs` (Code quality rules).
@@ -22,11 +24,13 @@ We will copy and adapt the following foundational elements from `lamara-web`:
 - `playwright.config.ts` & `vitest.config.ts`.
 
 ### 1.3 Developer Experience (DX) & CI/CD
+
 - **Harness Scripts:** The custom `scripts/harness` directory (e.g., `check-architecture.mjs`) to enforce architectural boundaries.
 - **Git Hooks:** `commitlint` and the `scripts/install-git-hooks.cjs` setup to enforce semantic commits.
 - **AGENTS.md & CLAUDE.md:** Adapting the agent instructions so AI assistants maintain the strict architecture.
 
 ### 1.4 Architectural Scaffolding
+
 - **Folder Structure:**
   - `src/app/` (Thin routing layer).
   - `src/components/ui/` (Dumb, reusable shadcn components).
@@ -40,15 +44,18 @@ We will copy and adapt the following foundational elements from `lamara-web`:
 While the foundation is ported, the product itself needs to be uniquely scaffolded for Lamara:
 
 ### 2.1 Project Meta & Branding
+
 - **README.md:** specific to the Lamara frontend.
 - **Environment Variables:** Define `.env.example` specific to Lamara's backend API and authentication needs.
 - **Public Assets:** Favicons, fonts, and global CSS (`src/app/globals.css`) specific to Lamara's design system.
 
 ### 2.2 API & Data Fetching Integration
-- We need to establish how `lamara-frontend` will talk to `lamara-backend`. 
+
+- We need to establish how `lamara-frontend` will talk to `lamara-backend`.
 - Since `lamara-backend` uses Swagger/OpenAPI, we will want to scaffold an OpenAPI client generator (e.g., `orval` or `openapi-fetch`) to auto-generate `src/contracts` directly from the backend.
 
 ### 2.3 Initial Routes & Layouts
+
 - **Root Layout:** `src/app/layout.tsx` with Lamara's font (e.g., Inter/Geist) and core providers.
 - **Initial Pages:** A basic landing page (`/`) and a dashboard/auth placeholder, rather than porting Lamara's specific product pages.
 
