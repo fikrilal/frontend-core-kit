@@ -3,10 +3,9 @@ export const siteUrl = "https://lamara.dev";
 export const siteName = "Lamara";
 
 export const siteDescription =
-  "Local AI coding-tool token tracking from your tray.";
+  "Track AI coding-tool token usage locally from a lightweight tray app.";
 
-export const siteOgAlt =
-  "Lamara, local AI coding-tool token tracking from your tray.";
+export const siteOgAlt = "Lamara — local AI coding-tool usage from your tray.";
 
 export const publicRoutes = [
   {
