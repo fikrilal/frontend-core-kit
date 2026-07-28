@@ -1,5 +1,4 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { applyThemePreference } from "@/lib/theme";
@@ -32,17 +31,18 @@ describe("ThemeToggle", () => {
   });
 
   it("toggles from dark to light on click", async () => {
-    const user = userEvent.setup();
     render(<ThemeToggle />);
 
     const button = screen.getByRole("button", {
       name: "Switch to light theme",
     });
-    await user.click(button);
+    fireEvent.click(button);
 
     expect(document.documentElement.classList.contains("dark")).toBe(false);
-    expect(
-      screen.getByRole("button", { name: "Switch to dark theme" }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Switch to dark theme" }),
+      ).toBeInTheDocument();
+    });
   });
 });

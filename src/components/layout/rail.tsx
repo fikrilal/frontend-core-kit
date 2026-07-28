@@ -28,7 +28,7 @@ interface RailProps extends HTMLAttributes<HTMLDivElement> {
 export function Rail({ children, className, ...props }: RailProps) {
   return (
     <div
-      className={cn("border-line mx-auto w-full max-w-6xl border-x", className)}
+      className={cn("border-line mx-auto w-full max-w-5xl border-x", className)}
       {...props}
     >
       {children}

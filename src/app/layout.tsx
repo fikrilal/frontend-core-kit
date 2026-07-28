@@ -10,7 +10,6 @@ import {
 } from "@/app/site-metadata";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { ThemeSync } from "@/components/theme/theme-sync";
-import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
@@ -112,7 +111,6 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <ThemeSync />
         {children}
-        <Toaster />
       </body>
     </html>
   );

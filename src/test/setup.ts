@@ -6,7 +6,7 @@ afterEach(() => {
   cleanup();
 });
 
-// Button (beUI press) uses matchMedia for hover-capable devices.
+// Theme behavior reads the system color preference through matchMedia.
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   configurable: true,

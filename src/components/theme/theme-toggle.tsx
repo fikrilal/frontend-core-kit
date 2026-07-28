@@ -1,9 +1,7 @@
 "use client";
 
-import { MoonIcon, SunIcon } from "lucide-react";
 import { useCallback, useSyncExternalStore } from "react";
 
-import { Button } from "@/components/ui/button";
 import {
   getIsDarkSnapshot,
   subscribeToThemeClass,
@@ -11,15 +9,9 @@ import {
 } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
-/**
- * Icon button: moon in dark mode, sun in light. Flips resolved theme and
- * stores an explicit light/dark preference (see `toggleTheme`).
- */
 export function ThemeToggle({ className }: { className?: string }) {
   const mounted = useSyncExternalStore(
-    () => {
-      return () => undefined;
-    },
+    () => () => undefined,
     () => true,
     () => false,
   );
@@ -40,25 +32,63 @@ export function ThemeToggle({ className }: { className?: string }) {
       : "Switch to dark theme";
 
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
-      size="icon"
       aria-label={label}
       title={mounted ? (isDark ? "Light theme" : "Dark theme") : "Theme"}
       onClick={onToggle}
       className={cn(
-        "text-muted-foreground hover:text-foreground size-8 rounded-lg",
+        "text-muted-foreground hover:text-foreground hover:bg-muted focus-visible:ring-foreground/25 inline-flex size-8 cursor-pointer items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:outline-none",
         className,
       )}
     >
-      {!mounted ? (
-        <span className="size-4" aria-hidden />
-      ) : isDark ? (
-        <MoonIcon className="size-4" aria-hidden />
+      {mounted ? (
+        isDark ? (
+          <MoonIcon />
+        ) : (
+          <SunIcon />
+        )
       ) : (
-        <SunIcon className="size-4" aria-hidden />
+        <span className="size-4" aria-hidden />
       )}
-    </Button>
+    </button>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg
+      aria-hidden
+      className="size-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="1.75"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8Z"
+      />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg
+      aria-hidden
+      className="size-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="1.75"
+    >
+      <circle cx="12" cy="12" r="3.5" />
+      <path
+        strokeLinecap="round"
+        d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"
+      />
+    </svg>
   );
 }
