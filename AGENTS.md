@@ -50,7 +50,7 @@ type(scope): message
 Examples: `feat(auth): …`, `docs(api): …`, `chore(harness): …`.
 
 Scope is required. See `docs/contributing/commit-conventions.md` and
-`commitlint.config.cjs`. Install local hooks with `npm run setup:hooks`.
+`commitlint.config.cjs`. Install local hooks with `pnpm setup:hooks`.
 
 ## Next.js Version Warning
 
@@ -122,7 +122,7 @@ Use the harness docs for non-trivial work:
 Risk expectations:
 
 - `low`: targeted checks are usually sufficient.
-- `medium`: run `npm run verify`; add `npm run verify:runtime` for browser-visible
+- `medium`: run `pnpm verify`; add `pnpm verify:runtime` for browser-visible
   behavior.
 - `high`: run full verification and runtime evidence; human review expected.
 
