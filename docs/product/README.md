@@ -1,3 +1,3 @@
-# Product Docs
+# Product Documentation
 
-- `docs/product/initial-pages.md` — first public page set, navigation, content ownership
+- [Initial public slice](initial-pages.md)

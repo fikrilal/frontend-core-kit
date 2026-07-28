@@ -8,7 +8,6 @@ Lamara Frontend is the web application for Lamara.
 - Architecture: `docs/core/architecture.md`
 - Tech stack: `docs/core/tech-stack.md`
 - Project foundation: `docs/core/project-foundation.md`
-- API integration: `docs/engineering/api-integration.md`
 - Initial pages: `docs/product/initial-pages.md`
 - Design direction: `docs/design/design-direction.md`
 - Design system (shadcn / chanhdai / beUI): `docs/design/design-system.md`
@@ -83,31 +82,31 @@ Before using unfamiliar Next.js behavior, inspect the installed docs under
 Fast local gate:
 
 ```bash
-npm run verify:fast
+pnpm verify:fast
 ```
 
 Full local gate:
 
 ```bash
-npm run verify
+pnpm verify
 ```
 
 Runtime/browser gate:
 
 ```bash
-npm run verify:runtime
+pnpm verify:runtime
 ```
 
 Targeted commands:
 
 ```bash
-npm run format:check
-npm run lint
-npm run typecheck
-npm run test
-npm run build
-npm run harness:check
-npm run test:e2e
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm harness:check
+pnpm test:e2e
 ```
 
 Never claim checks passed unless they were actually run.
