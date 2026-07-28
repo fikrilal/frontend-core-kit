@@ -31,7 +31,7 @@ const processEnvAllowed = [
   "tests/",
 ];
 
-const rawFetchAllowed = ["scripts/", "src/contracts/", "src/server/", "tests/"];
+const rawFetchAllowed = ["scripts/", "src/server/api/", "tests/"];
 
 /** Soft cap so route files stay composition-only. */
 const MAX_APP_PAGE_LINES = 50;
