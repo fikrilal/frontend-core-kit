@@ -4,8 +4,9 @@
 
 Lamara Frontend is a single Next.js application. It currently serves one
 statically rendered marketing page and metadata routes. It also owns a
-build-time snapshot of the backend OpenAPI contract. It has no HTTP transport,
-session, persistence, or authenticated runtime.
+build-time snapshot of the backend OpenAPI contract and one server-only
+password-login adapter used only by tests. It has no login route, session,
+persistence, or authenticated runtime.
 
 ```text
 browser
@@ -25,7 +26,8 @@ src/app/
   Routes, layouts, metadata, and route-level composition.
 
 src/features/
-  Product-owned pages and behavior. Current feature: marketing.
+  Product-owned pages and behavior. Current runtime feature: marketing.
+  Auth currently owns only an unexposed server adapter experiment.
 
 src/components/layout/
   Cross-page layout chrome.
@@ -40,10 +42,10 @@ src/lib/
   Small product-independent utilities.
 
 src/server/
-  Reserved for implemented server-only integrations.
+  Validated server configuration and shared HTTP protocol behavior.
 
 src/contracts/
-  Committed external contract locks and generated compile-time types.
+  Committed external contract locks and generated types/runtime schemas.
 ```
 
 Empty future folders are not required. Documentation must not claim a boundary
@@ -55,15 +57,16 @@ exists until code using it lands.
 backend-core-kit OpenAPI artifact
   -> explicit contracts:sync
   -> committed frontend snapshot + provenance
-  -> deterministic generated TypeScript
+  -> deterministic TypeScript types + Zod runtime schemas
 ```
 
 The backend owns the protocol. The frontend snapshot selects an intentional
 compatible revision and makes drift reviewable. Normal verification generates
 from that committed snapshot and never depends on the sibling backend checkout.
 
-Generated types are compile-time evidence only. Runtime response validation
-does not exist until the transport and feature-schema plans are implemented.
+Generated TypeScript types provide compile-time evidence. Generated Zod schemas
+validate untrusted network responses at runtime. Both artifacts come from the
+same committed OpenAPI snapshot and are checked for drift.
 
 ## Dependency direction
 
@@ -73,14 +76,16 @@ app routes
   -> layout / UI / lib
 ```
 
-When server integration exists:
+Current server integration:
 
 ```text
 feature server module
-  -> server adapter
+  -> typed server API client + Lamara response normalization
   -> generated contract
   -> external service
 ```
+
+No route reaches this path yet. Tests exercise it through the HTTP boundary.
 
 Rules:
 
@@ -118,6 +123,6 @@ Add structure progressively:
   benefit from those boundaries.
 
 The remaining accepted network direction lives in
-`docs/planning/api-core-network-proposal.md`. HTTP transport, sessions, and
-authenticated features are not part of the implemented runtime architecture
-yet.
+`docs/planning/api-core-network-proposal.md`. Sessions, refresh, authentication
+routes, additional HTTP methods, and user-facing authenticated features are not
+implemented.

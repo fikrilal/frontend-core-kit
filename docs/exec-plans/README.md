@@ -33,10 +33,11 @@ Implementation is split into independently reviewable plans:
 
 1. **Completed:**
    [API contract foundation](completed/2026-07-28_api-contract-foundation.md)
-2. **Active:** [Server API transport](active/2026-07-28_server-api-transport.md)
-3. **Queued:** [Server session core](queued/2026-07-28_server-session-core.md)
-4. **Queued:** [First authenticated feature](queued/2026-07-28_first-authenticated-feature.md)
+2. **Completed:**
+   [Password login API client slice](completed/2026-07-28_password-login-api-client.md)
+3. **Completed:**
+   [Generated runtime contracts and Node 24](completed/2026-07-29_generated-runtime-contracts-node24.md)
+4. **Queued:** [Server session core](queued/2026-07-28_server-session-core.md)
+5. **Queued:** [First authenticated feature](queued/2026-07-28_first-authenticated-feature.md)
 
-Complete and move each plan before promoting the next one to `active/`. Do not
-start session or authenticated-feature work while its recorded decision gates
-remain unresolved.
+Start the session plan only after its recorded decision gates are resolved.

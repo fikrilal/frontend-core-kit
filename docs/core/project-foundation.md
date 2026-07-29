@@ -35,14 +35,17 @@ commit npm or Yarn lockfiles.
 
 ## Environment
 
-There are no application environment variables today. Add `.env.example` and a
-single validated server config module when the first runtime configuration is
-implemented. Never add placeholder secrets or unused variables.
+`LAMARA_API_BASE_URL` is the only application environment variable. It is
+server-only, validated through `src/server/config/env.ts`, and documented in
+`.env.example`.
+
+It must contain an HTTP(S) origin without credentials, a path, query string, or
+fragment. Never prefix it with `NEXT_PUBLIC_`.
 
 ## API contract
 
-The backend OpenAPI snapshot and generated TypeScript types are committed under
-`src/contracts/lamara-api/`.
+The backend OpenAPI snapshot, generated TypeScript types, and generated Zod
+runtime schemas are committed under `src/contracts/lamara-api/`.
 
 ```bash
 pnpm contracts:check

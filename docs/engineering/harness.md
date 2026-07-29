@@ -24,22 +24,26 @@ because browser installation and runtime cost are machine-specific.
 
 ## Contract check
 
-`pnpm contracts:check` regenerates API types from the committed frontend
-OpenAPI snapshot in a temporary directory and fails on any byte-level drift.
-The gate has no sibling-repository or network dependency.
+`pnpm contracts:check` regenerates API types and Zod runtime schemas from the
+committed frontend OpenAPI snapshot in a temporary directory and fails on any
+byte-level drift. The gate has no sibling-repository or network dependency.
 
 ## Architecture check
 
 `scripts/harness/check-architecture.mjs` enforces current stable boundaries:
 
 - environment access is restricted to approved runtime/configuration files;
-- raw `fetch` is restricted to the server API boundary, scripts, and tests;
+- application raw `fetch` is restricted to
+  `src/server/api/client.ts`; scripts and tests retain explicit allowances;
 - generic UI and library modules cannot depend on product/server layers;
 - Client Components cannot import server-only modules;
 - features are consumed through their public API;
 - route pages remain thin compositions.
 
 Keep allowlists narrow. Add a rule only when it protects a real boundary.
+
+The password-login function uses the typed client rather than calling `fetch`
+or reading environment variables directly.
 
 ## Public-page check
 

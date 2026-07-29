@@ -2,7 +2,7 @@
 
 ## Objective
 
-Prove the contract, transport, and session boundaries through one real
+Prove the contract, API client, and session boundaries through one real
 authenticated product workflow: sign in, load `/v1/me`, perform one explicitly
 idempotent profile mutation, and sign out.
 
@@ -27,7 +27,7 @@ not begin until the product flow and visual references are selected.
 ## Dependencies
 
 - API contract foundation is completed.
-- Server API transport is completed.
+- Typed server API client is completed.
 - Server session core is completed with production-like evidence.
 - The selected backend auth and `/v1/me` contracts match the committed frontend
   snapshot.
@@ -39,9 +39,9 @@ not begin until the product flow and visual references are selected.
 - [ ] Successful sign-in rotates the opaque web session ID and stores API
       credentials only in the server session store.
 - [ ] A feature-owned server adapter loads `/v1/me` using generated endpoint
-      types and a feature-owned runtime schema.
+      types and its generated runtime schema.
 - [ ] Feature loaders translate `ApiResult` into explicit product states without
-      leaking transport details into UI components.
+      leaking HTTP-client details into UI components.
 - [ ] One real mutation generates its idempotency key at the logical Server
       Action boundary and reuses it for any permitted retry.
 - [ ] Authenticated data uses `no-store`.
@@ -70,7 +70,7 @@ security boundaries.
 - `src/features/auth/`
 - `src/features/account/` or the approved owning feature
 - `src/server/session/`
-- feature-owned runtime schemas and server adapters
+- generated runtime schemas and feature-owned server adapters
 - layout/navigation only where the approved routes require it
 - browser tests and runtime evidence
 - product, architecture, API, security, and testing documentation
@@ -97,8 +97,8 @@ security boundaries.
 
 ### First protected read and write
 
-- [ ] Add a feature-owned `getMe` adapter using generated contract types and a
-      Zod schema for only the consumed fields.
+- [ ] Add a feature-owned `getMe` adapter using generated contract types and
+      the generated `/v1/me` response schema.
 - [ ] Add a loader that owns redirect/error/product-state policy.
 - [ ] Render the minimum approved account information as a Server Component.
 - [ ] Add one approved `PATCH /v1/me` operation.
@@ -109,8 +109,8 @@ security boundaries.
 
 ### Tests and evidence
 
-- [ ] Unit-test feature schemas, result mapping, redirect allowlist, and
-      idempotency-key ownership.
+- [ ] Unit-test generated-schema integration, result mapping, redirect
+      allowlist, and idempotency-key ownership.
 - [ ] Integration-test login/session establishment, `/v1/me`, refresh-and-retry,
       mutation retry, logout, and backend failure mapping.
 - [ ] Browser-test the real routes and remove assertions for anything still
@@ -123,9 +123,10 @@ security boundaries.
 
 ## Decisions
 
-- Endpoint adapters remain feature-owned; the shared transport cannot become an
+- Endpoint adapters remain feature-owned; the shared API client cannot become an
   auth/account god-module.
-- Runtime schemas validate only fields the feature consumes.
+- Runtime validation uses the generated endpoint schema; feature code selects
+  the fields it consumes after validation.
 - Server Components own the initial authenticated read unless the approved UX
   proves a client-side refresh requirement.
 - No global client state or query library is introduced by default.

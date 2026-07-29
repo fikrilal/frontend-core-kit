@@ -1,9 +1,10 @@
 # Lamara Web API Core Proposal
 
-**Status:** Accepted for staged implementation; no runtime implementation yet
-**Scope:** OpenAPI contracts, server-side HTTP transport, session ownership,
+**Status:** Accepted; contract, runtime-schema, and API-client foundations
+complete
+**Scope:** OpenAPI contracts, server-side HTTP client, session ownership,
 authentication refresh, and feature API adapters  
-**Risk:** High for session/auth; medium for contract and transport work
+**Risk:** High for session/auth; medium for contract and API client work
 
 ## Recommendation
 
@@ -12,8 +13,10 @@ kit yet.
 
 The first implementation should have four boundaries:
 
-1. a committed OpenAPI snapshot and reproducible generated TypeScript types;
-2. a small server-only HTTP transport that owns protocol behavior;
+1. a committed OpenAPI snapshot with reproducible TypeScript types and Zod
+   runtime schemas;
+2. a small server-only typed client and response boundary that own protocol
+   behavior;
 3. a server-side session service that owns credentials and refresh
    coordination;
 4. thin, feature-owned API adapters that make endpoint calls easy to read and
@@ -105,7 +108,7 @@ web-native ownership:
 ```text
 feature server adapter
   -> authenticated API facade
-  -> typed transport
+  -> typed API client
   -> backend
 ```
 
@@ -144,17 +147,18 @@ rules require a different implementation.
 ```text
 src/contracts/lamara-api/
   openapi.yaml           # committed frontend contract lock
-  generated.ts           # generated; never hand-edited
-  runtime/               # handwritten Zod schemas for consumed payloads
-  index.ts
+  generated.ts           # generated TypeScript; never hand-edited
+  runtime.generated.ts   # generated Zod; never hand-edited
+  index.ts               # type-only exports
+  runtime.ts             # runtime-schema exports
 
 src/server/config/
   env.ts                 # validated server environment
 
 src/server/api/
-  transport.ts           # fetch execution and protocol normalization
+  client.ts              # configured openapi-fetch client
+  response.ts            # Lamara envelope/failure normalization
   result.ts              # ApiResult and failure taxonomy
-  envelope.ts            # success envelope parsing
   problem.ts             # RFC 7807 extension parsing
   index.ts               # narrow public API
 
@@ -179,8 +183,8 @@ folders until a feature has enough policy to justify them.
 app route / Server Action
   -> feature public API
   -> feature server adapter
-  -> server session + server API transport
-  -> generated contract + runtime schema
+  -> server session + typed server API client
+  -> generated contract types + runtime schema
   -> Lamara API
 ```
 
@@ -202,33 +206,37 @@ pnpm contracts:generate
 pnpm contracts:check
 ```
 
-`contracts:generate` generates TypeScript types from the committed snapshot.
-`contracts:check` regenerates to a temporary location and fails on drift.
-`verify:fast` should include `contracts:check` once the pipeline exists.
+`contracts:generate` generates TypeScript types and Zod 4 schemas from the
+committed snapshot. `contracts:check` regenerates both artifacts to a temporary
+location and fails on drift. `verify:fast` includes `contracts:check`.
 
 Updating the frontend contract is an explicit operation:
 
 1. copy or sync the backend's committed `docs/openapi/openapi.yaml`;
 2. regenerate;
-3. review the OpenAPI and generated-type diff;
-4. update affected runtime schemas/adapters and tests.
+3. review the OpenAPI, generated-type, and generated-schema diff;
+4. update affected adapters and tests.
 
 CI must not depend on the sibling backend checkout or a live backend URL.
 
 Use `openapi-typescript` for runtime-free path, parameter, body, and response
-types. Do not handwrite endpoint path constants or duplicate request DTO types.
+types. Use `openapi-fetch` so literal methods, paths, parameters, and bodies are
+checked together. Do not accept untyped dynamic paths or duplicate request DTO
+types.
 
 ### Runtime validation
 
-Generated TypeScript types do not validate network input at runtime. Each
-consumed endpoint must also parse its successful `data` with a Zod schema.
+Generated TypeScript types do not validate network input at runtime. Orval
+therefore generates Zod 4 schemas from the same committed OpenAPI snapshot.
+Each consumed endpoint parses successful `data` with the corresponding
+generated schema.
 
-Keep runtime schemas scoped to consumed data rather than generating and
-shipping a second runtime representation of the backend's entire API on day
-one. Constrain handwritten schemas against the corresponding generated type so
-contract changes produce a compile-time failure as well as runtime protection.
+Generated validators follow OpenAPI exactly. Missing formats or constraints
+must be fixed in the backend contract and resynced; frontend code must not patch
+generated schemas. Runtime schemas have an explicit import boundary so callers
+do not accidentally treat the type-only contract entry point as runtime code.
 
-The shared transport validates only protocol-wide shapes:
+The shared response boundary validates only protocol-wide shapes:
 
 - success envelope;
 - optional metadata;
@@ -237,10 +245,11 @@ The shared transport validates only protocol-wide shapes:
 
 Feature schemas validate feature payloads.
 
-## HTTP Transport
+## HTTP Client And Response Boundary
 
-The transport is a small wrapper around the native server-side `fetch`. It is
-not a business API and must not contain endpoint-specific rules.
+The server client is a configured `openapi-fetch` client backed by native
+server-side `fetch`. Lamara-specific response normalization remains separate.
+Neither module is a business API or contains endpoint-specific rules.
 
 ### Request responsibilities
 
@@ -321,7 +330,7 @@ A feature adapter should state only the operation-specific facts:
 - generated path/method;
 - path/query/body input;
 - whether auth is required;
-- runtime schema;
+- generated runtime schema;
 - cache policy;
 - idempotency policy for a write.
 
@@ -330,7 +339,7 @@ Conceptually:
 ```ts
 export async function getMe(context: AuthenticatedApiContext) {
   return context.get("/v1/me", {
-    schema: meSchema,
+    schema: MeDto,
     cache: "no-store",
   });
 }
@@ -342,7 +351,7 @@ endpoint before generalizing. Do not build separate `getOne`, `getList`,
 call sites show they remove real duplication. The backend envelope already
 allows one parser to handle object and list `data`.
 
-Feature loaders translate `ApiResult` into feature behavior. Shared transport
+Feature loaders translate `ApiResult` into feature behavior. Shared API code
 must not decide user-facing copy, redirects, toast messages, or feature failure
 types.
 
@@ -437,7 +446,7 @@ response.
 - Never refresh on `403`.
 - Retry a write after `401` only when the endpoint supports idempotency and the
   same logical operation retains the same idempotency key.
-- Do not automatically retry timeout/network failures in the transport.
+- Do not automatically retry timeout/network failures in the API client.
 - `IDEMPOTENCY_IN_PROGRESS` handling belongs to the feature operation because
   polling/backoff is product behavior.
 
@@ -471,7 +480,7 @@ logical mutation.
 - Generated files are marked as generated and excluded from manual formatting
   rules only when necessary.
 
-### Transport
+### API client and response boundary
 
 Test:
 
@@ -508,13 +517,12 @@ Test:
 Extend the existing harness to enforce:
 
 - no Client Component imports from `src/server/**`;
-- no raw `fetch` outside the transport, scripts, and tests;
+- no raw `fetch` outside the API client, scripts, and tests;
 - no direct `process.env` outside config;
 - generated contracts are not manually edited;
 - feature endpoint adapters remain under feature-owned server modules.
 
-The current raw-fetch allowlist is broader than the intended end state and
-should be narrowed when the transport lands.
+The raw-fetch allowlist must remain narrowed to the API client implementation.
 
 ## Delivery Sequence
 
@@ -525,12 +533,13 @@ should be narrowed when the transport lands.
 - Add current-state API integration documentation only as working behavior
   lands.
 
-### Phase 1: Contract and unauthenticated transport
+### Phase 1: Contract and unauthenticated API client
 
 - Add the committed OpenAPI contract lock and generation/check commands.
-- Implement result, envelope, problem, timeout, and transport behavior.
-- Prove the boundary with a health request and one normal enveloped endpoint
-  using injected-fetch tests.
+- Implement the typed client, result, envelope, problem, timeout, and transport
+  failure behavior.
+- Prove the boundary with password login using HTTP-boundary tests without
+  exposing a product route or creating a live backend session.
 
 ### Phase 2: Production session core
 
@@ -550,7 +559,7 @@ should be narrowed when the transport lands.
 
 After Lamara and one second web product use the same boundary, compare them.
 Extract only code that is genuinely product-independent. Keep product
-contracts, feature schemas, endpoint adapters, copy, and UI in each product.
+contracts, generated schemas, endpoint adapters, copy, and UI in each product.
 
 Detailed file-by-file tasks and command evidence belong in an execution plan
 after this proposal is accepted.

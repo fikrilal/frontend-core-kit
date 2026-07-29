@@ -29,7 +29,7 @@ Do not move this plan to `active/` until all gates are recorded:
 ## Dependencies
 
 - API contract foundation is completed.
-- Server API transport is completed.
+- Typed server API client is completed.
 - Backend refresh semantics still match the accepted proposal: refresh tokens
   rotate, reuse may revoke the session, and unknown outcomes require
   re-authentication.

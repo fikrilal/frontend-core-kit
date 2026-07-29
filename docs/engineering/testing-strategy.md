@@ -14,14 +14,24 @@ Unit and component tests cover theme preference and the theme control. Node
 tests cover contract-source argument validation, snapshot validation, hashing,
 and exact generated-output drift detection.
 
+HTTP-boundary server tests cover:
+
+- validated API-origin configuration;
+- typed password-login request construction;
+- success-envelope and generated-schema validation;
+- problem details and request-ID correlation;
+- invalid/malformed responses without secret leakage;
+- network, timeout, and caller-cancellation failures;
+- invalid internal request bodies.
+
 Playwright covers:
 
 - landing-page content and active anchor navigation;
 - manifest, robots, sitemap, icon, and social-image endpoints;
 - confirmation that deferred product routes remain unimplemented.
 
-There are no HTTP transport, auth, session, download, or report tests because
-those runtime features do not exist.
+There are no login route, browser authentication, session, download, or report
+tests because those runtime features do not exist.
 
 ## Commands
 
@@ -49,7 +59,8 @@ Add tests alongside an implemented boundary:
 - utilities: Vitest;
 - interactive components: Testing Library;
 - route and browser behavior: Playwright;
-- server integrations: injected unit tests plus focused integration evidence.
+- server integrations: injected HTTP-boundary tests plus focused integration
+  evidence.
 
 High-risk auth/session work requires failure-path, concurrency, and runtime
 coverage when it begins.
