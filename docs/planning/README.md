@@ -2,9 +2,10 @@
 
 Planning documents are proposals, not current behavior.
 
-Active draft:
+Accepted proposal:
 
 - [API core proposal](api-core-network-proposal.md)
 
-When a proposal is accepted, create an execution plan before implementation.
-Promote only shipped, durable decisions into current-state documentation.
+Its staged execution plans are indexed under
+[`docs/exec-plans/README.md`](../exec-plans/README.md). Promote only shipped,
+durable behavior into current-state documentation.

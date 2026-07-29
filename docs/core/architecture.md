@@ -3,7 +3,8 @@
 ## Current system
 
 Lamara Frontend is a single Next.js application. It currently serves one
-statically rendered marketing page and metadata routes. It has no backend,
+statically rendered marketing page and metadata routes. It also owns a
+build-time snapshot of the backend OpenAPI contract. It has no HTTP transport,
 session, persistence, or authenticated runtime.
 
 ```text
@@ -42,11 +43,27 @@ src/server/
   Reserved for implemented server-only integrations.
 
 src/contracts/
-  Reserved for implemented external contracts and generated artifacts.
+  Committed external contract locks and generated compile-time types.
 ```
 
 Empty future folders are not required. Documentation must not claim a boundary
 exists until code using it lands.
+
+## Contract boundary
+
+```text
+backend-core-kit OpenAPI artifact
+  -> explicit contracts:sync
+  -> committed frontend snapshot + provenance
+  -> deterministic generated TypeScript
+```
+
+The backend owns the protocol. The frontend snapshot selects an intentional
+compatible revision and makes drift reviewable. Normal verification generates
+from that committed snapshot and never depends on the sibling backend checkout.
+
+Generated types are compile-time evidence only. Runtime response validation
+does not exist until the transport and feature-schema plans are implemented.
 
 ## Dependency direction
 
@@ -100,6 +117,7 @@ Add structure progressively:
 - domain/application/data layers are reserved for behavior complex enough to
   benefit from those boundaries.
 
-The draft network architecture lives in
-`docs/planning/api-core-network-proposal.md`. It is not implemented or
-normative.
+The remaining accepted network direction lives in
+`docs/planning/api-core-network-proposal.md`. HTTP transport, sessions, and
+authenticated features are not part of the implemented runtime architecture
+yet.

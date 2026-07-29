@@ -8,6 +8,7 @@ Lamara Frontend is the web application for Lamara.
 - Architecture: `docs/core/architecture.md`
 - Tech stack: `docs/core/tech-stack.md`
 - Project foundation: `docs/core/project-foundation.md`
+- API integration: `docs/engineering/api-integration.md`
 - Initial pages: `docs/product/initial-pages.md`
 - Design direction: `docs/design/design-direction.md`
 - Design system (shadcn / chanhdai / beUI): `docs/design/design-system.md`
@@ -105,6 +106,7 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm contracts:check
 pnpm harness:check
 pnpm test:e2e
 ```

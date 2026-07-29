@@ -10,6 +10,7 @@ Implemented:
 - one public landing page at `/`;
 - light and dark theme support;
 - web manifest, robots, sitemap, icon, and social images;
+- a committed backend OpenAPI snapshot with generated TypeScript types;
 - format, lint, type, unit, architecture, build, and browser gates.
 
 Not implemented:
@@ -17,7 +18,7 @@ Not implemented:
 - downloads or release integration;
 - authentication or sessions;
 - dashboard, reports, accounts, or sync;
-- Lamara API integration.
+- Lamara API transport or runtime requests.
 
 Planned work must not be described as shipped. See
 [`docs/README.md`](docs/README.md) for the current sources of truth.
@@ -47,6 +48,19 @@ pnpm dev
 ```
 
 Open <http://127.0.0.1:3000>.
+
+## API contract
+
+The committed OpenAPI snapshot and generated TypeScript types are checked by
+the normal verification gate:
+
+```bash
+pnpm contracts:check
+```
+
+See
+[`docs/engineering/api-integration.md`](docs/engineering/api-integration.md)
+before updating the snapshot.
 
 ## Verification
 

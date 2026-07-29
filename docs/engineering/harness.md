@@ -12,6 +12,7 @@ pnpm verify:runtime
 
 ```text
 format:check
+contracts:check
 lint
 typecheck
 test
@@ -20,6 +21,12 @@ harness:check
 
 `verify` adds the production build. `verify:runtime` runs Playwright separately
 because browser installation and runtime cost are machine-specific.
+
+## Contract check
+
+`pnpm contracts:check` regenerates API types from the committed frontend
+OpenAPI snapshot in a temporary directory and fails on any byte-level drift.
+The gate has no sibling-repository or network dependency.
 
 ## Architecture check
 

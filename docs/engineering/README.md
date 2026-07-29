@@ -2,5 +2,7 @@
 
 - [Harness](harness.md)
 - [Testing strategy](testing-strategy.md)
+- [API integration](api-integration.md)
 
-API/network design remains a draft under `docs/planning/`.
+The contract boundary is implemented. HTTP transport, sessions, and
+authenticated features remain staged under `docs/exec-plans/`.

@@ -39,6 +39,20 @@ There are no application environment variables today. Add `.env.example` and a
 single validated server config module when the first runtime configuration is
 implemented. Never add placeholder secrets or unused variables.
 
+## API contract
+
+The backend OpenAPI snapshot and generated TypeScript types are committed under
+`src/contracts/lamara-api/`.
+
+```bash
+pnpm contracts:check
+pnpm contracts:sync -- --source /absolute/path/to/openapi.yaml
+pnpm contracts:generate
+```
+
+Normal verification needs only the committed snapshot. Contract sync is an
+explicit maintainer action and requires a clean, tracked source artifact.
+
 ## Verification
 
 ```bash
@@ -47,7 +61,7 @@ pnpm verify
 pnpm verify:runtime
 ```
 
-- `verify:fast`: formatting, lint, types, unit tests, harness.
+- `verify:fast`: formatting, contract drift, lint, types, unit tests, harness.
 - `verify`: fast checks plus production build.
 - `verify:runtime`: Playwright browser coverage.
 

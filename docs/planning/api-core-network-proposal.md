@@ -1,6 +1,6 @@
 # Lamara Web API Core Proposal
 
-**Status:** Draft for review  
+**Status:** Accepted for staged implementation; no runtime implementation yet
 **Scope:** OpenAPI contracts, server-side HTTP transport, session ownership,
 authentication refresh, and feature API adapters  
 **Risk:** High for session/auth; medium for contract and transport work
@@ -520,8 +520,8 @@ should be narrowed when the transport lands.
 
 ### Phase 0: Promote accepted decisions
 
-- Keep this proposal non-normative until it is accepted.
-- Create an execution plan for implementation.
+- Record acceptance before implementation begins.
+- Create staged execution plans for implementation.
 - Add current-state API integration documentation only as working behavior
   lands.
 

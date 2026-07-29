@@ -24,3 +24,19 @@ docs/exec-plans/completed/
 
 Tiny docs edits and small one-file mechanical changes do not need execution
 plans.
+
+## API Core Network Sequence
+
+The accepted direction is documented in
+[`docs/planning/api-core-network-proposal.md`](../planning/api-core-network-proposal.md).
+Implementation is split into independently reviewable plans:
+
+1. **Completed:**
+   [API contract foundation](completed/2026-07-28_api-contract-foundation.md)
+2. **Active:** [Server API transport](active/2026-07-28_server-api-transport.md)
+3. **Queued:** [Server session core](queued/2026-07-28_server-session-core.md)
+4. **Queued:** [First authenticated feature](queued/2026-07-28_first-authenticated-feature.md)
+
+Complete and move each plan before promoting the next one to `active/`. Do not
+start session or authenticated-feature work while its recorded decision gates
+remain unresolved.

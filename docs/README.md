@@ -13,6 +13,7 @@ separate under `docs/planning/`.
 - [Design system](design/design-system.md)
 - [Testing strategy](engineering/testing-strategy.md)
 - [Engineering harness](engineering/harness.md)
+- [API integration](engineering/api-integration.md)
 - [Commit conventions](contributing/commit-conventions.md)
 
 ## Planning and execution

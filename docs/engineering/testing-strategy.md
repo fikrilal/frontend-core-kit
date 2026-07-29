@@ -10,7 +10,9 @@
 
 ## Current coverage
 
-Unit and component tests cover theme preference and the theme control.
+Unit and component tests cover theme preference and the theme control. Node
+tests cover contract-source argument validation, snapshot validation, hashing,
+and exact generated-output drift detection.
 
 Playwright covers:
 
@@ -18,13 +20,15 @@ Playwright covers:
 - manifest, robots, sitemap, icon, and social-image endpoints;
 - confirmation that deferred product routes remain unimplemented.
 
-There are no auth, session, API, download, or report tests because those
-features do not exist.
+There are no HTTP transport, auth, session, download, or report tests because
+those runtime features do not exist.
 
 ## Commands
 
 ```bash
 pnpm test
+pnpm test:contracts
+pnpm contracts:check
 pnpm test:e2e
 pnpm verify:runtime
 ```

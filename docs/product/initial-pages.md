@@ -48,3 +48,7 @@ not shown until release artifacts and installation guidance are implemented.
 The next public route should be `/download`, but only after release-source
 ownership, supported platforms, artifact selection, and preview/signing caveats
 are defined. Authentication is not part of the immediate public foundation.
+
+The current engineering sequence may establish the API contract and
+unauthenticated server transport before another product route is added. That
+foundation must not introduce speculative public or authenticated routes.
