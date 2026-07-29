@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.join(rootDir, "src"),
+      "server-only": path.join(rootDir, "src/test/server-only-mock.ts"),
     },
   },
   test: {
