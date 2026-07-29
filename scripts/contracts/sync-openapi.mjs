@@ -27,7 +27,9 @@ try {
   console.log(
     `Synced ${provenance.sourcePath} from ${provenance.sourceCommit.slice(0, 12)} (${provenance.sha256}).`,
   );
-  console.log("Run pnpm contracts:generate to update generated types.");
+  console.log(
+    "Run pnpm contracts:generate to update generated types and runtime schemas.",
+  );
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;

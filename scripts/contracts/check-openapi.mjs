@@ -7,8 +7,10 @@ import process from "node:process";
 
 import {
   generateContractSource,
+  generateRuntimeContractSource,
   generatedPath,
   hasContractDrift,
+  runtimeGeneratedPath,
 } from "./contract-tools.mjs";
 
 let temporaryDirectory;
@@ -17,21 +19,38 @@ try {
   temporaryDirectory = await fs.mkdtemp(
     path.join(os.tmpdir(), "lamara-contract-check-"),
   );
-  const temporaryGeneratedPath = path.join(temporaryDirectory, "generated.ts");
-  await fs.writeFile(temporaryGeneratedPath, await generateContractSource());
-
-  const [committed, generated] = await Promise.all([
-    fs.readFile(generatedPath),
-    fs.readFile(temporaryGeneratedPath),
+  const temporaryTypePath = path.join(temporaryDirectory, "generated.ts");
+  const temporaryRuntimePath = path.join(
+    temporaryDirectory,
+    "runtime.generated.ts",
+  );
+  const [typeSource, runtimeSource] = await Promise.all([
+    generateContractSource(),
+    generateRuntimeContractSource(),
+  ]);
+  await Promise.all([
+    fs.writeFile(temporaryTypePath, typeSource),
+    fs.writeFile(temporaryRuntimePath, runtimeSource),
   ]);
 
-  if (hasContractDrift(committed, generated)) {
+  const [committedTypes, generatedTypes, committedRuntime, generatedRuntime] =
+    await Promise.all([
+      fs.readFile(generatedPath),
+      fs.readFile(temporaryTypePath),
+      fs.readFile(runtimeGeneratedPath),
+      fs.readFile(temporaryRuntimePath),
+    ]);
+
+  if (
+    hasContractDrift(committedTypes, generatedTypes) ||
+    hasContractDrift(committedRuntime, generatedRuntime)
+  ) {
     throw new Error(
-      "Generated API contract is out of date. Run: pnpm contracts:generate",
+      "Generated API contracts are out of date. Run: pnpm contracts:generate",
     );
   }
 
-  console.log("Generated API contract is current.");
+  console.log("Generated API TypeScript types and Zod schemas are current.");
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;

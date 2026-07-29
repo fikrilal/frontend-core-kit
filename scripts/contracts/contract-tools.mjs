@@ -1,10 +1,12 @@
 import { execFileSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import openapiTS, { astToString } from "openapi-typescript";
+import { generate } from "orval";
 import { format, resolveConfig } from "prettier";
 
 const scriptsDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -16,6 +18,10 @@ export const contractDirectory = path.join(
 );
 export const snapshotPath = path.join(contractDirectory, "openapi.yaml");
 export const generatedPath = path.join(contractDirectory, "generated.ts");
+export const runtimeGeneratedPath = path.join(
+  contractDirectory,
+  "runtime.generated.ts",
+);
 export const provenancePath = path.join(contractDirectory, "provenance.json");
 
 const generatedHeader = `/**
@@ -137,6 +143,59 @@ export async function generateContractSource(inputPath = snapshotPath) {
     ...prettierConfig,
     filepath: generatedPath,
   });
+}
+
+export async function generateRuntimeContractSource(inputPath = snapshotPath) {
+  const temporaryDirectory = await fs.mkdtemp(
+    path.join(os.tmpdir(), "lamara-runtime-contract-"),
+  );
+  const temporaryOutputPath = path.join(
+    temporaryDirectory,
+    "runtime.generated.ts",
+  );
+
+  try {
+    await generate(
+      {
+        input: {
+          target: inputPath,
+        },
+        output: {
+          client: "zod",
+          mode: "single",
+          target: temporaryOutputPath,
+          override: {
+            zod: {
+              generate: {
+                body: false,
+                header: false,
+                param: false,
+                query: false,
+                response: true,
+              },
+              generateReusableSchemas: true,
+              variant: "classic",
+              version: 4,
+            },
+          },
+        },
+      },
+      repositoryRoot,
+      {
+        failOnWarnings: true,
+      },
+    );
+
+    const source = await fs.readFile(temporaryOutputPath, "utf8");
+    const prettierConfig = (await resolveConfig(runtimeGeneratedPath)) ?? {};
+
+    return format(source, {
+      ...prettierConfig,
+      filepath: runtimeGeneratedPath,
+    });
+  } finally {
+    await fs.rm(temporaryDirectory, { recursive: true, force: true });
+  }
 }
 
 export async function writeFileAtomic(targetPath, contents) {
