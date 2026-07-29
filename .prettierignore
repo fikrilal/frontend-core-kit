@@ -1,0 +1,2 @@
+# Exact backend compatibility lock; do not rewrite its bytes.
+src/contracts/lamara-api/openapi.yaml

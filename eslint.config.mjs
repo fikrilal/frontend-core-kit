@@ -96,6 +96,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generator-owned and verified byte-for-byte by contracts:check.
+    "src/contracts/lamara-api/generated.ts",
     // Plain Node CJS tooling (require-based).
     "scripts/**/*.cjs",
     "commitlint.config.cjs",

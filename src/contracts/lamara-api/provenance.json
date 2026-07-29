@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "git@github.com:fikrilal/backend-core-kit.git",
+  "sourceCommit": "88f6c2f9a2f1307778759ed0869561165593194a",
+  "sourcePath": "docs/openapi/openapi.yaml",
+  "sha256": "851c912c46d35255e06c28ca0e7cccee003e8f40ce0c974ca7d7f075b6b93e08"
+}
