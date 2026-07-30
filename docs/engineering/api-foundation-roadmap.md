@@ -1,276 +1,109 @@
 # API Foundation Coverage And Roadmap
 
-**Status:** Accepted direction; partially implemented
-**Scope:** Gaps between the current unauthenticated JSON API foundation and the
-initial authenticated product slice.
+**Status:** Authenticated read foundation implemented; later capabilities are
+demand-driven.
 
-This document records what `src/server/api/**` supports now and how missing
-capabilities should be introduced. It does not authorize speculative
-implementation. Add each capability when an active product endpoint needs it,
-and track that work in an execution plan when the change is non-trivial.
+This document distinguishes the current boundary from intentionally deferred
+work. It does not authorize speculative implementation.
 
-## Current Boundary
-
-The implemented path is:
+## Implemented
 
 ```text
-feature-owned server endpoint
+feature server adapter
   -> typed openapi-fetch client
   -> Lamara API
   -> shared response normalization
-  -> generated Zod data validation
-  -> ApiResult<T>
+  -> generated Zod envelope validation
+  -> ApiResult<TData, TMeta>
 ```
 
-It is currently proven only by
-`POST /v1/auth/password/login`. No route, session, cookie, authenticated
-request, refresh workflow, or mutation retry invokes this boundary.
+| Capability          | Current implementation                                                     |
+| ------------------- | -------------------------------------------------------------------------- |
+| Configuration       | Validated server-only API origin and session TTL                           |
+| Request typing      | Generated OpenAPI paths, bodies, response types, and runtime schemas       |
+| Request correlation | Generated/forwarded `X-Request-Id`; response ID preferred                  |
+| Endpoint policy     | Auth adapters explicitly use `no-store` and a 10-second timeout            |
+| JSON success        | Complete generated envelope and JSON-compatible content-type validation    |
+| Empty success       | Dedicated `204` reader used by logout                                      |
+| Failures            | Safe problem, invalid-response, network, timeout, and cancellation results |
+| Secret handling     | Normal results exclude raw bodies, request bodies, credentials, and issues |
+| Sessions            | Opaque cookie; versioned in-memory record with bounded absolute TTL        |
+| Authentication      | Bearer attachment, one eligible `401` refresh/retry, no refresh on `403`   |
+| Concurrency         | In-process lock and compare-and-set replacement of rotated tokens          |
 
-### Implemented
+This is proven by password login, refresh, logout, `/v1/me`, session unit tests,
+and browser runtime coverage.
 
-| Capability          | Current implementation                                                        |
-| ------------------- | ----------------------------------------------------------------------------- |
-| API origin          | Server-only and validated as an HTTP(S) origin                                |
-| Request typing      | Generated OpenAPI paths, bodies, and response types                           |
-| HTTP transport      | Server-only `openapi-fetch` client backed by native `fetch`                   |
-| JSON requests       | Default `Accept`; JSON serialization and `Content-Type` when a body exists    |
-| Request correlation | Generated or forwarded `X-Request-Id`; response ID preferred                  |
-| Endpoint policy     | Password login explicitly selects `no-store` and a 10-second timeout          |
-| Success handling    | `{ data }` envelopes for ordinary JSON responses                              |
-| Runtime validation  | Generated Zod schema validates successful `data`                              |
-| Error handling      | Problem, invalid-response, network, timeout, and cancellation results         |
-| Secret handling     | Normal failures exclude request bodies, raw bodies, tokens, and schema issues |
-| Programmer errors   | Invalid configuration and internal serialization failures may throw           |
+## Deferred capabilities
 
-This is sufficient for the current password-login integration experiment. It
-is not the complete authenticated API foundation.
+### Raw or file responses
 
-## Missing Capabilities And Expected Design
-
-### Complete envelope validation
-
-**Current gap:** `readApiResult` validates `data`, but it accepts `meta` as
-unvalidated `unknown`. It also checks the envelope structure independently of
-the generated OpenAPI response schema.
-
-**Expected implementation:**
-
-- Pass the generated complete response schema, such as an Orval operation
-  response alias, from the feature endpoint to the response reader.
-- Validate `{ data, meta? }` as one external boundary.
-- Return validated `data` and typed metadata through an `ApiResult` generic.
-- Keep endpoint functions responsible for selecting the generated schema; do
-  not create handwritten copies.
-- Treat an invalid envelope, invalid metadata, or invalid data as
-  `invalid-response` without returning the raw payload or Zod issues.
-
-Conceptually:
-
-```ts
-return readJsonApiResult(request, AuthPasswordLoginResponse);
-```
-
-The exact generic signature should be selected when a paginated endpoint proves
-both data and metadata requirements.
-
-### Empty success responses
-
-**Current gap:** A successful `204 No Content` is treated as an invalid
-`{ data }` envelope.
-
-**Expected implementation:**
-
-- Add a separate empty-response reader when the first documented `204`
-  endpoint is consumed.
-- Return a successful `ApiResult<void>` without attempting JSON parsing.
-- Reject an unexpected body when the contract requires an empty response.
-- Preserve status and request correlation.
-- Do not weaken the normal JSON reader to accept missing data.
-
-An explicit `readEmptyApiResult` is preferable to a large response function
-with loosely related flags.
-
-### Raw and file responses
-
-**Current gap:** The foundation has no path for downloads, images, streams, or
-other responses that do not use the Lamara JSON envelope.
-
-**Expected implementation:**
-
-- Add a separate raw-response adapter only when a real endpoint requires one.
-- Make the expected media type and parser explicit at the feature call site.
-- Preserve timeout, cancellation, request ID, and HTTP failure normalization.
-- Never include an error response body in the normal result.
-- Avoid buffering large files when streaming is supported by the consuming
-  route.
-
-Health endpoints are not a frontend requirement and must not be used merely to
-justify a raw mode.
-
-### Content-type validation
-
-**Current gap:** Successful bodies are parsed from text as JSON without first
-requiring a JSON-compatible response media type.
-
-**Expected implementation:**
-
-- Normal JSON endpoints should accept `application/json` and structured
-  `application/*+json` media types.
-- A non-empty success response with an unexpected media type should become
-  `invalid-response`.
-- Empty and raw responses should use their dedicated readers.
-- Proxy-generated HTML, plain text, malformed JSON, and empty error bodies must
-  continue to fail safely without exposing their contents.
+Add a separate raw adapter only when a real endpoint needs downloads, images,
+or streams. Make media type and parsing explicit, preserve safe failure
+normalization, and avoid buffering large files where streaming is appropriate.
 
 ### Cache-policy enforcement
 
-**Current gap:** Password login explicitly uses `cache: "no-store"`, but
-`openapi-fetch` does not require future endpoint adapters to state a cache
-policy.
+Every endpoint adapter must select a cache policy. Authenticated reads and
+mutations use `no-store`. A public read may choose explicit Next.js
+revalidation. Add a harness rule only after multiple endpoints make reliable
+enforcement worthwhile.
 
-**Expected implementation:**
+### Caller cancellation composition
 
-- Every feature endpoint must select a cache policy at its call site.
-- Authenticated, user-specific, and mutation requests must use `no-store`.
-- Public reads must choose either `no-store` or an explicit Next.js
-  revalidation policy.
-- Add a harness or lint rule only when it can enforce this reliably without
-  false confidence.
-- Do not introduce a caching abstraction before a real public read needs one.
-
-### Timeout and caller cancellation composition
-
-**Current gap:** An endpoint can pass one `AbortSignal`; the foundation does not
-compose an endpoint timeout with a caller-provided cancellation signal.
-
-**Expected implementation:**
-
-- Keep a required timeout for every remote request.
-- When a caller signal exists, combine it with the timeout using
-  `AbortSignal.any`.
-- Preserve the cause so timeout remains `timeout` and caller cancellation
-  remains `cancelled`.
-- Never automatically retry a timeout or network failure because the remote
-  outcome may be unknown.
-
-Add a shared signal helper only when a real endpoint accepts caller
-cancellation.
-
-### Authentication and session ownership
-
-**Current gap:** The low-level client does not attach bearer tokens, persist
-credentials, refresh access, or retry after authentication failure.
-
-**Expected implementation:**
-
-- Keep credentials in a server-side session store; the browser receives only
-  an opaque `httpOnly`, `secure`, `sameSite` session cookie.
-- Build an authenticated facade above `src/server/api`, rather than adding
-  session behavior to `createLamaraApiClient`.
-- Let the facade attach the current bearer token.
-- On an eligible `401`, coordinate one distributed refresh, atomically persist
-  both rotated tokens, and retry an allowed operation at most once.
-- Never refresh on `403`.
-- Never retry an old refresh token after an unknown refresh outcome.
-- Keep tokens out of HTML, React Server Component payloads, browser storage,
-  URLs, logs, and normal errors.
-
-The detailed ownership and concurrency requirements remain in the queued
-[server session plan](../exec-plans/queued/2026-07-28_server-session-core.md).
+Current endpoints own only their timeout. If a real caller needs cancellation,
+compose it with the endpoint timeout using `AbortSignal.any` while preserving
+timeout versus cancellation classification. Never retry a timeout or network
+failure automatically because the remote outcome may be unknown.
 
 ### Idempotent mutations
 
-**Current gap:** The client can transport arbitrary typed headers, but there is
-no implemented ownership rule for `Idempotency-Key` or safe write retry.
+When the first backend-supported product mutation arrives:
 
-**Expected implementation:**
-
-- Generate the key once at the logical mutation boundary, normally a Server
-  Action or feature operation.
-- Preserve the same key across any permitted authenticated retry.
-- Retry a write after refresh only when the backend operation explicitly
-  supports idempotency.
-- Never automatically retry network failures or timeouts.
-- Keep conflict, in-progress, replayed, and unknown-outcome behavior
+- create one idempotency key at the logical Server Action or feature boundary;
+- preserve that key across any permitted authentication retry;
+- retry after refresh only when the operation explicitly supports idempotency;
+- never automatically retry timeout or network failures;
+- keep conflict, replay, in-progress, and unknown-outcome behavior
   feature-owned.
-- Prove this design with one real mutation before extracting a general helper.
 
-### Generated problem responses
+Prove this with one real mutation before extracting a helper.
 
-**Current gap:** Successful response validation is generated, but backend
-OpenAPI currently lists error codes without describing error response bodies.
-`problem.ts` therefore owns a small handwritten safe subset.
+### Generated problems
 
-**Expected implementation:**
-
-- Add standard problem response schemas to the backend OpenAPI.
-- Sync and regenerate the frontend contract.
-- Replace handwritten problem-shape duplication with the generated schema when
-  it is expressive enough.
-- Continue returning only the safe fields required by feature code; raw backend
-  details must not become user-facing copy.
+The backend OpenAPI lists error codes but does not currently describe standard
+problem response bodies. Add those schemas in the backend contract before
+replacing the frontend’s small handwritten safe subset. Raw backend detail must
+not automatically become user-facing copy.
 
 ### Operational diagnostics
 
-**Current gap:** Request IDs are preserved, but the foundation does not emit
-structured request lifecycle telemetry.
+Add logging or tracing only after the deployed runtime has a telemetry
+destination. Record method, route template, status, duration, failure kind, and
+request ID. Never record authorization, cookies, request bodies, raw response
+bodies, passwords, or tokens.
 
-**Expected implementation:**
+## Required evidence
 
-- Add operational logging or tracing only when a deployed runtime has a defined
-  telemetry destination.
-- Record method, route template, status, duration, failure kind, and request ID.
-- Never record authorization, cookies, request bodies, raw response bodies,
-  passwords, access tokens, or refresh tokens.
-- Keep user-facing errors independent from transport logging.
+As capabilities land, prove the lowest relevant boundary:
 
-## Required Coverage As Capabilities Land
+| Area                 | Evidence                                                                      |
+| -------------------- | ----------------------------------------------------------------------------- |
+| JSON responses       | Complete envelope, metadata, malformed data, and content type                 |
+| Empty responses      | Valid `204`, unexpected status/body, and request ID                           |
+| Request construction | Path/query encoding, body, request ID, timeout, and cache policy              |
+| Failures             | Problem JSON, malformed JSON, proxy text/HTML, network, timeout, cancellation |
+| Authentication       | Bearer attachment, no `403` refresh, one eligible `401` retry                 |
+| Concurrency          | Single-process refresh and atomic rotated-token replacement                   |
+| Mutations            | Stable idempotency key and no unsafe timeout/network retry                    |
+| Privacy              | No credentials in client output, storage, URLs, logs, or normal errors        |
 
-The stable boundary should eventually prove:
+Use injected HTTP tests for deterministic transport behavior and Playwright for
+browser-owned behavior.
 
-| Area                 | Required evidence                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------ |
-| JSON responses       | Object, list, complete envelope, pagination metadata, malformed data                 |
-| Empty responses      | Valid `204`, unexpected body, request-ID preservation                                |
-| Raw responses        | Expected media type, streaming/buffering behavior, safe failure                      |
-| Request construction | Path and query encoding, JSON body, request ID, cache policy                         |
-| Failures             | Problem JSON, malformed JSON, HTML/text proxy errors, network, timeout, cancellation |
-| Authentication       | Bearer attachment, no refresh on `403`, one refresh and retry on eligible `401`      |
-| Concurrency          | Distributed single refresh and atomic rotated-token persistence                      |
-| Mutations            | Stable idempotency key and no unsafe timeout/network retry                           |
-| Privacy              | No credentials in client bundles, browser storage, rendered payloads, URLs, or logs  |
+## Delivery rule
 
-Use injected `fetch` for deterministic transport tests. Session concurrency
-requires integration evidence against the selected production-like session
-store. Browser evidence begins only when real authentication routes exist.
-
-## Delivery Order
-
-1. Validate complete generated JSON envelopes before the first paginated
-   endpoint.
-2. Add empty-response handling with the first `204` consumer.
-3. Implement the server session core and authenticated facade.
-4. Prove authenticated read and refresh behavior with the first protected
-   endpoint.
-5. Prove idempotency ownership with the first supported mutation.
-6. Add raw/file handling and operational telemetry only when concrete product
-   requirements introduce them.
-
-Each step must leave unused future capabilities unimplemented. Do not create a
-generic request builder, repository hierarchy, retry engine, or client-side
-query layer in anticipation of later phases.
-
-## Completion Conditions
-
-The API foundation is complete for the initial authenticated product slice
-when:
-
-- every consumed success response is validated by its generated runtime
-  contract;
-- all consumed response kinds—JSON, empty, or raw—have explicit handling;
-- authenticated data is server-owned and uncached;
-- refresh coordination is correct across concurrent application instances;
-- writes retry only with stable backend-supported idempotency;
-- expected remote failures return safe discriminated results;
-- transport, session, privacy, and relevant browser evidence pass;
-- documentation describes only behavior that is actually implemented.
+The next API capability must be selected by a concrete product endpoint. Do not
+create a generic request builder, repository hierarchy, retry engine,
+client-side query layer, raw-response mode, or telemetry system in
+anticipation of later phases.
