@@ -65,8 +65,10 @@ pnpm exec playwright install chromium
 pnpm verify:runtime
 ```
 
-Browser tests prove visible content, active navigation, metadata endpoints, and
-intentional 404s for deferred routes.
+Browser tests prove public content, metadata endpoints, route protection,
+password login, the opaque `HttpOnly` session cookie, authenticated loading,
+and logout. The runner uses a contract-faithful local API fixture and isolates
+Next.js output in `.next-e2e`.
 
 ## Risk
 

@@ -23,15 +23,27 @@ HTTP-boundary server tests cover:
 - invalid/malformed responses without secret leakage;
 - network, timeout, and caller-cancellation failures;
 - invalid internal request bodies.
+- code-first password-login failure mapping with HTTP-status fallback;
+- separation between backend problem text and frontend-owned copy.
+
+Session tests cover:
+
+- session establishment and expiry;
+- access-token reuse and rotation;
+- concurrent single-refresh behavior;
+- atomic replacement of both rotated tokens;
+- transient, terminal, and unknown refresh outcomes;
+- in-memory compare-and-set and lock behavior.
 
 Playwright covers:
 
-- landing-page content and active anchor navigation;
+- generic landing-page content and sign-in navigation;
 - manifest, robots, sitemap, icon, and social-image endpoints;
-- confirmation that deferred product routes remain unimplemented.
-
-There are no login route, browser authentication, session, download, or report
-tests because those runtime features do not exist.
+- protected-route redirection;
+- password login, opaque-cookie properties, authenticated current-user
+  rendering, and logout;
+- an arbitrary nonexistent-route response without naming hypothetical product
+  routes.
 
 ## Commands
 
@@ -49,8 +61,9 @@ Install Chromium once per machine:
 pnpm exec playwright install chromium
 ```
 
-Playwright starts `pnpm dev` automatically and reuses an existing local server
-outside CI.
+Playwright runs on port 3100, starts an isolated Next.js dev output directory,
+and a contract-faithful API fixture. The runner does not require Docker or
+reuse a developer server.
 
 ## Growth
 
@@ -62,5 +75,5 @@ Add tests alongside an implemented boundary:
 - server integrations: injected HTTP-boundary tests plus focused integration
   evidence.
 
-High-risk auth/session work requires failure-path, concurrency, and runtime
-coverage when it begins.
+High-risk auth/session changes require failure-path, concurrency, and runtime
+coverage.
