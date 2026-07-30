@@ -1,22 +1,17 @@
 import { expect, test } from "@playwright/test";
 
-test("renders the landing page and its active navigation", async ({ page }) => {
+test("renders the generic landing page and opens sign in", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", {
-      name: "Track AI coding-tool usage from your tray.",
-    }),
+    page.getByRole("heading", { name: "Lamara is taking shape." }),
   ).toBeVisible();
-  await expect(page.getByText("Codex", { exact: true })).toBeVisible();
-  await expect(page.getByText("Claude Code", { exact: true })).toBeVisible();
-  await expect(page.getByText("OpenCode", { exact: true })).toBeVisible();
-
-  await page.getByRole("link", { name: "Privacy", exact: true }).click();
-  await expect(page).toHaveURL(/#privacy$/);
-  await expect(
-    page.getByRole("heading", { name: "Usage totals, not your work." }),
-  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Sign in", exact: true })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
 
 test("serves required metadata endpoints", async ({ request }) => {
@@ -33,9 +28,74 @@ test("serves required metadata endpoints", async ({ request }) => {
   }
 });
 
-test("does not expose deferred product routes", async ({ request }) => {
-  for (const path of ["/download", "/login", "/dashboard", "/reports"]) {
-    const response = await request.get(path);
-    expect(response.status(), `${path} should remain unimplemented`).toBe(404);
-  }
+test("does not expose an arbitrary nonexistent route", async ({ request }) => {
+  const response = await request.get("/not-a-real-route");
+  expect(response.status()).toBe(404);
+});
+
+test("protects the authenticated route", async ({ page }) => {
+  await page.goto("/app");
+
+  await expect(page).toHaveURL(/\/login$/);
+});
+
+test("maps a backend login code to safe frontend copy", async ({
+  context,
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("user@example.com");
+  await page.getByLabel("Password").fill("wrong-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+
+  await expect(
+    page.getByText("The email or password is incorrect."),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(false);
+});
+
+test("signs in with an opaque cookie and signs out", async ({
+  context,
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("user@example.com");
+  await page.getByLabel("Password").fill("test-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+
+  await expect(page).toHaveURL(/\/app$/);
+  await expect(
+    page.getByRole("heading", { name: "You are signed in." }),
+  ).toBeVisible();
+  await expect(page.getByText("user@example.com")).toBeVisible();
+
+  const sessionCookie = (await context.cookies()).find(
+    (cookie) => cookie.name === "lamara_session",
+  );
+  expect(sessionCookie).toMatchObject({
+    httpOnly: true,
+    sameSite: "Lax",
+  });
+  expect(sessionCookie?.value).toMatch(/^[A-Za-z0-9_-]{43}$/);
+
+  const browserOwnedState = await page.evaluate(() => ({
+    html: document.documentElement.outerHTML,
+    localStorage: Object.entries(localStorage),
+    sessionStorage: Object.entries(sessionStorage),
+  }));
+  expect(JSON.stringify(browserOwnedState)).not.toContain("e2e-refresh-token");
+  expect(JSON.stringify(browserOwnedState)).not.toContain(".signature");
+
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(false);
 });

@@ -18,7 +18,7 @@
     "test": "vitest run && pnpm test:contracts",
     "test:contracts": "node --test scripts/contracts/*.test.mjs",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/testing/run-e2e.mjs",
     "contracts:sync": "node scripts/contracts/sync-openapi.mjs",
     "contracts:generate": "node scripts/contracts/generate-openapi.mjs",
     "contracts:check": "node scripts/contracts/check-openapi.mjs",

@@ -16,6 +16,7 @@ const sourceExtensions = new Set([
 const ignoredDirectories = new Set([
   ".git",
   ".next",
+  ".next-e2e",
   "coverage",
   "node_modules",
   "playwright-report",
