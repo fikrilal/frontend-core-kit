@@ -1,27 +1,29 @@
 # Lamara Frontend
 
-Public web application for Lamara, a local-first desktop utility for tracking
-AI coding-tool usage.
+Web application for Lamara, a SaaS product under development.
 
 ## Current scope
 
 Implemented:
 
-- one public landing page at `/`;
+- a generic public landing page at `/`;
 - light and dark theme support;
 - web manifest, robots, sitemap, icon, and social images;
 - a committed backend OpenAPI snapshot with generated TypeScript types and Zod
   runtime schemas;
-- a typed server-only API client and validated password-login function with no
-  route;
+- password login at `/login`;
+- process-memory server sessions with an opaque browser cookie;
+- an authenticated technical proof at `/app`, current-user loading, refresh
+  rotation, and logout;
 - format, lint, type, unit, architecture, build, and browser gates.
 
 Not implemented:
 
-- downloads or release integration;
-- user-facing authentication, cookies, or sessions;
-- dashboard, reports, accounts, or sync;
-- any route that invokes the Lamara API.
+- registration, password recovery, OIDC, or account management;
+- product workflows or product-specific authenticated pages.
+
+Detailed product positioning and workflows are not finalized. The frontend must
+not invent product capabilities.
 
 Planned work must not be described as shipped. See
 [`docs/README.md`](docs/README.md) for the current sources of truth.
@@ -52,6 +54,12 @@ pnpm dev
 
 Open <http://127.0.0.1:3000>.
 
+The auth routes also require the two server-only values documented in
+`.env.example`.
+
+Sessions intentionally live in the single Next.js process. Restarting or
+redeploying that process signs in users out.
+
 ## API contract
 
 The committed OpenAPI snapshot, generated TypeScript types, and generated Zod
@@ -73,5 +81,5 @@ pnpm verify
 pnpm verify:runtime
 ```
 
-`verify` does not include browser tests. Run `verify:runtime` for visible route
-or interaction changes.
+`verify` does not include browser tests. Run `verify:runtime` for session or
+visible behavior changes.

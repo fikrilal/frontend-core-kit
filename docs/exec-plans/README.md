@@ -37,7 +37,8 @@ Implementation is split into independently reviewable plans:
    [Password login API client slice](completed/2026-07-28_password-login-api-client.md)
 3. **Completed:**
    [Generated runtime contracts and Node 24](completed/2026-07-29_generated-runtime-contracts-node24.md)
-4. **Queued:** [Server session core](queued/2026-07-28_server-session-core.md)
-5. **Queued:** [First authenticated feature](queued/2026-07-28_first-authenticated-feature.md)
+4. **Completed:**
+   [Generic auth and session foundation](completed/2026-07-30_generic-auth-session-foundation.md)
 
-Start the session plan only after its recorded decision gates are resolved.
+There is no active or queued plan. Do not introduce product workflows until a
+real product decision exists.

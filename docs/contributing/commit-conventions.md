@@ -13,7 +13,7 @@ Examples:
 
 ```text
 feat(auth): add password login server adapters
-fix(marketing): correct hero download href
+fix(marketing): correct landing-page copy
 docs(api): document session cookie BFF model
 chore(harness): extend architecture boundary checks
 test(api): cover problem-details parsing
@@ -47,13 +47,11 @@ Use the narrowest accurate scope for the change.
 
 | Scope       | Use for                                                    |
 | ----------- | ---------------------------------------------------------- |
-| `api`       | Server API client, envelope/problem-details, health smoke  |
+| `api`       | Server API client and envelope/problem-details handling    |
 | `auth`      | Session/auth core, login/register/logout adapters, cookies |
 | `contracts` | OpenAPI/path/Zod contracts under `src/contracts`           |
 | `marketing` | Landing page / marketing feature                           |
-| `downloads` | Download page / install commands                           |
 | `privacy`   | Privacy page                                               |
-| `sources`   | Supported sources page                                     |
 | `ui`        | Shared UI primitives (`src/components/ui`)                 |
 | `layout`    | Shared layout/chrome (topbar, footer, rail, shell)         |
 | `seo`       | Metadata, sitemap, robots, OG/twitter images               |
