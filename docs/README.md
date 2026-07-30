@@ -1,7 +1,8 @@
 # Lamara Frontend Documentation
 
-These documents describe the current repository. Proposed work is kept
-separate under `docs/planning/`.
+These documents distinguish implemented behavior from planned work. Accepted
+future API capabilities live in the engineering roadmap; unresolved proposals
+remain under `docs/planning/`.
 
 ## Current sources of truth
 

@@ -2,8 +2,7 @@
 
 **Status:** Accepted direction; partially implemented
 **Scope:** Gaps between the current unauthenticated JSON API foundation and the
-complete API behavior described in the
-[API core proposal](../planning/api-core-network-proposal.md).
+initial authenticated product slice.
 
 This document records what `src/server/api/**` supports now and how missing
 capabilities should be introduced. It does not authorize speculative

@@ -27,8 +27,8 @@ plans.
 
 ## API Core Network Sequence
 
-The accepted direction is documented in
-[`docs/planning/api-core-network-proposal.md`](../planning/api-core-network-proposal.md).
+The accepted direction is documented in the
+[API foundation roadmap](../engineering/api-foundation-roadmap.md).
 Implementation is split into independently reviewable plans:
 
 1. **Completed:**

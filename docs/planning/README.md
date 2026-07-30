@@ -1,11 +1,13 @@
 # Planning Documentation
 
-Planning documents are proposals, not current behavior.
+Planning documents are proposals, not current behavior. There are no active
+proposals.
 
-Accepted proposal:
+Retired background:
 
-- [API core proposal](api-core-network-proposal.md)
+- [Superseded API core proposal](api-core-network-proposal.md)
 
-Its staged execution plans are indexed under
-[`docs/exec-plans/README.md`](../exec-plans/README.md). Promote only shipped,
-durable behavior into current-state documentation.
+Current API direction lives in
+[API foundation coverage and roadmap](../engineering/api-foundation-roadmap.md).
+Staged work is indexed under
+[`docs/exec-plans/README.md`](../exec-plans/README.md).

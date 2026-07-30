@@ -123,6 +123,6 @@ Add structure progressively:
   benefit from those boundaries.
 
 The remaining accepted network direction lives in
-`docs/planning/api-core-network-proposal.md`. Sessions, refresh, authentication
+`docs/engineering/api-foundation-roadmap.md`. Sessions, refresh, authentication
 routes, additional HTTP methods, and user-facing authenticated features are not
 implemented.
