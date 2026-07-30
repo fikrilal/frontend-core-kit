@@ -30,11 +30,11 @@ export default function OpenGraphImage() {
         }}
       >
         <span style={{ color: "#f08a4b", fontSize: 28, letterSpacing: 2 }}>
-          LOCAL-FIRST DESKTOP UTILITY
+          SAAS PRODUCT
         </span>
         <strong style={{ fontSize: 112, letterSpacing: -5 }}>{siteName}</strong>
         <span style={{ color: "#b4b4b4", fontSize: 42 }}>
-          AI coding-tool usage, visible from your tray.
+          Currently under development.
         </span>
       </div>
     </div>,

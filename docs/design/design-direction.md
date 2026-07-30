@@ -1,20 +1,20 @@
 # Lamara Frontend Design Direction
 
-## Product position
+## Product status
 
-Lamara is a compact, local-first developer utility. The web presence should
-feel technical, calm, direct, and trustworthy—not like a generic analytics
-SaaS.
+Lamara is a SaaS product under development. The detailed product position and
+workflows are not finalized, so the current UI must remain neutral and
+technically honest.
 
-The landing page should communicate:
+The foundation may communicate only:
 
-- Lamara lives in the desktop tray;
-- it summarizes supported local AI coding-tool usage;
-- it exposes tokens, estimated cost, and freshness;
-- it is designed not to collect prompts, responses, source code, or file
-  contents.
+- Lamara exists and is under development;
+- users can sign in with the implemented authentication mechanism;
+- an authenticated session is active;
+- users can sign out.
 
-Avoid claims for unimplemented account, sync, report, or download behavior.
+Do not invent wedding workflows, dashboards, analytics, reports, pricing,
+download behavior, or unsupported calls to action.
 
 ## Visual language
 
@@ -27,33 +27,22 @@ Reuse their structural language:
 
 - narrow centered rails;
 - soft line boundaries;
-- compact sticky chrome;
+- compact chrome;
 - neutral surfaces;
 - restrained type hierarchy;
 - sparse motion;
-- dense, inspectable product panels.
+- direct form labels and feedback.
 
-Lamara’s deliberate difference is a restrained ember accent used for identity
-and important signal—not as a full-page theme.
-
-Avoid:
-
-- generic gradients and abstract hero art;
-- oversized startup copy;
-- fake dashboards unrelated to Lamara;
-- decorative motion without product value;
-- unsupported calls to action.
+Use the existing restrained ember accent for identity and important state.
+Avoid generic gradients, abstract hero art, oversized startup copy, fake
+product panels, and decorative motion.
 
 ## Current composition
 
 ```text
-Header
-Hero + product-faithful tray preview
-Supported sources
-How the local data path works
-Privacy boundary
-Footer
+Generic landing page
+Minimal password-login card
+Minimal authenticated session proof
 ```
 
-The next public slice may introduce a download page when actual release
-behavior is defined.
+Product design begins only after the first real workflow is decided.

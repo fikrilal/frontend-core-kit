@@ -31,10 +31,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteName}`,
   },
   description: siteDescription,
-  alternates: {
-    canonical: "/",
-  },
-  category: "technology",
+  category: "business",
   creator: "fikrilal",
   authors: [
     {
@@ -42,16 +39,7 @@ export const metadata: Metadata = {
       url: "https://github.com/fikrilal",
     },
   ],
-  keywords: [
-    "Lamara",
-    "AI coding tools",
-    "token tracking",
-    "Codex",
-    "Claude Code",
-    "OpenCode",
-    "local-first",
-    "Tauri",
-  ],
+  keywords: ["Lamara", "SaaS", "software"],
   manifest: "/manifest.webmanifest",
   robots: {
     index: true,
@@ -102,6 +90,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
