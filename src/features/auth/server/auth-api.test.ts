@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { PasswordLoginData, PasswordLoginInput } from "./password-login";
-import { loginWithPassword } from "./password-login";
+import {
+  getCurrentUser,
+  loginWithPassword,
+  logoutRemoteSession,
+  type CurrentUserData,
+  type PasswordLoginData,
+  type PasswordLoginInput,
+} from "./auth-api";
 
 const input = {
   email: "dante@example.com",
@@ -29,12 +35,14 @@ const loginData = {
   },
 } satisfies PasswordLoginData;
 
-describe("loginWithPassword", () => {
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.unstubAllGlobals();
-  });
+const currentUser = loginData.user satisfies CurrentUserData;
 
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+});
+
+describe("auth API", () => {
   it("uses the generated endpoint contract and returns validated login data", async () => {
     let captured: Request | undefined;
     vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
@@ -104,6 +112,62 @@ describe("loginWithPassword", () => {
     expect(serialized).not.toContain("must-not-leak-access");
     expect(serialized).not.toContain("must-not-leak-refresh");
     expect(serialized).not.toContain(input.password);
+  });
+
+  it("loads the current user with a bearer token", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(jsonResponse({ data: currentUser }));
+    });
+
+    const result = await getCurrentUser("access-token");
+
+    expect(result).toMatchObject({
+      ok: true,
+      data: currentUser,
+      status: 200,
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe("https://api.lamara.dev/v1/me");
+    expect(captured.method).toBe("GET");
+    expect(captured.cache).toBe("no-store");
+    expect(captured.headers.get("authorization")).toBe("Bearer access-token");
+  });
+
+  it("logs out through the empty-response contract", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(
+        new Response(null, {
+          status: 204,
+          headers: { "X-Request-Id": "backend-request-id" },
+        }),
+      );
+    });
+
+    const result = await logoutRemoteSession("refresh-token");
+
+    expect(result).toEqual({
+      ok: true,
+      data: undefined,
+      status: 204,
+      traceId: "backend-request-id",
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe("https://api.lamara.dev/v1/auth/logout");
+    expect(captured.method).toBe("POST");
+    expect(captured.cache).toBe("no-store");
+    expect(await captured.json()).toEqual({ refreshToken: "refresh-token" });
   });
 });
 

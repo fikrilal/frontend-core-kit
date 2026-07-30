@@ -35,12 +35,16 @@ commit npm or Yarn lockfiles.
 
 ## Environment
 
-`LAMARA_API_BASE_URL` is the only application environment variable. It is
-server-only, validated through `src/server/config/env.ts`, and documented in
-`.env.example`.
+Application environment is server-only, validated through
+`src/server/config/env.ts`, and documented in `.env.example`:
 
-It must contain an HTTP(S) origin without credentials, a path, query string, or
-fragment. Never prefix it with `NEXT_PUBLIC_`.
+- `LAMARA_API_BASE_URL`: HTTP(S) origin without credentials, path, query, or
+  fragment;
+- `LAMARA_SESSION_TTL_SECONDS`: absolute frontend session TTL from 5 minutes to
+  365 days.
+
+Never prefix these values with `NEXT_PUBLIC_`. The deployed session TTL must
+not exceed the backend refresh-token lifetime.
 
 ## API contract
 
@@ -73,6 +77,9 @@ Browser installation:
 ```bash
 pnpm exec playwright install chromium
 ```
+
+The browser gate starts its own contract-faithful API fixture and does not
+require Docker. A production Docker image is intentionally not defined yet.
 
 ## Baseline principle
 

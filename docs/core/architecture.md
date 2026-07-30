@@ -2,127 +2,115 @@
 
 ## Current system
 
-Lamara Frontend is a single Next.js application. It currently serves one
-statically rendered marketing page and metadata routes. It also owns a
-build-time snapshot of the backend OpenAPI contract and one server-only
-password-login adapter used only by tests. It has no login route, session,
-persistence, or authenticated runtime.
+Lamara Frontend is one Next.js application with a generic public page and a
+narrow authenticated infrastructure proof.
 
 ```text
 browser
   -> Next.js App Router
-  -> marketing route
-  -> marketing feature
-  -> local layout and theme components
+     -> marketing feature
+     -> auth feature
+        -> server API adapters
+        -> session service
+           -> process-memory store
+        -> generated Lamara API contract
+           -> Lamara backend
 ```
 
-Theme preference is the only client-owned state. It is stored in
-`localStorage`.
+Implemented routes:
+
+- `/`: generic under-development landing page;
+- `/login`: email/password login;
+- `/app`: protected current-user proof, not a product dashboard.
+
+Theme preference is the only client-owned application state and lives in
+`localStorage`. Authentication state is server-owned.
 
 ## Ownership
 
 ```text
 src/app/
-  Routes, layouts, metadata, and route-level composition.
+  Thin routes, layouts, metadata, and route-level composition.
 
 src/features/
-  Product-owned pages and behavior. Current runtime feature: marketing.
-  Auth currently owns only an unexposed server adapter experiment.
+  User-visible behavior. Marketing owns the public page. Auth owns login,
+  protected loading, logout, and its endpoint adapters.
 
-src/components/layout/
-  Cross-page layout chrome.
+src/components/
+  Cross-page layout, branding, theme behavior, and business-free primitives.
 
-src/components/ui/
-  Generic primitives, added only when an active feature needs them.
+src/server/api/
+  Shared typed HTTP construction and Lamara response normalization.
 
-src/components/theme/
-  Theme initialization, synchronization, and controls.
+src/server/session/
+  Opaque-cookie sessions, process-memory token storage, token rotation, and
+  single-process refresh coordination.
 
-src/lib/
-  Small product-independent utilities.
-
-src/server/
-  Validated server configuration and shared HTTP protocol behavior.
+src/server/config/
+  Validated access to server-only environment.
 
 src/contracts/
-  Committed external contract locks and generated types/runtime schemas.
+  Committed OpenAPI compatibility lock and generated types/runtime schemas.
 ```
 
-Empty future folders are not required. Documentation must not claim a boundary
-exists until code using it lands.
+Features expose a small public API through `index.ts`. Routes import that public
+API; feature internals may import their own private modules. The session layer
+does not depend on the auth feature, which prevents shared server
+infrastructure from depending upward on user-facing code.
 
-## Contract boundary
+## Contract and request boundary
 
 ```text
-backend-core-kit OpenAPI artifact
+backend OpenAPI artifact
   -> explicit contracts:sync
-  -> committed frontend snapshot + provenance
-  -> deterministic TypeScript types + Zod runtime schemas
+  -> committed snapshot + provenance
+  -> generated TypeScript and Zod
+  -> feature endpoint adapter
+  -> shared response normalization
 ```
 
-The backend owns the protocol. The frontend snapshot selects an intentional
-compatible revision and makes drift reviewable. Normal verification generates
-from that committed snapshot and never depends on the sibling backend checkout.
+The committed snapshot is an intentional frontend compatibility revision.
+Normal builds never read a sibling checkout or download a live contract.
+Generated types constrain method, path, body, and response at compile time.
+Generated complete-envelope schemas validate successful responses at runtime.
 
-Generated TypeScript types provide compile-time evidence. Generated Zod schemas
-validate untrusted network responses at runtime. Both artifacts come from the
-same committed OpenAPI snapshot and are checked for drift.
+Feature endpoint adapters explicitly select timeout and cache policy. The
+shared boundary handles request IDs, JSON-compatible content types, normal
+envelopes, empty `204` responses, safe problem details, network outcomes, and
+invalid responses. It does not own product copy or sessions.
 
-## Dependency direction
+## Authentication and rendering
+
+Login and logout use Server Actions. `/app` is a Server Component and loads the
+current user on the server. The browser stores only a random opaque
+`HttpOnly` cookie. API tokens remain in the Next.js server process.
+
+The authenticated read flow is:
 
 ```text
-app routes
-  -> feature public APIs
-  -> layout / UI / lib
+cookie -> memory session -> usable access token -> /v1/me
+                         -> expiring/401 -> coordinated refresh -> retry once
 ```
 
-Current server integration:
+The application deliberately supports one Next.js process. Its in-memory store
+coordinates concurrent refreshes inside that process. Restarting or
+redeploying it invalidates every frontend session and requires users to sign in
+again. See
+[`docs/engineering/session-management.md`](../engineering/session-management.md).
 
-```text
-feature server module
-  -> typed server API client + Lamara response normalization
-  -> generated contract
-  -> external service
-```
+## Dependency and growth rules
 
-No route reaches this path yet. Tests exercise it through the HTTP boundary.
+- Route files compose feature entry points and metadata only.
+- Server Components are the default.
+- Client Components are limited to browser APIs, local interaction, and event
+  handlers.
+- Client Components never import server-only modules.
+- Raw network access stays behind server adapters or generated contracts.
+- External data is runtime validated.
+- `process.env` is read only by approved config/runtime files.
+- No global client state, query cache, repository/use-case hierarchy, or
+  product app shell exists without a concrete requirement.
+- Add feature layers only when current behavior benefits from them.
 
-Rules:
-
-- Route files stay thin and compose feature entry points.
-- Product behavior belongs to its feature.
-- Generic UI components contain no Lamara business rules.
-- Client Components do not import server-only code.
-- `process.env` is read only through approved runtime configuration.
-- Raw network calls live behind server adapters.
-- External data is validated at runtime.
-- Features expose a small public API through `index.ts`.
-- Do not add state managers, repositories, use cases, or packages before a real
-  requirement exists.
-
-## Rendering and state
-
-Use Server Components by default. Add a Client Component only for browser APIs,
-local interaction state, or event handlers. Keep client boundaries as low as
-practical.
-
-Prefer state in this order:
-
-1. server data;
-2. URL state;
-3. component-local state;
-4. shared client state only for a proven cross-tree need.
-
-## Growth rule
-
-Add structure progressively:
-
-- a display feature may need only a page component and `index.ts`;
-- a feature with forms or data loading may add `components/` and `server/`;
-- domain/application/data layers are reserved for behavior complex enough to
-  benefit from those boundaries.
-
-The remaining accepted network direction lives in
-`docs/engineering/api-foundation-roadmap.md`. Sessions, refresh, authentication
-routes, additional HTTP methods, and user-facing authenticated features are not
-implemented.
+Detailed product positioning and workflows remain undecided. The authenticated
+proof must not grow into invented navigation or features.
