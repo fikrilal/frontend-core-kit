@@ -1,15 +1,26 @@
 import { describe, expect, it } from "vitest";
 
-import { readServerConfig } from "./env";
+import { readApiConfig, readSessionConfig } from "./env";
 
-describe("readServerConfig", () => {
+describe("server configuration", () => {
   it("normalizes a valid API origin", () => {
     expect(
-      readServerConfig({
+      readApiConfig({
         LAMARA_API_BASE_URL: "https://api.lamara.dev/",
       }),
     ).toEqual({
       apiBaseUrl: "https://api.lamara.dev",
+    });
+  });
+
+  it("validates session configuration", () => {
+    expect(
+      readSessionConfig({
+        LAMARA_SESSION_TTL_SECONDS: "2592000",
+      }),
+    ).toEqual({
+      sessionTtlSeconds: 2_592_000,
+      secureCookies: false,
     });
   });
 
@@ -22,9 +33,20 @@ describe("readServerConfig", () => {
     "https://api.lamara.dev#fragment",
   ])("rejects an invalid API origin: %s", (value) => {
     expect(() =>
-      readServerConfig({
+      readApiConfig({
         LAMARA_API_BASE_URL: value,
       }),
     ).toThrow();
   });
+
+  it.each([undefined, "0", "299", "31536001", "not-a-number"])(
+    "rejects an invalid session TTL: %s",
+    (value) => {
+      expect(() =>
+        readSessionConfig({
+          LAMARA_SESSION_TTL_SECONDS: value,
+        }),
+      ).toThrow();
+    },
+  );
 });

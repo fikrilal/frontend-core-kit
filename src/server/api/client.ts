@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { paths } from "@/contracts/lamara-api";
-import { readServerConfig } from "@/server/config/env";
+import { readApiConfig } from "@/server/config/env";
 import createClient, { type Client } from "openapi-fetch";
 
 export type LamaraApiClient = Client<paths>;
@@ -29,7 +29,7 @@ export function createLamaraApiClient({
   fetch: fetchImplementation = globalThis.fetch,
   requestId: createRequestId = () => globalThis.crypto.randomUUID(),
 }: LamaraApiClientDependencies): LamaraApiClient {
-  const normalizedBaseUrl = readServerConfig({
+  const normalizedBaseUrl = readApiConfig({
     LAMARA_API_BASE_URL: baseUrl,
   }).apiBaseUrl;
 
@@ -59,7 +59,7 @@ export function createLamaraApiClient({
 }
 
 export function createConfiguredLamaraApiClient(): LamaraApiClient {
-  const config = readServerConfig();
+  const config = readApiConfig();
 
   return createLamaraApiClient({
     baseUrl: config.apiBaseUrl,

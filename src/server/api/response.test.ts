@@ -2,7 +2,7 @@ import { z } from "zod";
 import { describe, expect, it } from "vitest";
 
 import { createLamaraApiClient } from "./client";
-import { readApiResult } from "./response";
+import { readApiResult, readEmptyApiResult } from "./response";
 
 const loginPath = "/v1/auth/password/login";
 const loginInput = {
@@ -12,8 +12,73 @@ const loginInput = {
 const dataSchema = z.object({
   value: z.string(),
 });
+const envelopeSchema = z.object({
+  data: dataSchema,
+});
 
 describe("readApiResult", () => {
+  it("validates the complete envelope and returns typed metadata", async () => {
+    const schema = z.object({
+      data: dataSchema,
+      meta: z.object({ nextCursor: z.string().nullable() }),
+    });
+    const client = createLamaraApiClient({
+      baseUrl: "https://api.lamara.dev",
+      requestId: () => "request-id",
+      fetch: () =>
+        Promise.resolve(
+          jsonResponse({
+            data: { value: "valid" },
+            meta: { nextCursor: "cursor-id" },
+          }),
+        ),
+    });
+
+    const result = await readApiResult(
+      client.POST(loginPath, {
+        body: loginInput,
+        parseAs: "text",
+      }),
+      schema,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: { value: "valid" },
+      meta: { nextCursor: "cursor-id" },
+      status: 200,
+      traceId: "request-id",
+    });
+  });
+
+  it("rejects a successful response with an unexpected content type", async () => {
+    const client = createLamaraApiClient({
+      baseUrl: "https://api.lamara.dev",
+      requestId: () => "request-id",
+      fetch: () =>
+        Promise.resolve(
+          new Response(JSON.stringify({ data: { value: "secret" } }), {
+            headers: { "Content-Type": "text/plain" },
+          }),
+        ),
+    });
+
+    const result = await readApiResult(
+      client.POST(loginPath, {
+        body: loginInput,
+        parseAs: "text",
+      }),
+      envelopeSchema,
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      failure: { kind: "invalid-response" },
+      status: 200,
+    });
+    expect(JSON.stringify(result)).not.toContain("secret");
+  });
+
   it("parses problem details and prefers the response request ID", async () => {
     const client = createLamaraApiClient({
       baseUrl: "https://api.lamara.dev",
@@ -46,7 +111,7 @@ describe("readApiResult", () => {
         cache: "no-store",
         parseAs: "text",
       }),
-      dataSchema,
+      envelopeSchema,
     );
 
     expect(result).toEqual({
@@ -110,7 +175,7 @@ describe("readApiResult", () => {
         cache: "no-store",
         parseAs: "text",
       }),
-      dataSchema,
+      envelopeSchema,
     );
 
     expect(result).toEqual({
@@ -144,7 +209,7 @@ describe("readApiResult", () => {
         cache: "no-store",
         parseAs: "text",
       }),
-      dataSchema,
+      envelopeSchema,
     );
 
     expect(result).toEqual({
@@ -184,7 +249,7 @@ describe("readApiResult", () => {
           body: loginInput,
           parseAs: "text",
         }),
-        dataSchema,
+        envelopeSchema,
       ),
       readApiResult(
         timeoutClient.POST(loginPath, {
@@ -192,7 +257,7 @@ describe("readApiResult", () => {
           parseAs: "text",
           signal: AbortSignal.timeout(1),
         }),
-        dataSchema,
+        envelopeSchema,
       ),
       readApiResult(
         cancelledClient.POST(loginPath, {
@@ -200,7 +265,7 @@ describe("readApiResult", () => {
           parseAs: "text",
           signal: caller.signal,
         }),
-        dataSchema,
+        envelopeSchema,
       ),
     ]);
 
@@ -241,9 +306,54 @@ describe("readApiResult", () => {
           body: circularBody,
           parseAs: "text",
         }),
-        dataSchema,
+        envelopeSchema,
       ),
     ).rejects.toThrow();
+  });
+});
+
+describe("readEmptyApiResult", () => {
+  it("accepts an empty 204 response without parsing JSON", async () => {
+    const client = createLamaraApiClient({
+      baseUrl: "https://api.lamara.dev",
+      requestId: () => "request-id",
+      fetch: () => Promise.resolve(new Response(null, { status: 204 })),
+    });
+
+    const result = await readEmptyApiResult(
+      client.POST("/v1/auth/logout", {
+        body: { refreshToken: "refresh-token" },
+        parseAs: "text",
+      }),
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: undefined,
+      status: 204,
+      traceId: "request-id",
+    });
+  });
+
+  it("rejects an unexpected non-empty success status", async () => {
+    const client = createLamaraApiClient({
+      baseUrl: "https://api.lamara.dev",
+      requestId: () => "request-id",
+      fetch: () => Promise.resolve(jsonResponse({ data: null })),
+    });
+
+    const result = await readEmptyApiResult(
+      client.POST("/v1/auth/logout", {
+        body: { refreshToken: "refresh-token" },
+        parseAs: "text",
+      }),
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      failure: { kind: "invalid-response" },
+      status: 200,
+    });
   });
 });
 

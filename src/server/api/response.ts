@@ -10,20 +10,87 @@ type OpenApiResponse = Readonly<{
   response: Response;
 }>;
 
-export async function readApiResult<T>(
+type ApiEnvelope<TData, TMeta> = Readonly<{
+  data: TData;
+  meta?: TMeta;
+}>;
+
+export function readApiResult<TData, TMeta = unknown>(
   request: Promise<OpenApiResponse>,
-  schema: z.ZodType<T>,
-): Promise<ApiResult<T>> {
+  schema: z.ZodType<ApiEnvelope<TData, TMeta>>,
+): Promise<ApiResult<TData, TMeta>> {
+  return readResponse<TData, TMeta>(request, (result, status, traceId) => {
+    if (!hasJsonMediaType(result.response)) {
+      return invalidResponse(
+        status,
+        traceId,
+        "Lamara API returned an unexpected success content type.",
+      );
+    }
+
+    const json = parseJson(result.data);
+    if (!json.ok) {
+      return invalidResponse(
+        status,
+        traceId,
+        "Lamara API returned an invalid success envelope.",
+      );
+    }
+
+    const parsedEnvelope = schema.safeParse(json.value);
+    if (!parsedEnvelope.success) {
+      return invalidResponse(
+        status,
+        traceId,
+        "Lamara API returned data that does not match the contract.",
+      );
+    }
+
+    return {
+      ok: true,
+      data: parsedEnvelope.data.data,
+      ...("meta" in parsedEnvelope.data
+        ? { meta: parsedEnvelope.data.meta }
+        : {}),
+      status,
+      traceId,
+    };
+  });
+}
+
+export function readEmptyApiResult(
+  request: Promise<OpenApiResponse>,
+): Promise<ApiResult<undefined>> {
+  return readResponse<undefined>(request, (_result, status, traceId) => {
+    if (status !== 204) {
+      return invalidResponse(
+        status,
+        traceId,
+        "Lamara API returned an unexpected non-empty success.",
+      );
+    }
+
+    return {
+      ok: true,
+      data: undefined,
+      status,
+      traceId,
+    };
+  });
+}
+
+async function readResponse<TData, TMeta = unknown>(
+  request: Promise<OpenApiResponse>,
+  readSuccess: (
+    result: OpenApiResponse,
+    status: number,
+    traceId: string,
+  ) => ApiResult<TData, TMeta>,
+): Promise<ApiResult<TData, TMeta>> {
   try {
     const result = await request;
     const status = result.response.status;
-    const responseRequestId = result.response.headers
-      .get("x-request-id")
-      ?.trim();
-    const traceId =
-      responseRequestId === undefined || responseRequestId.length === 0
-        ? "unknown"
-        : responseRequestId;
+    const traceId = readTraceId(result.response);
 
     if (!result.response.ok) {
       const problem = parseApiProblem(result.error, status);
@@ -49,31 +116,7 @@ export async function readApiResult<T>(
       };
     }
 
-    const json = parseJson(result.data);
-    if (!json.ok || !isRecord(json.value) || !("data" in json.value)) {
-      return invalidResponse(
-        status,
-        traceId,
-        "Lamara API returned an invalid success envelope.",
-      );
-    }
-
-    const parsedData = schema.safeParse(json.value.data);
-    if (!parsedData.success) {
-      return invalidResponse(
-        status,
-        traceId,
-        "Lamara API returned data that does not match the contract.",
-      );
-    }
-
-    return {
-      ok: true,
-      data: parsedData.data,
-      ...("meta" in json.value ? { meta: json.value.meta } : {}),
-      status,
-      traceId,
-    };
+    return readSuccess(result, status, traceId);
   } catch (error) {
     if (!(error instanceof ApiRequestError)) {
       throw error;
@@ -137,11 +180,11 @@ function parseJson(
   }
 }
 
-function invalidResponse(
+function invalidResponse<TData = never, TMeta = unknown>(
   status: number,
   traceId: string,
   message: string,
-): ApiResult<never> {
+): ApiResult<TData, TMeta> {
   return {
     ok: false,
     failure: {
@@ -151,6 +194,28 @@ function invalidResponse(
     status,
     traceId,
   };
+}
+
+function readTraceId(response: Response): string {
+  const responseRequestId = response.headers.get("x-request-id")?.trim();
+  if (!responseRequestId) {
+    return "unknown";
+  }
+  return responseRequestId;
+}
+
+function hasJsonMediaType(response: Response): boolean {
+  const contentType = response.headers
+    .get("content-type")
+    ?.split(";", 1)[0]
+    ?.trim()
+    .toLowerCase();
+
+  return (
+    contentType === "application/json" ||
+    (contentType?.startsWith("application/") === true &&
+      contentType.endsWith("+json"))
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

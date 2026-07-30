@@ -36,20 +36,43 @@ const apiBaseUrlSchema = z
   })
   .transform((value) => new URL(value).origin);
 
-const serverConfigSchema = z.object({
+const apiConfigSchema = z.object({
   LAMARA_API_BASE_URL: apiBaseUrlSchema,
 });
 
-export type ServerConfig = Readonly<{
+const sessionConfigSchema = z.object({
+  LAMARA_SESSION_TTL_SECONDS: z.coerce.number().int().min(300).max(31_536_000),
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
+});
+
+export type ApiConfig = Readonly<{
   apiBaseUrl: string;
 }>;
 
-export function readServerConfig(
+export type SessionConfig = Readonly<{
+  sessionTtlSeconds: number;
+  secureCookies: boolean;
+}>;
+
+export function readApiConfig(
   environment: Record<string, string | undefined> = process.env,
-): ServerConfig {
-  const parsed = serverConfigSchema.parse(environment);
+): ApiConfig {
+  const parsed = apiConfigSchema.parse(environment);
 
   return {
     apiBaseUrl: parsed.LAMARA_API_BASE_URL,
+  };
+}
+
+export function readSessionConfig(
+  environment: Record<string, string | undefined> = process.env,
+): SessionConfig {
+  const parsed = sessionConfigSchema.parse(environment);
+
+  return {
+    sessionTtlSeconds: parsed.LAMARA_SESSION_TTL_SECONDS,
+    secureCookies: parsed.NODE_ENV === "production",
   };
 }

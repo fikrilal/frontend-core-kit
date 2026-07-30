@@ -30,11 +30,11 @@ export type ApiFailure =
       message: string;
     }>;
 
-export type ApiResult<T> =
+export type ApiResult<T, TMeta = unknown> =
   | Readonly<{
       ok: true;
       data: T;
-      meta?: unknown;
+      meta?: TMeta;
       status: number;
       traceId: string;
     }>
