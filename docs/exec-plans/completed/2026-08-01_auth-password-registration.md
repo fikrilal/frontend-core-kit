@@ -1,7 +1,7 @@
 # 2026-08-01 Password Registration Vertical Slice
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent
 **Risk:** high
 **Authority:** implement, verify, and commit the password-registration auth
@@ -146,3 +146,5 @@ external account cleanup is required because default verification uses fixtures.
 
 - Implement email verification and resend only after the product flow and email
   delivery policy are decided.
+- Add this task to the Phase 4.4 operating-evidence ledger only after an
+  independent review and hosted CI reproduction.

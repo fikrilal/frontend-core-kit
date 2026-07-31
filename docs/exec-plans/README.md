@@ -81,8 +81,8 @@ The accepted direction is documented in the
    [Scope and repair bounds](completed/2026-08-01_agent-harness-phase-4-2-scope-repair-bounds.md)
 9. **Completed:**
    [Authorized PR loop](completed/2026-08-01_agent-harness-phase-4-3-authorized-pr-loop.md)
-10. **Active:**
-    [Password registration](active/2026-08-01_auth-password-registration.md)
+10. **Completed:**
+    [Password registration](completed/2026-08-01_auth-password-registration.md)
 11. **Queued:**
     [Operating proof](queued/2026-08-01_agent-harness-phase-4-4-operating-proof.md)
 
