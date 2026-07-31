@@ -4,9 +4,12 @@ import {
   getCurrentUser,
   loginWithPassword,
   logoutRemoteSession,
+  registerWithPassword,
   type CurrentUserData,
   type PasswordLoginData,
   type PasswordLoginInput,
+  type PasswordRegisterData,
+  type PasswordRegisterInput,
 } from "./auth-api";
 
 const input = {
@@ -15,6 +18,11 @@ const input = {
   deviceId: "browser-install-id",
   deviceName: "Dante's browser",
 } satisfies PasswordLoginInput;
+
+const registerInput = {
+  email: "new-user@example.com",
+  password: "correct horse battery staple",
+} satisfies PasswordRegisterInput;
 
 const loginData = {
   accessToken: "access-token",
@@ -37,12 +45,51 @@ const loginData = {
 
 const currentUser = loginData.user satisfies CurrentUserData;
 
+const registerData = {
+  ...loginData,
+  user: {
+    ...loginData.user,
+    email: registerInput.email,
+    emailVerified: false,
+  },
+} satisfies PasswordRegisterData;
+
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
 describe("auth API", () => {
+  it("uses the generated endpoint contract and returns validated registration data", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(jsonResponse({ data: registerData }));
+    });
+
+    const result = await registerWithPassword(registerInput);
+
+    expect(result).toMatchObject({
+      ok: true,
+      data: registerData,
+      status: 200,
+    });
+    expect(result.traceId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    );
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe(
+      "https://api.lamara.dev/v1/auth/password/register",
+    );
+    expect(captured.method).toBe("POST");
+    expect(captured.cache).toBe("no-store");
+    expect(await captured.json()).toEqual(registerInput);
+  });
+
   it("uses the generated endpoint contract and returns validated login data", async () => {
     let captured: Request | undefined;
     vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
