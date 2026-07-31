@@ -261,7 +261,7 @@ export function selectVerificationLanes(risk) {
   ];
 }
 
-function loadActivePlan(root) {
+export function loadActivePlan(root) {
   const directory = path.join(root, "docs/exec-plans/active");
   if (!fs.existsSync(directory)) {
     throw taskError(
