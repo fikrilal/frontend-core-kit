@@ -94,6 +94,13 @@ scan is not a WCAG conformance claim; human and assistive-technology review
 remain separate evidence. The runner uses a contract-faithful local API fixture
 and isolates Next.js output in `.next-e2e`.
 
+The same lane compares five repository-owned Linux Chromium images covering
+light/dark landing, login, login failure, and authenticated foundation. Tests
+fix the viewport, theme preference, color scheme, animations, fonts, and fixture
+data. E2E mode hides only Next.js's development indicator; compile/runtime errors
+still surface. Update baselines with `pnpm test:e2e:update` only for an intended
+change, inspect every PNG, and never regenerate merely to make a diff pass.
+
 ## Risk
 
 - Low: documentation and narrow static changes; targeted checks may suffice.

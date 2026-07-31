@@ -70,5 +70,7 @@ The accepted direction is documented in the
    [Contract fixtures and backend preflight](completed/2026-08-01_agent-harness-phase-3-2.md)
 5. **Completed:**
    [Accessibility fitness](completed/2026-08-01_agent-harness-phase-3-3.md)
+6. **Completed:**
+   [Repository-owned visual evidence](completed/2026-08-01_agent-harness-phase-3-4.md)
 
 Do not introduce product workflows until a real product decision exists.

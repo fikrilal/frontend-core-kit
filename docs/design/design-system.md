@@ -70,3 +70,8 @@ themes. Interactive elements must expose a visible `:focus-visible` indicator;
 do not remove the browser outline unless a ring or equivalent indicator replaces
 it. The browser accessibility suite enforces the implemented page states, while
 human review remains necessary for conformance.
+
+Representative desktop states are stored beside `tests/e2e/visual.spec.ts` as
+reviewable visual baselines. An intentional UI change must update only affected
+images through `pnpm test:e2e:update`; inspect the PNGs before accepting them.
+These baselines detect drift but do not make aesthetic decisions.

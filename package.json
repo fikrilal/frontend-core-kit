@@ -21,6 +21,7 @@
     "test:harness": "node --test scripts/harness/*.test.mjs scripts/testing/*.test.mjs",
     "test:watch": "vitest",
     "test:e2e": "node scripts/testing/run-e2e.mjs",
+    "test:e2e:update": "node scripts/testing/run-e2e.mjs --update-snapshots",
     "backend:preflight": "node scripts/testing/check-backend-readiness.mjs",
     "contracts:sync": "node scripts/contracts/sync-openapi.mjs",
     "contracts:generate": "node scripts/contracts/generate-openapi.mjs",

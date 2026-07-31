@@ -1,6 +1,6 @@
 # Harness Baseline
 
-**Baseline version:** 6
+**Baseline version:** 7
 
 **Captured:** 2026-08-01
 
@@ -39,7 +39,7 @@ listed as missing.
 | Authentication  | Failure, token, session, refresh, cookie, and browser-flow coverage                       | Default runtime lane uses a fixture rather than the real backend                |
 | Security        | Server-only boundaries, secret-safe API failures, read-only CI, and immutable action pins | No secret scan, dependency audit, or browser security scan                      |
 | Accessibility   | Axe WCAG A/AA scans plus keyboard, error, title, heading, and landmark browser assertions | No human assistive-technology, zoom/reflow, or cross-browser review             |
-| Visual quality  | Human inspection only                                                                     | No screenshot comparison or deterministic visual oracle                         |
+| Visual quality  | Five inspected, repository-owned Linux Chromium baselines in the runtime gate             | No responsive, cross-browser, or human taste oracle                             |
 | Delivery        | Proven clean-checkout CI, frozen install, stable aggregate status, and summaries          | No repository rule, container evidence, artifact provenance, or deployment gate |
 
 ## Test Inventory
@@ -52,7 +52,8 @@ The inventory below is recorded from the verification run in this baseline:
 | Contract Node tests          |     6 | Contract tooling and deterministic generation            |
 | Harness Node tests           |    18 | Knowledge, risk, aggregate-status, and workflow fixtures |
 | Testing-tool Node tests      |     7 | Auth fixture contracts and sanitized backend preflight   |
-| Playwright scenarios         |    10 | Public metadata, auth/session, accessibility, and 404    |
+| Playwright scenarios         |    14 | Public, auth/session, accessibility, visual, and 404     |
+| Visual baselines             |     5 | Light/dark landing, login/error, and authenticated state |
 
 Counts describe current test cases, not requirements coverage. They must not be
 used as a target that encourages low-value tests.
@@ -66,7 +67,7 @@ runtime:
 | --------------------- | ------ | --------- | ----------------------------------- |
 | `pnpm verify:fast`    | passed | 24.25 s   | Full fast deterministic gate        |
 | `pnpm verify`         | passed | 32.79 s   | Fast controls plus production build |
-| `pnpm verify:runtime` | passed | 7.9 s     | Ten Chromium scenarios              |
+| `pnpm verify:runtime` | passed | 8.0 s     | Fourteen Chromium scenarios         |
 
 These values establish an observation point for future calibration. A later
 phase may introduce regression budgets only after multiple comparable samples.
@@ -79,10 +80,9 @@ production compilation, and browser flows. The least-privilege CI workflow
 reproduced that evidence successfully in
 [run 30682954749](https://github.com/Orymu/lamara-frontend/actions/runs/30682954749).
 There is still no required repository rule,
-real-backend smoke lane, container evidence, or calibrated maintainability,
-security or visual sensor. Accessibility now has a deterministic first-line
-sensor, but automated results do not replace human review or establish
-conformance.
+real-backend smoke lane, container evidence, or calibrated security sensor.
+Accessibility and visual regression now have deterministic first-line sensors,
+but automated results do not replace human accessibility or visual-taste review.
 
 Phase 3 can now add new quality signals without mistaking configured automation
 for observed delivery confidence.

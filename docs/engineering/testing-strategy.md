@@ -56,6 +56,8 @@ Playwright covers:
   landing, login, login-error, protected-redirect, and authenticated states;
 - keyboard navigation, visible login-field focus, form-error relationships,
   document titles, headings, and page landmarks.
+- repository-owned visual comparisons for light/dark landing, default/error
+  login, and authenticated-foundation states at a fixed desktop viewport.
 
 Axe catches a useful subset of accessibility defects; it does not certify WCAG
 conformance. Human keyboard, zoom/reflow, reduced-motion, and
@@ -78,6 +80,7 @@ pnpm contracts:check
 pnpm knowledge:check
 pnpm risk:classify -- --base <revision> --head <revision>
 pnpm test:e2e
+pnpm test:e2e:update
 pnpm verify:runtime
 pnpm backend:preflight
 ```
@@ -91,6 +94,12 @@ pnpm exec playwright install chromium
 Playwright runs on port 3100, starts an isolated Next.js dev output directory,
 and a contract-faithful API fixture. The runner does not require Docker or
 reuse a developer server.
+
+`pnpm test:e2e:update` deliberately rewrites visual baselines. Use it only for
+an intended visual change, inspect every changed PNG, and include the images in
+human review. A failing comparison is evidence to investigate, not permission
+to accept the current rendering. Generated diffs and actual images stay under
+the ignored `test-results/` directory.
 
 `pnpm backend:preflight` is an explicit, read-only developer diagnostic. It
 loads `LAMARA_API_BASE_URL` from the process or `.env.local`, calls only
