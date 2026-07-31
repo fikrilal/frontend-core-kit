@@ -77,11 +77,11 @@ The accepted direction is documented in the
    [Repository-owned visual evidence](completed/2026-08-01_agent-harness-phase-3-4.md)
 7. **Completed:**
    [Task-oriented verification](completed/2026-08-01_agent-harness-phase-4-1-task-verification.md)
-8. **Active:**
-   [Scope and repair bounds](active/2026-08-01_agent-harness-phase-4-2-scope-repair-bounds.md)
-9. **Queued:**
-   [Authorized PR loop](queued/2026-08-01_agent-harness-phase-4-3-authorized-pr-loop.md)
-10. **Queued:**
-    [Operating proof](queued/2026-08-01_agent-harness-phase-4-4-operating-proof.md)
+8. **Completed:**
+   [Scope and repair bounds](completed/2026-08-01_agent-harness-phase-4-2-scope-repair-bounds.md)
+9. **Completed:**
+   [Authorized PR loop](completed/2026-08-01_agent-harness-phase-4-3-authorized-pr-loop.md)
+10. **Active:**
+    [Operating proof](active/2026-08-01_agent-harness-phase-4-4-operating-proof.md)
 
 Do not introduce product workflows until a real product decision exists.

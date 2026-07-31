@@ -1,7 +1,7 @@
 # 2026-08-01 Agent Harness Phase 4.2: Scope And Repair Bounds
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent
 **Risk:** high
 **Authority:** implement and verify repository-local plan-schema and task-bound

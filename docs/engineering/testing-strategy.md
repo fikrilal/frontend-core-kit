@@ -81,6 +81,8 @@ pnpm knowledge:check
 pnpm risk:classify -- --base <revision> --head <revision>
 pnpm task:begin
 pnpm task:verify
+pnpm task:handoff -- --title "type(scope): summary" --dry-run
+pnpm harness:evidence
 pnpm test:e2e
 pnpm test:e2e:update
 pnpm verify:runtime
@@ -117,6 +119,13 @@ change discovery, active-plan risk, runtime/browser prerequisites, structured
 boundaries, pre-existing user changes, scope violations, repeated failures,
 lane ordering, failure stop behavior, and secret-safe JSON summaries. These
 commands never invoke live backend preflight automatically.
+
+`pnpm task:handoff` fixture coverage proves action-specific stops, fresh
+verification/scope requirements, clean-baseline checks, normal Git command
+ordering, draft-only creation, matching-draft repair updates, body sanitization,
+and no force-push. `pnpm harness:evidence` fixtures prove an empty ledger stays
+insufficient, a diverse reviewed sample is only ready for human review, and
+invalid plan sources or free-form fields are rejected.
 
 ## Growth
 

@@ -30,6 +30,7 @@
     "task:begin": "node scripts/harness/task-begin.mjs",
     "task:verify": "node scripts/harness/task-verify.mjs",
     "task:handoff": "node scripts/harness/task-handoff-cli.mjs",
+    "harness:evidence": "node scripts/harness/operating-evidence-cli.mjs",
     "knowledge:check": "node scripts/harness/check-knowledge.mjs",
     "architecture:check": "node scripts/harness/check-architecture.mjs",
     "maintainability:check": "knip --include files,exports,dependencies --include-entry-exports",

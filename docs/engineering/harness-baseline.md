@@ -1,6 +1,6 @@
 # Harness Baseline
 
-**Baseline version:** 8
+**Baseline version:** 9
 
 **Captured:** 2026-08-01
 
@@ -30,7 +30,7 @@ listed as missing.
 
 | Dimension       | Blocking controls today                                                                      | Known gap                                                                       |
 | --------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Intent          | V2 task boundaries, lifecycle/link/proposal checks, risk selection, scope, and repair bounds | No semantic judgment of plan quality or line-level user-change ownership        |
+| Intent          | V2 boundaries, scoped verification, draft-only handoff policy, and operating-evidence ledger | No semantic judgment of plan quality or line-level user-change ownership        |
 | Formatting      | Prettier check                                                                               | None known for covered file types                                               |
 | Static analysis | ESLint/TypeScript, calibrated size and complexity caps, and Knip dead-code analysis          | Duplication has a measured baseline but no permanent sensor                     |
 | Architecture    | Environment, fetch, import, feature API, and thin-route checks                               | Regex/static heuristics do not prove all dependency directions                  |
@@ -46,14 +46,14 @@ listed as missing.
 
 The inventory below is recorded from the verification run in this baseline:
 
-| Layer                        | Count | Scope                                                         |
-| ---------------------------- | ----: | ------------------------------------------------------------- |
-| Vitest unit/component/server |    60 | Application and server-boundary behavior                      |
-| Contract Node tests          |     6 | Contract tooling and deterministic generation                 |
-| Harness Node tests           |    39 | Knowledge, risk, task boundaries/state, and workflow fixtures |
-| Testing-tool Node tests      |     7 | Auth fixture contracts and sanitized backend preflight        |
-| Playwright scenarios         |    14 | Public, auth/session, accessibility, visual, and 404          |
-| Visual baselines             |     5 | Light/dark landing, login/error, and authenticated state      |
+| Layer                        | Count | Scope                                                               |
+| ---------------------------- | ----: | ------------------------------------------------------------------- |
+| Vitest unit/component/server |    60 | Application and server-boundary behavior                            |
+| Contract Node tests          |     6 | Contract tooling and deterministic generation                       |
+| Harness Node tests           |    48 | Knowledge, risk, task loop/handoff, and operating-evidence fixtures |
+| Testing-tool Node tests      |     7 | Auth fixture contracts and sanitized backend preflight              |
+| Playwright scenarios         |    14 | Public, auth/session, accessibility, visual, and 404                |
+| Visual baselines             |     5 | Light/dark landing, login/error, and authenticated state            |
 
 Counts describe current test cases, not requirements coverage. They must not be
 used as a target that encourages low-value tests.
@@ -89,12 +89,13 @@ for observed delivery confidence.
 
 ## Task-Loop Measurements
 
-Phase 4.2 adds an explicit task baseline and bounded repair controls. The
-controls are not yet a claim of autonomous repair success: the local shell lacks
-the repository's Node 24 runtime, and the first real task/hosted evidence remains
-follow-up work. V2 boundaries make paths, actions, maximum risk, and repair limit
-machine-readable; the baseline preserves pre-existing paths but does not infer
-line-level ownership.
+Phase 4 adds explicit task baselines, bounded repair controls, an action-specific
+draft-handoff adapter, and a sanitized operating-evidence ledger. These controls
+are not a claim of autonomous repair success: the local shell lacks the
+repository's Node 24 runtime, no live handoff was authorized, and the evidence
+ledger contains zero reviewed real-task records. V2 boundaries make paths,
+actions, maximum risk, and repair limit machine-readable; the baseline preserves
+pre-existing paths but does not infer line-level ownership.
 
 ## Maintainability Measurements
 

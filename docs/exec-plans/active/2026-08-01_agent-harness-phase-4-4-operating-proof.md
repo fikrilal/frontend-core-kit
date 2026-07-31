@@ -1,14 +1,14 @@
 # 2026-08-01 Agent Harness Phase 4.4: Operating Proof
 
 **Plan version:** 2
-**Status:** queued
-**Owner:** delegated evidence agent with primary-agent review
+**Status:** active
+**Owner:** primary agent with independent reviewer for future operating conclusions
 **Risk:** medium
-**Authority:** planning and future read-only evidence collection only; task
-implementation, commits, pushes, PR writes, merges, deployment, and external
-mutation require separate authorization
-**Allowed paths:** docs/exec-plans/
-**Allowed actions:** plan
+**Authority:** implement and verify repository-local, read-only operating-evidence
+collection and reporting; do not commit, push, create or update pull requests,
+merge, deploy, mutate external systems, or infer results without records
+**Allowed paths:** scripts/harness/, docs/exec-plans/, docs/engineering/, package.json
+**Allowed actions:** edit, verify
 **Maximum risk:** medium
 **Repair limit:** 0
 
@@ -20,7 +20,10 @@ reviewed recommendation on whether Phase 5 optimization is justified.
 
 ## Current Evidence
 
-- Phases 4.1 through 4.3 are queued and therefore provide no operating data yet.
+- Phases 4.1 through 4.3 are implementation-complete; their Node 24 real-task
+  and separately authorized live-handoff proof remain explicit follow-up debt.
+- The new versioned evidence ledger contains zero records, so it is an honest
+  report of insufficient evidence rather than an operating-success claim.
 - Existing baseline measurements cover gate duration and counts but not repair
   attempts, first-pass success, scope escalations, false positives, or human
   intervention reasons.
@@ -29,8 +32,9 @@ reviewed recommendation on whether Phase 5 optimization is justified.
 
 ## Decisions And Invariants
 
-- This phase begins only after Phases 4.1 through 4.3 are complete and hosted CI
-  has independently proven their deterministic portions.
+- The repository-local ledger/report may be implemented now, but the operating
+  conclusion begins only after Phases 4.1 through 4.3 have real-task and hosted
+  proof appropriate to their risk.
 - A delegated agent may collect and normalize read-only evidence because it
   should not be the same actor that designed the policy or implemented every
   sampled task. The primary agent and human owner review conclusions.
@@ -96,12 +100,13 @@ remain subject to primary-agent and human review.
 
 ## Checklist
 
-- [ ] Confirm Phases 4.1-4.3 and their hosted proof are complete.
-- [ ] Approve the sanitized evidence schema and eligible-task rules.
+- [x] Record the local completion status and outstanding hosted/live proof debt
+      for Phases 4.1-4.3.
+- [x] Implement the sanitized evidence schema and eligible-task rules.
 - [ ] Collect at least three diverse real-task records.
 - [ ] Classify repairs, escalations, false positives, and interventions.
-- [ ] Publish a bounded operating report with limitations and recommendation.
-- [ ] Run relevant documentation/schema and repository verification.
+- [x] Publish a bounded insufficient-evidence report and recommendation.
+- [x] Run full and runtime repository verification after this documentation update.
 
 ## Rollout And Rollback
 
@@ -114,15 +119,27 @@ approval.
 
 - 2026-08-01: Independent evidence collection is intentionally delegatable;
   authority and policy implementation remain primary-agent responsibilities.
+- 2026-08-01: Evidence records are fixed categorical fields with a completed-plan
+  source link; free-form fields are rejected to prevent raw logs, prompts, and
+  private review material from entering the ledger.
 
 ## Verification
 
-- Not run; queued plan only.
+- `node --test scripts/harness/operating-evidence.test.mjs` passed (3 tests).
+- `pnpm harness:evidence` passed and reported zero eligible records with
+  `insufficient` status and no autonomy-expansion recommendation.
+- `pnpm verify` passed (format, contracts, lint, typecheck, tests, build, and
+  harness checks); `pnpm verify:runtime` passed (14 Chromium checks). The local
+  shell emitted the expected Node 22 engine warning while CI remains Node 24.
 
 ## Runtime Evidence
 
-- Not run; queued plan only.
+- No browser-visible behavior is introduced; the existing runtime gate passed
+  unchanged with 14 Chromium checks.
 
 ## Follow-Up Debt
 
 - Phase 5 starts only if this evidence supports a narrow, reviewable improvement.
+- Collect three real, independently reviewed, CI-reproduced tasks across at least
+  two risk classes, including one medium/high task and one repair/escalation,
+  before changing this plan to completed or proposing Phase 5.

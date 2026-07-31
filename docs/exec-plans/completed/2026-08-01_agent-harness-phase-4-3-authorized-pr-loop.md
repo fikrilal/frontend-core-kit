@@ -1,13 +1,14 @@
 # 2026-08-01 Agent Harness Phase 4.3: Authorized PR Loop
 
 **Plan version:** 2
-**Status:** queued
+**Status:** completed
 **Owner:** primary agent
 **Risk:** high
-**Authority:** planning only; no commit, push, branch creation, pull request,
-GitHub write, merge, deployment, or other external mutation is authorized
-**Allowed paths:** docs/exec-plans/
-**Allowed actions:** plan
+**Authority:** implement and verify repository-local Git/GitHub handoff tooling;
+do not commit, push, create branches, create or update pull requests, merge,
+deploy, or mutate external systems
+**Allowed paths:** scripts/harness/, docs/exec-plans/, docs/engineering/, package.json
+**Allowed actions:** edit, verify
 **Maximum risk:** high
 **Repair limit:** 0
 
@@ -26,6 +27,9 @@ and mechanically enforced.
   authority before this phase can safely execute GitHub writes.
 - Existing commit conventions and hooks are enforced locally, while no auto-merge
   or repository mutation policy exists.
+- `task:handoff` now uses an injected Git/GitHub command adapter and a fresh
+  task-verification result; its live publication path remains disabled unless a
+  task plan grants each required structured action.
 - GitHub authentication and repository rules are external state and cannot be
   assumed by deterministic tests.
 
@@ -45,9 +49,9 @@ and mechanically enforced.
 - PR text includes objective, risk, acceptance evidence, executed commands,
   runtime evidence, rollback, and remaining human gates without raw logs or
   secrets.
-- Hosted repair may inspect failed checks and modify only the same authorized
-  task scope. Unclear failures, scope expansion, repeated failure, missing
-  credentials, or restricted actions stop for human direction.
+- Repair handoff requires a matching open draft PR, fresh task verification, and
+  separate `update-pr` authority. It never force-pushes, merges, deploys,
+  comments, or resolves review threads.
 - Never force-push. If published history must change, stop and request explicit
   approval for a safe strategy.
 
@@ -83,7 +87,7 @@ and mechanically enforced.
 Risk is high because this phase can mutate Git history on a remote and communicate
 through GitHub. The primary agent should own implementation and safety review.
 Unit/fixture work may be delegated, but live proof requires explicit case-specific
-user approval. This queued plan authorizes no mutation.
+user approval. This completed implementation authorizes no live mutation.
 
 ## Impact Areas
 
@@ -107,12 +111,13 @@ user approval. This queued plan authorizes no mutation.
 
 ## Checklist
 
-- [ ] Confirm Phase 4.1 and 4.2 are complete and independently proven.
-- [ ] Approve the exact action-authority matrix and draft-only initial rollout.
-- [ ] Implement injected Git/GitHub preflight and publication adapters.
-- [ ] Add permission, ordering, failure, privacy, and no-force fixtures.
-- [ ] Prove a draft PR only with separate explicit live authorization.
-- [ ] Document human gates, rollback, and hosted repair limits.
+- [x] Confirm Phase 4.1 and 4.2 implementation evidence and their remaining
+      Node 24 real-workflow proof debt.
+- [x] Define the exact action-authority matrix and draft-only initial rollout.
+- [x] Implement injected Git/GitHub preflight and publication adapters.
+- [x] Add permission, ordering, failure, privacy, and no-force fixtures.
+- [x] Exclude live draft-PR proof until separate explicit authorization exists.
+- [x] Document human gates, rollback, and hosted repair limits.
 
 ## Rollout And Rollback
 
@@ -125,16 +130,27 @@ point; local verification and plan evidence remain usable.
 
 - 2026-08-01: Draft PR creation is the maximum initial external autonomy; merge
   and deployment remain absent rather than merely disabled by default.
+- 2026-08-01: `task:handoff` re-runs local task verification immediately before
+  mutation and rejects dirty baselines, stale verified scope, detached branches,
+  missing `origin`, PR/base/head mismatches, and any absent required action.
 
 ## Verification
 
-- Not run; queued plan only.
+- `node --test scripts/harness/task-handoff.test.mjs` passed (6 tests), covering
+  authority stops, dry run, draft creation ordering, repair handoff, stale or
+  unowned changes, branch validation, sanitized body content, and no force-push.
+- `pnpm maintainability:check` passed after registering the CLI as
+  `pnpm task:handoff`.
 
 ## Runtime Evidence
 
-- Not run; queued plan only.
+- No live GitHub operation was attempted or authorized. The command adapter is
+  proven only through injected local fixtures.
 
 ## Follow-Up Debt
 
 - Phase 4.4 must measure real repair-loop outcomes before any broader autonomy is
   proposed.
+- A real Node 24.18.0 task must prove `task:begin`, `task:verify`, and a
+  separately authorized draft handoff before live publication is considered
+  independently proven.

@@ -53,6 +53,36 @@ changes that existed at `task:begin`, but it cannot determine who changed a line
 inside such a file later. Agents must treat pre-existing out-of-scope paths as
 user-owned and request a boundary change before editing them.
 
+## Draft handoff
+
+`pnpm task:handoff -- --title "type(scope): summary" --dry-run` exercises the
+same preflight without mutating Git or GitHub. The non-dry path re-runs task
+verification, requires a clean task baseline, validates the current named branch
+and `origin`, and requires separate `commit`, `push`, and `draft-pr` action
+authority in the active V2 plan before it can stage only verified task paths,
+create one normal commit, push normally, and create a draft PR. It never
+force-pushes, merges, deploys, comments, or changes review state.
+
+`pnpm task:handoff -- --pr <number> --title "type(scope): repair"` is the
+separate repair-handoff form. It requires `commit`, `push`, and `update-pr`
+authority, and only continues when the given PR is still an open draft whose
+base/head exactly match the local task. The adapter updates its sanitized
+evidence body after a normal push; it does not inspect or override review or CI
+outcomes. A real handoff always needs task-specific human authority for every
+external action.
+
+## Operating evidence
+
+`pnpm harness:evidence` reads the versioned,
+[sanitized operating-evidence ledger](harness-operating-evidence.md) and prints
+aggregates only. It requires each record to cite a completed execution plan and
+uses fixed categorical fields, so it cannot collect prompts, logs, credentials,
+environment values, PR links, source diffs, notes, or review prose. The command
+reports `insufficient` until there are at least three independently reviewed,
+CI-reproduced tasks across two risk classes, including a medium/high task and a
+repair or escalation. Even then, its only outcome is `ready-for-human-review`;
+it never expands autonomy or changes harness policy.
+
 CI repeats these commands from a clean checkout. Local results remain repair
 feedback; GitHub Actions is the independent integration run once the workflow
 has been pushed.
