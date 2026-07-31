@@ -22,5 +22,8 @@ after the task and its evidence have been independently reviewed.
 
 ## Current Report
 
-No eligible records have been collected. Phase 4.4 therefore has insufficient
-evidence for a Phase 5 recommendation.
+One eligible record has been collected for the password-registration task. It
+was independently reviewed, reproduced in hosted CI, completed after repair,
+and spans three bounded verification attempts. Phase 4.4 still has
+insufficient evidence: two additional reviewed tasks and a second risk class
+are required before a Phase 5 recommendation can be considered.

@@ -83,7 +83,7 @@ The accepted direction is documented in the
    [Authorized PR loop](completed/2026-08-01_agent-harness-phase-4-3-authorized-pr-loop.md)
 10. **Completed:**
     [Password registration](completed/2026-08-01_auth-password-registration.md)
-11. **Queued:**
-    [Operating proof](queued/2026-08-01_agent-harness-phase-4-4-operating-proof.md)
+11. **Active:**
+    [Operating proof](active/2026-08-01_agent-harness-phase-4-4-operating-proof.md)
 
 Do not introduce product workflows until a real product decision exists.

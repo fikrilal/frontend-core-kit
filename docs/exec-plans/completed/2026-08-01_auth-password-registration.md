@@ -141,10 +141,13 @@ external account cleanup is required because default verification uses fixtures.
   - Registration accessibility and visual states passed.
   - Existing landing, login, logout, protection, metadata, and authenticated
     foundation coverage remained green.
+- Phase 4.4 records this task as high-risk, not first-pass, completed after
+  repair, independently reviewed, and reproduced in hosted CI. Its 122-second
+  gate duration is the wall-clock span of hosted run `30695230750`.
 
 ## Follow-Up Debt
 
 - Implement email verification and resend only after the product flow and email
   delivery policy are decided.
-- Add this task to the Phase 4.4 operating-evidence ledger only after an
+- The Phase 4.4 operating-evidence ledger now contains this task after
   independent review and hosted CI reproduction.
