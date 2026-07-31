@@ -1,10 +1,14 @@
 # YYYY-MM-DD Short Title
 
-**Plan version:** 1
+**Plan version:** 2
 **Status:** active
 **Owner:** accountable human or agent role
 **Risk:** low | medium | high
 **Authority:** state permitted actions and explicit exclusions
+**Allowed paths:** narrow/repository-relative/file-or-directory-prefixes
+**Allowed actions:** comma-separated values from plan, edit, verify, commit, push, draft-pr, update-pr, merge, deploy
+**Maximum risk:** low | medium | high
+**Repair limit:** non-negative whole number
 
 ## Objective
 

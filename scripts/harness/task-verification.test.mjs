@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  beginTask,
   discoverTaskChanges,
   parseTaskVerificationArguments,
   runTaskVerification,
@@ -86,6 +87,7 @@ test("selects fast verification only for low risk", () => {
 test("runs only the fast lane for a low-risk active task", () => {
   const root = createRepository({ activePlanRisk: "low" });
   try {
+    begin(root);
     write(root, "docs/change.md", "change\n");
     const laneCalls = [];
     const summary = runTaskVerification({
@@ -106,6 +108,7 @@ test("runs only the fast lane for a low-risk active task", () => {
 test("runs high-risk lanes in order and writes a sanitized summary", () => {
   const root = createRepository({ activePlanRisk: "high" });
   try {
+    begin(root);
     write(root, "src/server/task.ts", "export {};\n");
     const laneCalls = [];
     const summary = runTaskVerification({
@@ -136,6 +139,7 @@ test("runs high-risk lanes in order and writes a sanitized summary", () => {
 test("stops after the first failed lane and records remediation", () => {
   const root = createRepository({ activePlanRisk: "medium" });
   try {
+    begin(root);
     write(root, "src/task.ts", "export {};\n");
     const laneCalls = [];
     assert.throws(
@@ -169,6 +173,7 @@ test("stops after the first failed lane and records remediation", () => {
 test("stops before lanes when required Chromium is unavailable", () => {
   const root = createRepository({ activePlanRisk: "medium" });
   try {
+    begin(root);
     write(root, "src/task.ts", "export {};\n");
     const laneCalls = [];
     assert.throws(
@@ -183,6 +188,63 @@ test("stops before lanes when required Chromium is unavailable", () => {
       failureWithCode("browser-missing"),
     );
     assert.deepEqual(laneCalls, []);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("preserves baseline paths but stops new task paths outside scope", () => {
+  const root = createRepository({ activePlanRisk: "medium" });
+  try {
+    write(root, "docs/pre-existing.md", "before\n");
+    begin(root);
+    write(root, "tests/outside.spec.ts", "export {};\n");
+    const laneCalls = [];
+
+    assert.throws(
+      () =>
+        runTaskVerification({
+          root,
+          nodeVersion: "24.18.0",
+          pnpmVersion: () => "11.15.0",
+          browserPath: () => "/chromium",
+          execute: taskExecutor(root, laneCalls),
+        }),
+      failureWithCode("scope-violation"),
+    );
+    assert.deepEqual(laneCalls, []);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("stops before a third unchanged failed repair attempt", () => {
+  const root = createRepository({ activePlanRisk: "medium" });
+  try {
+    begin(root);
+    write(root, "src/task.ts", "export {};\n");
+    const laneCalls = [];
+    const options = {
+      root,
+      nodeVersion: "24.18.0",
+      pnpmVersion: () => "11.15.0",
+      browserPath: () => "/chromium",
+      execute: taskExecutor(root, laneCalls, { "pnpm verify": 1 }),
+    };
+
+    assert.throws(
+      () => runTaskVerification(options),
+      failureWithCode("lane-full-failed"),
+    );
+    assert.throws(
+      () => runTaskVerification(options),
+      failureWithCode("lane-full-failed"),
+    );
+    assert.throws(
+      () => runTaskVerification(options),
+      failureWithCode("repair-budget-exhausted"),
+    );
+    assert.deepEqual(laneCalls, ["pnpm verify", "pnpm verify"]);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -217,6 +279,7 @@ test("stops before lanes for an unresolved base or missing active plan", () => {
 test("rejects unsafe summary paths and unsupported arguments", () => {
   const root = createRepository({ activePlanRisk: "low" });
   try {
+    begin(root);
     write(root, "docs/change.md", "change\n");
     assert.throws(
       () =>
@@ -241,6 +304,7 @@ test("rejects unsafe summary paths and unsupported arguments", () => {
 test("leaves the Git-visible task state unchanged", () => {
   const root = createRepository({ activePlanRisk: "low" });
   try {
+    begin(root);
     write(root, "docs/change.md", "change\n");
     const before = git(root, "status", "--short");
     runTaskVerification({
@@ -299,7 +363,7 @@ function validPlan(risk) {
     "Runtime Evidence",
     "Follow-Up Debt",
   ];
-  return `# Task\n\n**Plan version:** 1\n**Status:** active\n**Owner:** test owner\n**Risk:** ${risk}\n**Authority:** test only\n\n${sections.map((section) => `## ${section}\n\nRecorded evidence.\n`).join("\n")}`;
+  return `# Task\n\n**Plan version:** 2\n**Status:** active\n**Owner:** test owner\n**Risk:** ${risk}\n**Authority:** test only\n**Allowed paths:** docs/, src/\n**Allowed actions:** edit, verify\n**Maximum risk:** high\n**Repair limit:** 2\n\n${sections.map((section) => `## ${section}\n\nRecorded evidence.\n`).join("\n")}`;
 }
 
 function taskExecutor(root, laneCalls, outcomes = {}) {
@@ -316,6 +380,16 @@ function taskExecutor(root, laneCalls, outcomes = {}) {
     });
     return { status: result.status ?? 1, stdout: result.stdout ?? "" };
   };
+}
+
+function begin(root) {
+  return beginTask({
+    root,
+    nodeVersion: "24.18.0",
+    pnpmVersion: () => "11.15.0",
+    execute: taskExecutor(root, []),
+    now: () => "2026-08-01T00:00:00.000Z",
+  });
 }
 
 function incrementingClock() {

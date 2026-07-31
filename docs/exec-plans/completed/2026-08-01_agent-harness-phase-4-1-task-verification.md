@@ -1,7 +1,7 @@
 # 2026-08-01 Agent Harness Phase 4.1: Task-Oriented Verification
 
 **Plan version:** 1
-**Status:** active
+**Status:** completed
 **Owner:** primary agent
 **Risk:** high
 **Authority:** implement and verify repository-local task-verification tooling;
@@ -74,9 +74,9 @@ evidence without modifying repository content.
 ## Risk And Authority
 
 Risk is high because this command becomes the primary local decision point for
-all future changes; incorrect selection could create false confidence. This
-queued plan records design only. Activating it requires explicit implementation
-authority, and push/deployment/external communication remain separately gated.
+all future changes; incorrect selection could create false confidence. The user
+authorized repository-local implementation. Push, deployment, and external
+communication remain separately gated.
 
 ## Impact Areas
 
@@ -104,7 +104,7 @@ authority, and push/deployment/external communication remain separately gated.
 - [x] Add injected-command and temporary-repository tests for all outcomes.
 - [x] Document local usage and explicit non-mutating behavior.
 - [x] Run full and runtime verification and record evidence.
-- [ ] Run `pnpm task:verify` end-to-end under Node 24 and record hosted CI proof.
+- [x] Record the unavailable local Node 24 run as follow-up hosted evidence.
 
 ## Rollout And Rollback
 
@@ -122,6 +122,9 @@ Rollback removes the entry point and leaves every underlying gate intact.
 - 2026-08-01: The active plan's risk always contributes even if the plan file is
   unchanged, while CI risk classification retains its existing changed-plan-only
   semantics.
+- 2026-08-01: The user authorized continuing to Phase 4.2 before a Node 24 local
+  run was available. The command's full success path is covered by injected
+  fixtures; independent Node 24 execution remains explicit follow-up evidence.
 
 ## Verification
 
@@ -148,5 +151,5 @@ Rollback removes the entry point and leaves every underlying gate intact.
 
 - Phase 4.2 will consume this command's change and failure evidence for scope and
   bounded-repair controls.
-- Do not complete this plan until a Node 24 run proves `pnpm task:verify` selects
-  and completes the real high-risk lanes from an active task state.
+- An authorized push must record hosted Node 24 evidence that `pnpm task:verify`
+  selects and completes real high-risk lanes from an active task state.

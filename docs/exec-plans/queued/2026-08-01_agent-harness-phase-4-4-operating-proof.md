@@ -1,12 +1,16 @@
 # 2026-08-01 Agent Harness Phase 4.4: Operating Proof
 
-**Plan version:** 1
+**Plan version:** 2
 **Status:** queued
 **Owner:** delegated evidence agent with primary-agent review
 **Risk:** medium
 **Authority:** planning and future read-only evidence collection only; task
 implementation, commits, pushes, PR writes, merges, deployment, and external
 mutation require separate authorization
+**Allowed paths:** docs/exec-plans/
+**Allowed actions:** plan
+**Maximum risk:** medium
+**Repair limit:** 0
 
 ## Objective
 

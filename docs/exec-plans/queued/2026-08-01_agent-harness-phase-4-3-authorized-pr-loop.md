@@ -1,11 +1,15 @@
 # 2026-08-01 Agent Harness Phase 4.3: Authorized PR Loop
 
-**Plan version:** 1
+**Plan version:** 2
 **Status:** queued
 **Owner:** primary agent
 **Risk:** high
 **Authority:** planning only; no commit, push, branch creation, pull request,
 GitHub write, merge, deployment, or other external mutation is authorized
+**Allowed paths:** docs/exec-plans/
+**Allowed actions:** plan
+**Maximum risk:** high
+**Repair limit:** 0
 
 ## Objective
 

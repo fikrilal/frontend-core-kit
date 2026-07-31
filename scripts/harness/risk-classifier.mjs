@@ -172,7 +172,7 @@ export function loadChangedPlanDocuments(root, changedPaths) {
 
   if (planPaths.length > 0 && documents.length === 0) {
     throw new Error(
-      "Changed execution plans are missing at the target revision; retain a v1 plan that declares risk.",
+      "Changed execution plans are missing at the target revision; retain a V1/V2 plan that declares risk.",
     );
   }
 
@@ -215,7 +215,7 @@ function declaredPlanRisk(changedPaths, planDocuments, activePlanDocument) {
 
   if (changedPlanPaths.size > 0 && relevantDocuments.length === 0) {
     throw new Error(
-      "A changed execution plan must exist at the target revision and declare v1 risk metadata.",
+      "A changed execution plan must exist at the target revision and declare V1/V2 risk metadata.",
     );
   }
 
@@ -234,9 +234,9 @@ function declaredPlanRisk(changedPaths, planDocuments, activePlanDocument) {
     if (version === null && isLegacyCompletedPlan(planPath)) {
       return [];
     }
-    if (version !== "1") {
+    if (version !== "1" && version !== "2") {
       throw new Error(
-        `${planPath} must declare "**Plan version:** 1" for risk classification.`,
+        `${planPath} must declare "**Plan version:** 1" or "**Plan version:** 2" for risk classification.`,
       );
     }
     if (!risk || !validRisks.has(risk)) {

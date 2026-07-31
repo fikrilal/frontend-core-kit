@@ -79,6 +79,7 @@ pnpm test:harness
 pnpm contracts:check
 pnpm knowledge:check
 pnpm risk:classify -- --base <revision> --head <revision>
+pnpm task:begin
 pnpm task:verify
 pnpm test:e2e
 pnpm test:e2e:update
@@ -109,10 +110,13 @@ reports only configuration, reachability, HTTP readiness, JSON, or contract
 status; it never prints the configured origin or response body. It is not part
 of default CI and does not prove login or whole-API compatibility.
 
-`pnpm task:verify` selects existing gates for one active task. Its focused Node
-fixtures cover complete Git change discovery, active-plan risk, runtime and
-browser prerequisites, lane ordering, failure stop behavior, and secret-safe
-JSON summaries. It never invokes live backend preflight automatically.
+`pnpm task:begin` captures pre-existing paths for one V2 active task;
+`pnpm task:verify` selects existing gates only after scope, authority, maximum-
+risk, and repair-budget preflight. Focused Node fixtures cover complete Git
+change discovery, active-plan risk, runtime/browser prerequisites, structured
+boundaries, pre-existing user changes, scope violations, repeated failures,
+lane ordering, failure stop behavior, and secret-safe JSON summaries. These
+commands never invoke live backend preflight automatically.
 
 ## Growth
 

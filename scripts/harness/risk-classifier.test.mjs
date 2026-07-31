@@ -89,7 +89,7 @@ test("defaults unknown paths to medium and rejects paths outside the repository"
   );
 });
 
-test("requires changed execution plans to provide valid v1 risk", () => {
+test("requires changed execution plans to provide valid V1/V2 risk", () => {
   const planPath = "docs/exec-plans/active/plan.md";
 
   assert.throws(
@@ -286,7 +286,7 @@ test("keeps the GitHub workflow least-privilege and branch-protection ready", ()
 });
 
 function plan(risk) {
-  return `# Plan\n\n**Plan version:** 1\n**Risk:** ${risk}\n`;
+  return `# Plan\n\n**Plan version:** 2\n**Risk:** ${risk}\n`;
 }
 
 function actionPins(workflow, action) {

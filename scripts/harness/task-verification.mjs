@@ -7,6 +7,18 @@ import { chromium } from "@playwright/test";
 
 import { collectKnowledgeViolations } from "./knowledge-tools.mjs";
 import { classifyRisk, loadChangedPlanDocuments } from "./risk-classifier.mjs";
+import {
+  assertActionAllowed,
+  assertRiskAllowed,
+  parseTaskBoundaries,
+} from "./task-boundaries.mjs";
+import {
+  assertRepairBudget,
+  evaluateTaskScope,
+  initializeTaskState,
+  readTaskState,
+  recordTaskFailure,
+} from "./task-state.mjs";
 
 const validRisks = new Set(["low", "medium", "high"]);
 
@@ -57,17 +69,23 @@ export function runTaskVerification({
     validateKnowledge(root);
     const changes = discoverTaskChanges({ root, base, execute });
     const activePlan = loadActivePlan(root);
+    assertActionAllowed(activePlan.boundaries, "verify");
     const classification = classifyRisk({
       changedPaths: changes.changedPaths,
       planDocuments: loadChangedPlanDocuments(root, changes.changedPaths),
       activePlanDocument: activePlan,
     });
+    assertRiskAllowed(activePlan.boundaries, classification.risk);
     const lanes = selectVerificationLanes(classification.risk);
+    const state = readTaskState(root);
+    const scope = evaluateTaskScope({ root, state, activePlan, changes });
+    assertRepairBudget(state, scope);
 
     summary.status = "running";
     summary.risk = classification;
     summary.activePlan = activePlan.path;
     summary.changes = changes;
+    summary.scope = scope;
     summary.lanes = [];
 
     validateBrowserIfRequired({ risk: classification.risk, browserPath });
@@ -84,11 +102,18 @@ export function runTaskVerification({
       summary.lanes.push(laneSummary);
 
       if (result.status !== 0) {
-        throw taskError(
+        const failure = taskError(
           `lane-${lane.id}-failed`,
           `${lane.label} failed.`,
           `Run ${laneSummary.command} directly, repair the reported invariant, then rerun task verification.`,
         );
+        summary.repair = recordTaskFailure({
+          root,
+          state,
+          failureCode: failure.failure.code,
+          scope,
+        });
+        throw failure;
       }
     }
 
@@ -106,7 +131,60 @@ export function runTaskVerification({
   }
 }
 
-export function discoverTaskChanges({ root, base, execute = executeCommand }) {
+export function beginTask({
+  root,
+  base = "HEAD",
+  nodeVersion = process.versions.node,
+  pnpmVersion = readPnpmVersion,
+  execute = executeCommand,
+  now = () => new Date().toISOString(),
+}) {
+  validateRuntime({ root, nodeVersion, pnpmVersion });
+  validateKnowledge(root);
+  const changes = discoverTaskChanges({
+    root,
+    base,
+    execute,
+    allowEmpty: true,
+  });
+  const activePlan = loadActivePlan(root);
+  assertActionAllowed(activePlan.boundaries, "verify");
+  const classificationPaths =
+    changes.changedPaths.length > 0 ? changes.changedPaths : [activePlan.path];
+  const classification = classifyRisk({
+    changedPaths: classificationPaths,
+    planDocuments: loadChangedPlanDocuments(root, [
+      ...changes.changedPaths,
+      activePlan.path,
+    ]),
+    activePlanDocument: activePlan,
+  });
+  assertRiskAllowed(activePlan.boundaries, classification.risk);
+  const revision = resolveRevision({ root, revision: "HEAD", execute });
+  const state = initializeTaskState({
+    root,
+    base,
+    revision,
+    activePlan,
+    changes,
+    boundaries: activePlan.boundaries,
+    now,
+  });
+
+  return {
+    activePlan: activePlan.path,
+    preexistingPathCount: changes.changedPaths.length,
+    risk: classification.risk,
+    startedAt: state.startedAt,
+  };
+}
+
+export function discoverTaskChanges({
+  root,
+  base,
+  execute = executeCommand,
+  allowEmpty = false,
+}) {
   validateRevision(base, "base");
   verifyRepository({ root, execute });
   verifyRevision({ root, revision: base, label: "base", execute });
@@ -153,7 +231,7 @@ export function discoverTaskChanges({ root, base, execute = executeCommand }) {
 
   const changedPaths = Object.values(groups).flat().toSorted();
   const uniquePaths = [...new Set(changedPaths)].toSorted();
-  if (uniquePaths.length === 0) {
+  if (!allowEmpty && uniquePaths.length === 0) {
     throw taskError(
       "no-changes",
       "Task verification found no changed paths.",
@@ -183,7 +261,7 @@ export function selectVerificationLanes(risk) {
   ];
 }
 
-export function loadActivePlan(root) {
+function loadActivePlan(root) {
   const directory = path.join(root, "docs/exec-plans/active");
   if (!fs.existsSync(directory)) {
     throw taskError(
@@ -214,7 +292,7 @@ export function loadActivePlan(root) {
   const risk = metadataValue(source, "Risk")?.toLowerCase();
 
   if (
-    version !== "1" ||
+    version !== "2" ||
     status !== "active" ||
     !risk ||
     !validRisks.has(risk)
@@ -226,7 +304,11 @@ export function loadActivePlan(root) {
     );
   }
 
-  return { path: relativePath, source };
+  return {
+    path: relativePath,
+    source,
+    boundaries: parseTaskBoundaries(source),
+  };
 }
 
 export function validateRuntime({ root, nodeVersion, pnpmVersion }) {
@@ -289,13 +371,7 @@ function verifyRepository({ root, execute }) {
 }
 
 function verifyRevision({ root, revision, label, execute }) {
-  const result = execute(
-    "git",
-    ["rev-parse", "--verify", `${revision}^{commit}`],
-    {
-      cwd: root,
-    },
-  );
+  const result = revisionResult({ root, revision, execute });
   if (result.status !== 0) {
     throw taskError(
       "git-revision",
@@ -303,6 +379,24 @@ function verifyRevision({ root, revision, label, execute }) {
       `Provide a valid Git revision with --${label}.`,
     );
   }
+}
+
+function resolveRevision({ root, revision, execute }) {
+  const result = revisionResult({ root, revision, execute });
+  if (result.status !== 0) {
+    throw taskError(
+      "git-revision",
+      "Task verification could not resolve the current revision.",
+      "Resolve the Git worktree state and rerun task verification.",
+    );
+  }
+  return result.stdout.trim();
+}
+
+function revisionResult({ root, revision, execute }) {
+  return execute("git", ["rev-parse", "--verify", `${revision}^{commit}`], {
+    cwd: root,
+  });
 }
 
 function ensureNoMergeConflicts({ root, execute }) {
@@ -377,7 +471,9 @@ function createSummary({ base }) {
     activePlan: null,
     risk: null,
     changes: null,
+    scope: null,
     lanes: [],
+    repair: null,
     failure: null,
     durationMs: 0,
   };
