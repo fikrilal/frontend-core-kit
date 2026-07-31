@@ -1,0 +1,124 @@
+# 2026-08-01 Agent Harness Phase 4.4: Operating Proof
+
+**Plan version:** 1
+**Status:** queued
+**Owner:** delegated evidence agent with primary-agent review
+**Risk:** medium
+**Authority:** planning and future read-only evidence collection only; task
+implementation, commits, pushes, PR writes, merges, deployment, and external
+mutation require separate authorization
+
+## Objective
+
+Demonstrate that the completed Phase 4 loop is useful on real repository tasks,
+record its costs and failure modes without sensitive data, and produce a human-
+reviewed recommendation on whether Phase 5 optimization is justified.
+
+## Current Evidence
+
+- Phases 4.1 through 4.3 are queued and therefore provide no operating data yet.
+- Existing baseline measurements cover gate duration and counts but not repair
+  attempts, first-pass success, scope escalations, false positives, or human
+  intervention reasons.
+- The proposal rejects commit count and raw coverage percentage as success
+  metrics and requires feedback about the loop itself.
+
+## Decisions And Invariants
+
+- This phase begins only after Phases 4.1 through 4.3 are complete and hosted CI
+  has independently proven their deterministic portions.
+- A delegated agent may collect and normalize read-only evidence because it
+  should not be the same actor that designed the policy or implemented every
+  sampled task. The primary agent and human owner review conclusions.
+- Evaluate at least three completed, independently reviewed repository tasks
+  spanning at least two risk classes, with at least one medium/high task and one
+  task that required a repair or escalation. Do not invent product work merely
+  to satisfy the sample.
+- Record bounded aggregates and categorical reasons only: first-pass/eventual
+  outcome, attempts, failed boundary, elapsed gate time, scope/risk escalation,
+  human intervention category, false positive, and CI reproduction.
+- Do not store prompts, credentials, environment values, raw logs, user data, or
+  private review content.
+- Evidence may recommend narrower diagnostics or policy changes but cannot
+  directly weaken graders, thresholds, risk, authority, or required lanes.
+
+## Non-Goals
+
+- Optimizing for agent commit count, coverage percentage, or maximum autonomy.
+- Auto-merging, deploying, scheduling background jobs, or creating synthetic
+  product changes.
+- Implementing Phase 5 harness changes inside the evidence collection task.
+
+## Acceptance Scenarios
+
+1. Given an eligible completed task, when evidence is recorded, then every
+   required field is sourced from plans/gates/CI or a categorical human decision
+   and contains no sensitive/raw content.
+2. Given fewer than three eligible tasks or insufficient risk/repair diversity,
+   when conclusions are requested, then the phase reports insufficient evidence
+   instead of claiming success.
+3. Given repeated failure, false-positive, stale-guide, or human-intervention
+   evidence, when classified, then it maps to a concrete steering category and
+   proposed owner without silently changing the harness.
+4. Given the completed sample, when reviewed, then the report states observed
+   first-pass/eventual success, attempts, elapsed feedback, escalations, CI
+   reproduction, and limitations.
+5. Given evidence that the loop is noisy or unsafe, when Phase 5 is considered,
+   then the recommendation can be to simplify or stop rather than expand autonomy.
+
+## Risk And Authority
+
+Risk is medium because the implementation should be read-only documentation and
+sanitized aggregation, but misleading metrics could drive unsafe policy. This is
+the only whole Phase 4 slice suitable for delegation: another agent can collect
+evidence independently, while policy conclusions and any follow-up mutations
+remain subject to primary-agent and human review.
+
+## Impact Areas
+
+- versioned, sanitized Phase 4 operating-evidence ledger or report
+- harness baseline and execution-plan evidence links
+- read-only extraction helpers if manual collection proves error-prone
+- no application source, external system, or policy mutation
+
+## Verification Matrix
+
+| Acceptance                | Evidence                                       |
+| ------------------------- | ---------------------------------------------- |
+| Complete safe records     | schema/fixture validation and privacy review   |
+| Minimum sample/diversity  | deterministic eligibility summary              |
+| Honest conclusions        | source links, limitations, and human review    |
+| No harness self-weakening | diff inspection and existing full verification |
+
+## Checklist
+
+- [ ] Confirm Phases 4.1-4.3 and their hosted proof are complete.
+- [ ] Approve the sanitized evidence schema and eligible-task rules.
+- [ ] Collect at least three diverse real-task records.
+- [ ] Classify repairs, escalations, false positives, and interventions.
+- [ ] Publish a bounded operating report with limitations and recommendation.
+- [ ] Run relevant documentation/schema and repository verification.
+
+## Rollout And Rollback
+
+Evidence collection is additive and read-only. If the schema is misleading or
+captures unsafe content, stop collection, remove unsafe fields, and retain only
+validated aggregate records. No automation expansion follows without separate
+approval.
+
+## Decision And Deviation Log
+
+- 2026-08-01: Independent evidence collection is intentionally delegatable;
+  authority and policy implementation remain primary-agent responsibilities.
+
+## Verification
+
+- Not run; queued plan only.
+
+## Runtime Evidence
+
+- Not run; queued plan only.
+
+## Follow-Up Debt
+
+- Phase 5 starts only if this evidence supports a narrow, reviewable improvement.
