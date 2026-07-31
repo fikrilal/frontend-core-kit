@@ -27,6 +27,7 @@
     "contracts:generate": "node scripts/contracts/generate-openapi.mjs",
     "contracts:check": "node scripts/contracts/check-openapi.mjs",
     "risk:classify": "node scripts/harness/classify-risk.mjs",
+    "task:verify": "node scripts/harness/task-verify.mjs",
     "knowledge:check": "node scripts/harness/check-knowledge.mjs",
     "architecture:check": "node scripts/harness/check-architecture.mjs",
     "maintainability:check": "knip --include files,exports,dependencies --include-entry-exports",

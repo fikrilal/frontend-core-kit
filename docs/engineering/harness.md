@@ -22,6 +22,23 @@ harness:check
 `verify` adds the production build. `verify:runtime` runs Playwright separately
 because browser installation and runtime cost are machine-specific.
 
+## Task verification
+
+`pnpm task:verify` is the read-only local entry point for an active non-trivial
+task. It requires exactly one valid plan in `docs/exec-plans/active/`, checks the
+exact Node and pnpm versions declared by the repository, discovers committed,
+staged, unstaged, and untracked paths, and combines path risk with the active
+plan's declared risk. It runs `verify:fast` for low risk or `verify` followed by
+`verify:runtime` for medium/high risk, stopping after the first failed lane.
+
+Use `pnpm task:verify -- --base <revision>` only when the task includes commits
+after that base; the default base is `HEAD`. To write sanitized machine evidence,
+use `pnpm task:verify -- --summary test-results/task-verification.json`. The
+summary records only risk/path evidence, executed commands, outcomes, durations,
+and a remediation—not command output, environment values, credentials, cookies,
+or request data. The command never formats, regenerates snapshots, edits code,
+commits, pushes, or contacts external systems.
+
 CI repeats these commands from a clean checkout. Local results remain repair
 feedback; GitHub Actions is the independent integration run once the workflow
 has been pushed.

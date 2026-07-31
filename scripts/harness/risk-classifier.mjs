@@ -59,7 +59,11 @@ const lowRiskRules = [
   rule("repository metadata", (file) => file === ".gitignore"),
 ];
 
-export function classifyRisk({ changedPaths, planDocuments = [] }) {
+export function classifyRisk({
+  changedPaths,
+  planDocuments = [],
+  activePlanDocument = null,
+}) {
   if (!Array.isArray(changedPaths) || changedPaths.length === 0) {
     throw new Error(
       "No changed paths were provided; risk cannot be classified.",
@@ -71,7 +75,11 @@ export function classifyRisk({ changedPaths, planDocuments = [] }) {
   ].toSorted();
   const pathResults = normalizedPaths.map(classifyPath);
   const pathRisk = maximumRisk(pathResults.map((result) => result.risk));
-  const declared = declaredPlanRisk(normalizedPaths, planDocuments);
+  const declared = declaredPlanRisk(
+    normalizedPaths,
+    planDocuments,
+    activePlanDocument,
+  );
   const risk = maximumRisk([pathRisk, declared.risk].filter(Boolean));
   const allReasons = [...pathResults, ...declared.reasons];
 
@@ -195,7 +203,7 @@ ${reasons}
 `;
 }
 
-function declaredPlanRisk(changedPaths, planDocuments) {
+function declaredPlanRisk(changedPaths, planDocuments, activePlanDocument) {
   const changedPlanPaths = new Set(
     changedPaths.filter((file) =>
       /^docs\/exec-plans\/(?:active|queued|completed)\/[^/]+\.md$/.test(file),
@@ -211,7 +219,15 @@ function declaredPlanRisk(changedPaths, planDocuments) {
     );
   }
 
-  const reasons = relevantDocuments.flatMap((document) => {
+  const documents = activePlanDocument
+    ? [...relevantDocuments, activePlanDocument]
+    : relevantDocuments;
+  const uniqueDocuments = documents.filter(
+    (document, index) =>
+      documents.findIndex((candidate) => candidate.path === document.path) ===
+      index,
+  );
+  const reasons = uniqueDocuments.flatMap((document) => {
     const planPath = normalizePath(document.path);
     const version = metadataValue(document.source, "Plan version");
     const risk = metadataValue(document.source, "Risk")?.toLowerCase();
@@ -228,7 +244,16 @@ function declaredPlanRisk(changedPaths, planDocuments) {
         `${planPath} must declare a valid "**Risk:**" value: low, medium, or high.`,
       );
     }
-    return [{ path: planPath, risk, rule: "execution-plan declaration" }];
+    return [
+      {
+        path: planPath,
+        risk,
+        rule:
+          activePlanDocument?.path === planPath
+            ? "active execution-plan declaration"
+            : "execution-plan declaration",
+      },
+    ];
   });
 
   return {
