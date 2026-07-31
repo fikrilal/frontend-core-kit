@@ -7,7 +7,7 @@ export async function AuthenticatedPage() {
   const result = await loadAuthenticatedUser();
 
   return (
-    <main className="bg-muted/35 min-h-svh">
+    <div className="bg-muted/35 min-h-svh">
       <header className="border-border bg-background border-b">
         <div className="mx-auto flex h-14 max-w-5xl items-center gap-2 px-5">
           <LamaraMark className="size-7" />
@@ -15,7 +15,7 @@ export async function AuthenticatedPage() {
           <div className="flex-1" />
           <form action={logoutAction}>
             <button
-              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-foreground/25 rounded-sm text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               type="submit"
             >
               Sign out
@@ -24,7 +24,7 @@ export async function AuthenticatedPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-5 py-12">
+      <main className="mx-auto max-w-5xl px-5 py-12">
         <section className="border-border bg-background max-w-xl rounded-2xl border p-7 shadow-sm">
           <p className="text-muted-foreground mb-3 font-mono text-xs tracking-wider uppercase">
             Authenticated foundation
@@ -49,7 +49,7 @@ export async function AuthenticatedPage() {
             </p>
           )}
         </section>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

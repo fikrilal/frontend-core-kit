@@ -64,3 +64,9 @@ The current token set covers:
 - font and radius roles.
 
 Add tokens only after repeated use demonstrates a stable role.
+
+Text colors must retain WCAG AA contrast against their intended surface in both
+themes. Interactive elements must expose a visible `:focus-visible` indicator;
+do not remove the browser outline unless a ring or equivalent indicator replaces
+it. The browser accessibility suite enforces the implemented page states, while
+human review remains necessary for conformance.

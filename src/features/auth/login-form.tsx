@@ -17,8 +17,10 @@ export function LoginForm() {
           Email
         </label>
         <input
+          aria-describedby={state.error ? "login-error" : undefined}
+          aria-invalid={state.error ? true : undefined}
           autoComplete="email"
-          className="border-border bg-background focus:border-foreground h-10 rounded-lg border px-3 text-sm transition-colors outline-none"
+          className="border-border bg-background focus:border-foreground focus-visible:ring-foreground/25 h-10 rounded-lg border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           id="email"
           name="email"
           required
@@ -31,8 +33,10 @@ export function LoginForm() {
           Password
         </label>
         <input
+          aria-describedby={state.error ? "login-error" : undefined}
+          aria-invalid={state.error ? true : undefined}
           autoComplete="current-password"
-          className="border-border bg-background focus:border-foreground h-10 rounded-lg border px-3 text-sm transition-colors outline-none"
+          className="border-border bg-background focus:border-foreground focus-visible:ring-foreground/25 h-10 rounded-lg border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           id="password"
           name="password"
           required
@@ -44,13 +48,14 @@ export function LoginForm() {
         <p
           aria-live="polite"
           className="text-sm text-red-600 dark:text-red-400"
+          id="login-error"
         >
           {messageForLoginError(state.error)}
         </p>
       ) : null}
 
       <button
-        className="bg-foreground text-background hover:bg-foreground/90 h-10 rounded-lg px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+        className="bg-foreground text-background hover:bg-foreground/90 focus-visible:ring-foreground/25 h-10 rounded-lg px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
         disabled={pending}
         type="submit"
       >

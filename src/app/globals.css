@@ -10,7 +10,7 @@
   --border: oklch(0.922 0 0);
   --line: oklch(0.955 0 0);
   --surface: oklch(0.985 0 0);
-  --ember: oklch(0.63 0.2 40);
+  --ember: oklch(0.55 0.19 40);
   --success: oklch(0.63 0.17 145);
   --radius: 0.75rem;
 }

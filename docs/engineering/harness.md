@@ -87,8 +87,12 @@ pnpm verify:runtime
 
 Browser tests prove public content, metadata endpoints, route protection,
 password login, the opaque `HttpOnly` session cookie, authenticated loading,
-and logout. The runner uses a contract-faithful local API fixture and isolates
-Next.js output in `.next-e2e`.
+logout, and an accessibility baseline for every implemented page state. The
+accessibility scenarios combine Axe WCAG A/AA scans with explicit keyboard,
+error-association, title, heading, and landmark assertions. A passing automated
+scan is not a WCAG conformance claim; human and assistive-technology review
+remain separate evidence. The runner uses a contract-faithful local API fixture
+and isolates Next.js output in `.next-e2e`.
 
 ## Risk
 
@@ -143,6 +147,11 @@ The workflow was independently proven by
 all four jobs passed on a clean hosted runner. A repository administrator can
 now create a rule for `main` requiring the unique `CI Required` status. No
 repository rule or auto-merge policy is currently configured by this phase.
+
+Phase 3.2's contract-validated fixture and backend-preflight changes were
+independently reproduced in
+[GitHub Actions run 30685359536](https://github.com/Orymu/lamara-frontend/actions/runs/30685359536):
+all four jobs passed at commit `9d7b34b`.
 
 ## Maintainability fitness
 

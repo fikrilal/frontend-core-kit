@@ -52,6 +52,14 @@ Playwright covers:
   rendering, and logout;
 - an arbitrary nonexistent-route response without naming hypothetical product
   routes.
+- Axe scans for detectable WCAG 2 A/AA and 2.1 A/AA violations across the
+  landing, login, login-error, protected-redirect, and authenticated states;
+- keyboard navigation, visible login-field focus, form-error relationships,
+  document titles, headings, and page landmarks.
+
+Axe catches a useful subset of accessibility defects; it does not certify WCAG
+conformance. Human keyboard, zoom/reflow, reduced-motion, and
+assistive-technology review remain necessary as the product surface grows.
 
 The local API fixture validates successful login, refresh, logout, and current
 user responses against generated Zod schemas before sending them. Login,
