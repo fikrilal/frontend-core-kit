@@ -34,6 +34,20 @@ test("login page and its failure state match their visual baselines", async ({
   await expect(page).toHaveScreenshot("login-error.png", screenshotOptions);
 });
 
+test("registration page and its failure state match their visual baselines", async ({
+  page,
+}) => {
+  await openWithTheme(page, "/register", "light");
+  await expect(page).toHaveScreenshot("register.png", screenshotOptions);
+
+  await page.getByLabel("Email").fill("existing@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("test-password-10");
+  await page.getByLabel("Confirm password").fill("test-password-10");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page.locator("#register-error")).toBeVisible();
+  await expect(page).toHaveScreenshot("register-error.png", screenshotOptions);
+});
+
 test("authenticated foundation matches its visual baseline", async ({
   page,
 }) => {

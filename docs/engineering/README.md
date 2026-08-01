@@ -2,6 +2,7 @@
 
 - [Harness](harness.md)
 - [Harness baseline](harness-baseline.md)
+- [Harness operating evidence](harness-operating-evidence.md)
 - [Testing strategy](testing-strategy.md)
 - [API integration](api-integration.md)
 - [Session management](session-management.md)

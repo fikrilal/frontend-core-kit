@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "id": "auth-password-registration",
+      "plan": "docs/exec-plans/completed/2026-08-01_auth-password-registration.md",
+      "risk": "high",
+      "firstPass": false,
+      "eventualOutcome": "completed",
+      "attempts": 3,
+      "gateDurationSeconds": 122,
+      "repairOrEscalation": "repair",
+      "humanIntervention": "review",
+      "falsePositive": false,
+      "ciReproduced": true,
+      "independentlyReviewed": true
+    }
+  ]
+}

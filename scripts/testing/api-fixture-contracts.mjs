@@ -1,9 +1,11 @@
 import {
   AuthLogoutResponse,
+  AuthPasswordRegisterResponse,
   AuthPasswordLoginResponse,
   AuthRefreshResponse,
   LogoutRequestDto,
   PasswordLoginRequestDto,
+  PasswordRegisterRequestDto,
   RefreshRequestDto,
   UsersMeGetResponse,
 } from "../../src/contracts/lamara-api/runtime.generated.ts";
@@ -11,6 +13,8 @@ import {
 export const fixtureContracts = Object.freeze({
   loginRequest: PasswordLoginRequestDto,
   loginResponse: AuthPasswordLoginResponse,
+  registerRequest: PasswordRegisterRequestDto,
+  registerResponse: AuthPasswordRegisterResponse,
   refreshRequest: RefreshRequestDto,
   refreshResponse: AuthRefreshResponse,
   logoutRequest: LogoutRequestDto,

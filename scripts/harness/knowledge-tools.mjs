@@ -5,6 +5,10 @@ import {
   isLegacyCompletedPlan,
   planFolders,
 } from "./execution-plan-policy.mjs";
+import {
+  TaskBoundaryFailure,
+  parseTaskBoundaries,
+} from "./task-boundaries.mjs";
 
 const requiredPlanSections = [
   "Objective",
@@ -107,21 +111,30 @@ function checkExecutionPlans(root) {
         continue;
       }
 
-      if (version !== "1") {
+      if (version !== "1" && version !== "2") {
         violations.push(
-          `${relativeFile} declares unsupported plan version "${version}"; expected "1".`,
+          `${relativeFile} declares unsupported plan version "${version}"; expected "1" or "2".`,
         );
         continue;
       }
 
-      validateV1Plan({ folder, relativeFile, source, violations });
+      if (version === "1" && folder !== "completed") {
+        violations.push(
+          `${relativeFile} uses plan version 1 outside completed/. New active and queued plans must use version 2.`,
+        );
+      }
+
+      validatePlan({ folder, relativeFile, source, violations });
+      if (version === "2") {
+        validateTaskBoundaries({ relativeFile, source, violations });
+      }
     }
   }
 
   return violations;
 }
 
-function validateV1Plan({ folder, relativeFile, source, violations }) {
+function validatePlan({ folder, relativeFile, source, violations }) {
   const status = requiredMetadata(source, "Status", relativeFile, violations);
   const owner = requiredMetadata(source, "Owner", relativeFile, violations);
   const risk = requiredMetadata(source, "Risk", relativeFile, violations);
@@ -176,6 +189,28 @@ function validateV1Plan({ folder, relativeFile, source, violations }) {
   ) {
     violations.push(
       `${relativeFile} is completed but verification evidence still contains a placeholder. Record the outcome or move the plan out of completed/.`,
+    );
+  }
+}
+
+function validateTaskBoundaries({ relativeFile, source, violations }) {
+  try {
+    const boundaries = parseTaskBoundaries(source);
+    const risk = metadataValue(source, "Risk")?.toLowerCase();
+    if (risk && riskOrder(risk) > riskOrder(boundaries.maximumRisk)) {
+      violations.push(
+        `${relativeFile} declares risk "${risk}" above its **Maximum risk:** "${boundaries.maximumRisk}". Raise the maximum only with explicit authority.`,
+      );
+    }
+  } catch (error) {
+    if (error instanceof TaskBoundaryFailure) {
+      violations.push(
+        `${relativeFile}: ${error.failure.invariant} ${error.failure.remediation}`,
+      );
+      return;
+    }
+    violations.push(
+      `${relativeFile} has invalid structured task boundaries. Copy the current execution-plan template.`,
     );
   }
 }
@@ -243,6 +278,10 @@ function sectionContents(source, name) {
 
 function isPlaceholder(value) {
   return /^(?:tbd|todo|none|unassigned|unknown|pending)$/i.test(value.trim());
+}
+
+function riskOrder(risk) {
+  return { low: 0, medium: 1, high: 2 }[risk] ?? Number.POSITIVE_INFINITY;
 }
 
 function normalizeLinkTarget(rawTarget) {

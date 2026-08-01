@@ -2,13 +2,13 @@ import Link from "next/link";
 
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
-import { LoginForm } from "./login-form";
+import { RegisterForm } from "./register-form";
 
-export function LoginPage() {
+export function RegisterPage() {
   return (
     <main className="bg-muted/35 flex min-h-svh items-center justify-center px-4 py-12">
       <section
-        aria-labelledby="login-heading"
+        aria-labelledby="register-heading"
         className="border-border bg-background w-full max-w-sm rounded-2xl border p-7 shadow-sm"
       >
         <Link
@@ -23,24 +23,21 @@ export function LoginPage() {
         <div className="mb-7 space-y-2">
           <h1
             className="text-2xl font-semibold tracking-tight"
-            id="login-heading"
+            id="register-heading"
           >
-            Sign in
+            Create your account
           </h1>
           <p className="text-muted-foreground text-sm">
-            Use your Lamara account to continue.
+            Use your email to create a Lamara account.
           </p>
         </div>
 
-        <LoginForm />
+        <RegisterForm />
 
         <p className="text-muted-foreground mt-6 text-center text-sm">
-          Need an account?{" "}
-          <Link
-            className="text-foreground font-medium underline"
-            href="/register"
-          >
-            Create one
+          Already have an account?{" "}
+          <Link className="text-foreground font-medium underline" href="/login">
+            Sign in
           </Link>
         </p>
       </section>

@@ -79,6 +79,10 @@ pnpm test:harness
 pnpm contracts:check
 pnpm knowledge:check
 pnpm risk:classify -- --base <revision> --head <revision>
+pnpm task:begin
+pnpm task:verify
+pnpm task:handoff -- --title "type(scope): summary" --dry-run
+pnpm harness:evidence
 pnpm test:e2e
 pnpm test:e2e:update
 pnpm verify:runtime
@@ -107,6 +111,21 @@ loads `LAMARA_API_BASE_URL` from the process or `.env.local`, calls only
 reports only configuration, reachability, HTTP readiness, JSON, or contract
 status; it never prints the configured origin or response body. It is not part
 of default CI and does not prove login or whole-API compatibility.
+
+`pnpm task:begin` captures pre-existing paths for one V2 active task;
+`pnpm task:verify` selects existing gates only after scope, authority, maximum-
+risk, and repair-budget preflight. Focused Node fixtures cover complete Git
+change discovery, active-plan risk, runtime/browser prerequisites, structured
+boundaries, pre-existing user changes, scope violations, repeated failures,
+lane ordering, failure stop behavior, and secret-safe JSON summaries. These
+commands never invoke live backend preflight automatically.
+
+`pnpm task:handoff` fixture coverage proves action-specific stops, fresh
+verification/scope requirements, clean-baseline checks, normal Git command
+ordering, draft-only creation, matching-draft repair updates, body sanitization,
+and no force-push. `pnpm harness:evidence` fixtures prove an empty ledger stays
+insufficient, a diverse reviewed sample is only ready for human review, and
+invalid plan sources or free-form fields are rejected.
 
 ## Growth
 

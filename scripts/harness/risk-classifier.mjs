@@ -59,7 +59,11 @@ const lowRiskRules = [
   rule("repository metadata", (file) => file === ".gitignore"),
 ];
 
-export function classifyRisk({ changedPaths, planDocuments = [] }) {
+export function classifyRisk({
+  changedPaths,
+  planDocuments = [],
+  activePlanDocument = null,
+}) {
   if (!Array.isArray(changedPaths) || changedPaths.length === 0) {
     throw new Error(
       "No changed paths were provided; risk cannot be classified.",
@@ -71,7 +75,11 @@ export function classifyRisk({ changedPaths, planDocuments = [] }) {
   ].toSorted();
   const pathResults = normalizedPaths.map(classifyPath);
   const pathRisk = maximumRisk(pathResults.map((result) => result.risk));
-  const declared = declaredPlanRisk(normalizedPaths, planDocuments);
+  const declared = declaredPlanRisk(
+    normalizedPaths,
+    planDocuments,
+    activePlanDocument,
+  );
   const risk = maximumRisk([pathRisk, declared.risk].filter(Boolean));
   const allReasons = [...pathResults, ...declared.reasons];
 
@@ -164,7 +172,7 @@ export function loadChangedPlanDocuments(root, changedPaths) {
 
   if (planPaths.length > 0 && documents.length === 0) {
     throw new Error(
-      "Changed execution plans are missing at the target revision; retain a v1 plan that declares risk.",
+      "Changed execution plans are missing at the target revision; retain a V1/V2 plan that declares risk.",
     );
   }
 
@@ -195,7 +203,7 @@ ${reasons}
 `;
 }
 
-function declaredPlanRisk(changedPaths, planDocuments) {
+function declaredPlanRisk(changedPaths, planDocuments, activePlanDocument) {
   const changedPlanPaths = new Set(
     changedPaths.filter((file) =>
       /^docs\/exec-plans\/(?:active|queued|completed)\/[^/]+\.md$/.test(file),
@@ -207,20 +215,28 @@ function declaredPlanRisk(changedPaths, planDocuments) {
 
   if (changedPlanPaths.size > 0 && relevantDocuments.length === 0) {
     throw new Error(
-      "A changed execution plan must exist at the target revision and declare v1 risk metadata.",
+      "A changed execution plan must exist at the target revision and declare V1/V2 risk metadata.",
     );
   }
 
-  const reasons = relevantDocuments.flatMap((document) => {
+  const documents = activePlanDocument
+    ? [...relevantDocuments, activePlanDocument]
+    : relevantDocuments;
+  const uniqueDocuments = documents.filter(
+    (document, index) =>
+      documents.findIndex((candidate) => candidate.path === document.path) ===
+      index,
+  );
+  const reasons = uniqueDocuments.flatMap((document) => {
     const planPath = normalizePath(document.path);
     const version = metadataValue(document.source, "Plan version");
     const risk = metadataValue(document.source, "Risk")?.toLowerCase();
     if (version === null && isLegacyCompletedPlan(planPath)) {
       return [];
     }
-    if (version !== "1") {
+    if (version !== "1" && version !== "2") {
       throw new Error(
-        `${planPath} must declare "**Plan version:** 1" for risk classification.`,
+        `${planPath} must declare "**Plan version:** 1" or "**Plan version:** 2" for risk classification.`,
       );
     }
     if (!risk || !validRisks.has(risk)) {
@@ -228,7 +244,16 @@ function declaredPlanRisk(changedPaths, planDocuments) {
         `${planPath} must declare a valid "**Risk:**" value: low, medium, or high.`,
       );
     }
-    return [{ path: planPath, risk, rule: "execution-plan declaration" }];
+    return [
+      {
+        path: planPath,
+        risk,
+        rule:
+          activePlanDocument?.path === planPath
+            ? "active execution-plan declaration"
+            : "execution-plan declaration",
+      },
+    ];
   });
 
   return {

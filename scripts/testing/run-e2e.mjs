@@ -45,6 +45,41 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  if (
+    request.method === "POST" &&
+    request.url === "/v1/auth/password/register"
+  ) {
+    const body = await readJson(request);
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.registerRequest,
+      body,
+    );
+    if (!parsed) return problem(response, 400, "VALIDATION_FAILED");
+    if (parsed.email === "existing@example.com") {
+      return problem(response, 409, "AUTH_EMAIL_ALREADY_EXISTS");
+    }
+    if (
+      parsed.email !== "new-user@example.com" ||
+      parsed.password !== "test-password-10"
+    ) {
+      return problem(response, 400, "VALIDATION_FAILED");
+    }
+
+    return contractJson(
+      response,
+      200,
+      "password registration response",
+      fixtureContracts.registerResponse,
+      {
+        data: {
+          accessToken: accessToken(registeredMe),
+          refreshToken: "e2e-registration-refresh-token",
+          user: registeredMe,
+        },
+      },
+    );
+  }
+
   if (request.method === "POST" && request.url === "/v1/auth/refresh") {
     const parsed = tryParseFixtureContract(
       fixtureContracts.refreshRequest,
@@ -90,13 +125,16 @@ const api = createServer(async (request, response) => {
     if (!request.headers.authorization?.startsWith("Bearer ")) {
       return problem(response, 401, "AUTH_UNAUTHORIZED");
     }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
     return contractJson(
       response,
       200,
       "current user response",
       fixtureContracts.currentUserResponse,
       {
-        data: me,
+        data: tokenUsers.get(accessTokenValue) ?? me,
       },
     );
   }
@@ -143,11 +181,16 @@ async function stop(exitCode) {
   process.exit(exitCode);
 }
 
-function accessToken() {
+function accessToken(user = me) {
   const payload = Buffer.from(
-    JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 300 }),
+    JSON.stringify({
+      exp: Math.floor(Date.now() / 1000) + 300,
+      jti: crypto.randomUUID(),
+    }),
   ).toString("base64url");
-  return `header.${payload}.signature`;
+  const value = `header.${payload}.signature`;
+  tokenUsers.set(value, user);
+  return value;
 }
 
 async function readJson(request) {
@@ -179,7 +222,9 @@ function problem(response, status, code) {
         ? "Bad Request"
         : status === 401
           ? "Unauthorized"
-          : "Not Found",
+          : status === 409
+            ? "Conflict"
+            : "Not Found",
     status,
     code,
     traceId: response.getHeader("X-Request-Id"),
@@ -200,3 +245,17 @@ const me = {
   },
   roles: ["USER"],
 };
+
+const registeredMe = {
+  ...me,
+  email: "new-user@example.com",
+  emailVerified: false,
+  id: "e2e-registered-user-id",
+  profile: {
+    ...me.profile,
+    displayName: "New User",
+    givenName: "New",
+  },
+};
+
+const tokenUsers = new Map();

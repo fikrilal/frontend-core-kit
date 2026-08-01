@@ -1,6 +1,6 @@
 # Harness Baseline
 
-**Baseline version:** 7
+**Baseline version:** 9
 
 **Captured:** 2026-08-01
 
@@ -28,32 +28,32 @@ listed as missing.
 
 ## Current Sensors
 
-| Dimension       | Blocking controls today                                                                   | Known gap                                                                       |
-| --------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Intent          | v1 plan schema, lifecycle/link/proposal checks, and deterministic risk classification     | No semantic judgment of plan quality or human authority                         |
-| Formatting      | Prettier check                                                                            | None known for covered file types                                               |
-| Static analysis | ESLint/TypeScript, calibrated size and complexity caps, and Knip dead-code analysis       | Duplication has a measured baseline but no permanent sensor                     |
-| Architecture    | Environment, fetch, import, feature API, and thin-route checks                            | Regex/static heuristics do not prove all dependency directions                  |
-| API contracts   | Regeneration and byte-drift check from committed OpenAPI snapshot                         | No automatic backend publication or live compatibility lane                     |
-| Behavior        | Vitest, contract-validated auth fixtures, production build, and Playwright                | No mutation score, coverage threshold, or real-backend behavior lane            |
-| Authentication  | Failure, token, session, refresh, cookie, and browser-flow coverage                       | Default runtime lane uses a fixture rather than the real backend                |
-| Security        | Server-only boundaries, secret-safe API failures, read-only CI, and immutable action pins | No secret scan, dependency audit, or browser security scan                      |
-| Accessibility   | Axe WCAG A/AA scans plus keyboard, error, title, heading, and landmark browser assertions | No human assistive-technology, zoom/reflow, or cross-browser review             |
-| Visual quality  | Five inspected, repository-owned Linux Chromium baselines in the runtime gate             | No responsive, cross-browser, or human taste oracle                             |
-| Delivery        | Proven clean-checkout CI, frozen install, stable aggregate status, and summaries          | No repository rule, container evidence, artifact provenance, or deployment gate |
+| Dimension       | Blocking controls today                                                                      | Known gap                                                                       |
+| --------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Intent          | V2 boundaries, scoped verification, draft-only handoff policy, and operating-evidence ledger | No semantic judgment of plan quality or line-level user-change ownership        |
+| Formatting      | Prettier check                                                                               | None known for covered file types                                               |
+| Static analysis | ESLint/TypeScript, calibrated size and complexity caps, and Knip dead-code analysis          | Duplication has a measured baseline but no permanent sensor                     |
+| Architecture    | Environment, fetch, import, feature API, and thin-route checks                               | Regex/static heuristics do not prove all dependency directions                  |
+| API contracts   | Regeneration and byte-drift check from committed OpenAPI snapshot                            | No automatic backend publication or live compatibility lane                     |
+| Behavior        | Vitest, contract-validated auth fixtures, production build, and Playwright                   | No mutation score, coverage threshold, or real-backend behavior lane            |
+| Authentication  | Failure, token, session, refresh, cookie, and browser-flow coverage                          | Default runtime lane uses a fixture rather than the real backend                |
+| Security        | Server-only boundaries, secret-safe API failures, read-only CI, and immutable action pins    | No secret scan, dependency audit, or browser security scan                      |
+| Accessibility   | Axe WCAG A/AA scans plus keyboard, error, title, heading, and landmark browser assertions    | No human assistive-technology, zoom/reflow, or cross-browser review             |
+| Visual quality  | Five inspected, repository-owned Linux Chromium baselines in the runtime gate                | No responsive, cross-browser, or human taste oracle                             |
+| Delivery        | Proven clean-checkout CI, frozen install, stable aggregate status, and summaries             | No repository rule, container evidence, artifact provenance, or deployment gate |
 
 ## Test Inventory
 
 The inventory below is recorded from the verification run in this baseline:
 
-| Layer                        | Count | Scope                                                    |
-| ---------------------------- | ----: | -------------------------------------------------------- |
-| Vitest unit/component/server |    60 | Application and server-boundary behavior                 |
-| Contract Node tests          |     6 | Contract tooling and deterministic generation            |
-| Harness Node tests           |    18 | Knowledge, risk, aggregate-status, and workflow fixtures |
-| Testing-tool Node tests      |     7 | Auth fixture contracts and sanitized backend preflight   |
-| Playwright scenarios         |    14 | Public, auth/session, accessibility, visual, and 404     |
-| Visual baselines             |     5 | Light/dark landing, login/error, and authenticated state |
+| Layer                        | Count | Scope                                                               |
+| ---------------------------- | ----: | ------------------------------------------------------------------- |
+| Vitest unit/component/server |    60 | Application and server-boundary behavior                            |
+| Contract Node tests          |     6 | Contract tooling and deterministic generation                       |
+| Harness Node tests           |    48 | Knowledge, risk, task loop/handoff, and operating-evidence fixtures |
+| Testing-tool Node tests      |     7 | Auth fixture contracts and sanitized backend preflight              |
+| Playwright scenarios         |    14 | Public, auth/session, accessibility, visual, and 404                |
+| Visual baselines             |     5 | Light/dark landing, login/error, and authenticated state            |
 
 Counts describe current test cases, not requirements coverage. They must not be
 used as a target that encourages low-value tests.
@@ -86,6 +86,16 @@ but automated results do not replace human accessibility or visual-taste review.
 
 Phase 3 can now add new quality signals without mistaking configured automation
 for observed delivery confidence.
+
+## Task-Loop Measurements
+
+Phase 4 adds explicit task baselines, bounded repair controls, an action-specific
+draft-handoff adapter, and a sanitized operating-evidence ledger. These controls
+are not a claim of autonomous repair success: the local shell lacks the
+repository's Node 24 runtime, no live handoff was authorized, and the evidence
+ledger contains zero reviewed real-task records. V2 boundaries make paths,
+actions, maximum risk, and repair limit machine-readable; the baseline preserves
+pre-existing paths but does not infer line-level ownership.
 
 ## Maintainability Measurements
 

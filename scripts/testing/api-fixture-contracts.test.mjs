@@ -21,6 +21,23 @@ test("accepts a contract-valid password login request", () => {
   );
 });
 
+test("accepts a contract-valid password registration request", () => {
+  assert.deepEqual(
+    parseFixtureContract(
+      "password registration request",
+      fixtureContracts.registerRequest,
+      {
+        email: "new-user@example.com",
+        password: "test-password-10",
+      },
+    ),
+    {
+      email: "new-user@example.com",
+      password: "test-password-10",
+    },
+  );
+});
+
 test("returns no request data when an incoming fixture request is invalid", () => {
   assert.equal(
     tryParseFixtureContract(fixtureContracts.loginRequest, {
