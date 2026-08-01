@@ -40,5 +40,12 @@ Implementation is split into independently reviewable plans:
 4. **Completed:**
    [Generic auth and session foundation](completed/2026-07-30_generic-auth-session-foundation.md)
 
-There is no active or queued plan. Do not introduce product workflows until a
-real product decision exists.
+## Agent Harness Sequence
+
+The accepted direction is documented in the
+[agent-first harness and loop engineering proposal](../planning/agent-harness-loop-engineering-proposal.md).
+
+1. **Active:**
+   [Executable intent and knowledge](active/2026-08-01_agent-harness-phase-1.md)
+
+Do not introduce product workflows until a real product decision exists.
