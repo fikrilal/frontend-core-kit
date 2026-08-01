@@ -1,10 +1,10 @@
 # Harness Baseline
 
-**Baseline version:** 2
+**Baseline version:** 3
 
 **Captured:** 2026-08-01
 
-**Scope:** local Lamara Frontend repository
+**Scope:** Lamara Frontend repository and GitHub-hosted CI
 
 **Threshold status:** descriptive measurements only
 
@@ -20,26 +20,27 @@ listed as missing.
 - Framework: Next.js `16.2.10`.
 - Deployment topology: one frontend process; Docker packaging is planned but
   not implemented.
-- Automation: a GitHub Actions workflow is configured locally but has not been
-  pushed or observed on a hosted runner; no protected required check exists.
+- Automation: GitHub Actions independently runs risk classification, full
+  verification, conditional browser verification, and one aggregate status.
+  The workflow is proven on a hosted runner; no protected required check exists.
 - Runtime browser lane: isolated Next.js output and contract-faithful local API
   fixture; it does not call the real backend.
 
 ## Current Sensors
 
-| Dimension       | Blocking controls today                                                                   | Known gap                                                                                                |
-| --------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Intent          | v1 plan schema, lifecycle/link/proposal checks, and deterministic risk classification     | No semantic judgment of plan quality or human authority                                                  |
-| Formatting      | Prettier check                                                                            | None known for covered file types                                                                        |
-| Static analysis | ESLint and strict TypeScript                                                              | No complexity, duplication, or dead-export sensor                                                        |
-| Architecture    | Environment, fetch, import, feature API, and thin-route checks                            | Regex/static heuristics do not prove all dependency directions                                           |
-| API contracts   | Regeneration and byte-drift check from committed OpenAPI snapshot                         | No automatic backend publication or live compatibility lane                                              |
-| Behavior        | Vitest, Node fixtures, production build, and Playwright                                   | No mutation score or coverage threshold                                                                  |
-| Authentication  | Failure, token, session, refresh, cookie, and browser-flow coverage                       | Default runtime lane uses a fixture rather than the real backend                                         |
-| Security        | Server-only boundaries, secret-safe API failures, read-only CI, and immutable action pins | No secret scan, dependency audit, or browser security scan                                               |
-| Accessibility   | Semantic Testing Library and Playwright queries where tests exist                         | No automated accessibility audit                                                                         |
-| Visual quality  | Human inspection only                                                                     | No screenshot comparison or deterministic visual oracle                                                  |
-| Delivery        | Clean-checkout CI workflow, frozen install, stable aggregate status, and summaries        | Hosted CI is unobserved; no repository rule, container evidence, artifact provenance, or deployment gate |
+| Dimension       | Blocking controls today                                                                   | Known gap                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Intent          | v1 plan schema, lifecycle/link/proposal checks, and deterministic risk classification     | No semantic judgment of plan quality or human authority                         |
+| Formatting      | Prettier check                                                                            | None known for covered file types                                               |
+| Static analysis | ESLint and strict TypeScript                                                              | No complexity, duplication, or dead-export sensor                               |
+| Architecture    | Environment, fetch, import, feature API, and thin-route checks                            | Regex/static heuristics do not prove all dependency directions                  |
+| API contracts   | Regeneration and byte-drift check from committed OpenAPI snapshot                         | No automatic backend publication or live compatibility lane                     |
+| Behavior        | Vitest, Node fixtures, production build, and Playwright                                   | No mutation score or coverage threshold                                         |
+| Authentication  | Failure, token, session, refresh, cookie, and browser-flow coverage                       | Default runtime lane uses a fixture rather than the real backend                |
+| Security        | Server-only boundaries, secret-safe API failures, read-only CI, and immutable action pins | No secret scan, dependency audit, or browser security scan                      |
+| Accessibility   | Semantic Testing Library and Playwright queries where tests exist                         | No automated accessibility audit                                                |
+| Visual quality  | Human inspection only                                                                     | No screenshot comparison or deterministic visual oracle                         |
+| Delivery        | Proven clean-checkout CI, frozen install, stable aggregate status, and summaries          | No repository rule, container evidence, artifact provenance, or deployment gate |
 
 ## Test Inventory
 
@@ -49,7 +50,7 @@ The inventory below is recorded from the verification run in this baseline:
 | ---------------------------- | ----: | -------------------------------------------------------- |
 | Vitest unit/component/server |    60 | Application and server-boundary behavior                 |
 | Contract Node tests          |     6 | Contract tooling and deterministic generation            |
-| Harness Node tests           |    17 | Knowledge, risk, aggregate-status, and workflow fixtures |
+| Harness Node tests           |    18 | Knowledge, risk, aggregate-status, and workflow fixtures |
 | Playwright scenarios         |     6 | Public metadata, auth, session, and unknown-route flows  |
 
 Counts describe current test cases, not requirements coverage. They must not be
@@ -71,14 +72,14 @@ phase may introduce regression budgets only after multiple comparable samples.
 
 ## Baseline Interpretation
 
-The repository has credible local feedback for its small implemented slice:
+The repository has credible local and independent CI feedback for its small implemented slice:
 formatting, typing, contracts, focused behavior, architecture boundaries,
-production compilation, and browser flows. A least-privilege CI workflow now
-describes how to reproduce that evidence, but it is not independent proof until
-a remote run succeeds. There is still no required repository rule,
+production compilation, and browser flows. The least-privilege CI workflow
+reproduced that evidence successfully in
+[run 30682954749](https://github.com/Orymu/lamara-frontend/actions/runs/30682954749).
+There is still no required repository rule,
 real-backend smoke lane, container evidence, or calibrated maintainability,
 security, accessibility, or visual sensor.
 
-After an authorized push proves the workflow, Phase 3 can add new quality
-signals. This ordering prevents configured automation from being mistaken for
-observed delivery confidence.
+Phase 3 can now add new quality signals without mistaking configured automation
+for observed delivery confidence.

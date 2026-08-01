@@ -138,8 +138,8 @@ workflow uses no application secrets, backend connection, deployment token, or
 write permission. External actions are pinned to full commit SHAs with readable
 release comments; updates require reviewing and replacing both values.
 
-The workflow is configured but not independently proven until an authorized
-push produces a successful remote run. After that observation, a repository
-administrator can create a rule for `main` requiring the unique `CI Required`
-status. Do not configure that rule before GitHub has observed the status, and do
-not enable auto-merge as part of this phase.
+The workflow was independently proven by
+[GitHub Actions run 30682954749](https://github.com/Orymu/lamara-frontend/actions/runs/30682954749):
+all four jobs passed on a clean hosted runner. A repository administrator can
+now create a rule for `main` requiring the unique `CI Required` status. No
+repository rule or auto-merge policy is currently configured by this phase.

@@ -1,7 +1,7 @@
 # 2026-08-01 Agent Harness Phase 2: Independent Integration Proof
 
 **Plan version:** 1
-**Status:** active
+**Status:** completed
 **Owner:** primary agent
 **Risk:** high
 **Authority:** implement and verify repository-local CI and harness changes; do
@@ -153,10 +153,10 @@ or configure repository rules.
 - [x] Run `pnpm verify` and `pnpm verify:runtime` under Node 24.
 - [x] Record exact evidence and deviations.
 - [x] Commit locally after explicit user authorization.
-- [ ] Push only after explicit user authorization.
-- [ ] Observe `CI Risk`, `CI Verify`, `CI Runtime`, and `CI Required` on a
+- [x] Push only after explicit user authorization.
+- [x] Observe `CI Risk`, `CI Verify`, `CI Runtime`, and `CI Required` on a
       GitHub-hosted runner.
-- [ ] Record remote evidence and move this plan to `completed/`.
+- [x] Record remote evidence and move this plan to `completed/`.
 
 ## Rollout And Rollback
 
@@ -197,12 +197,18 @@ was ever activated. No application runtime state or production data changes.
   with removed `onlyBuiltDependencies` syntax, so strict installs rejected the
   ignored Sharp and resolver scripts. All three reviewed build dependencies now
   use the pnpm 11 `allowBuilds` map.
+- 2026-08-01: The user authorized fixing and observing CI, which expanded
+  authority to focused commits, pushes, and hosted-run observation. Repository
+  rules remained excluded.
+- 2026-08-01: Run
+  [30682954749](https://github.com/Orymu/lamara-frontend/actions/runs/30682954749)
+  passed all four jobs after the two portability repairs.
 
 ## Verification
 
 - Official GitHub and action documentation reviewed for action versions,
   read-only permissions, job summaries, and required-status behavior.
-- `pnpm test:harness`: passed, 17 tests including real temporary Git history,
+- `pnpm test:harness`: passed, 18 tests including real temporary Git history,
   GitHub output/summary files, aggregate status outcomes, and workflow structure.
 - `pnpm risk:classify -- --base HEAD~1 --head HEAD`: passed and raised the
   previous medium plan declaration to high for harness/package paths.
@@ -213,17 +219,21 @@ was ever activated. No application runtime state or production data changes.
   configuration, including production build and all harness checks; measured at
   32.79 seconds.
 - `git diff --check`: passed before plan completion.
+- Clean temporary checkout `pnpm install --frozen-lockfile`: passed under Node
+  `v24.18.0` and pnpm `11.15.0`; all three approved dependency builds ran.
 
 ## Runtime Evidence
 
 - `pnpm verify:runtime`: passed under Node `v24.18.0`; all 6 Chromium scenarios
   passed against the isolated API fixture; measured at 8.84 seconds.
-- No remote GitHub Actions run was attempted because push and remote mutation
-  were outside this plan's authority.
+- GitHub Actions
+  [run 30682954749](https://github.com/Orymu/lamara-frontend/actions/runs/30682954749):
+  `CI Risk` passed in 8 seconds, `CI Verify` in 1 minute 25 seconds, `CI Runtime`
+  in 1 minute 12 seconds, and `CI Required` in 8 seconds.
 
 ## Follow-Up Debt
 
-- A future authorized remote run must validate actual GitHub-hosted runner
-  behavior before `CI Required` is configured in repository rules.
+- Repository-rule activation remains a separate administrator decision; this
+  phase did not require `CI Required` on `main`.
 - Phase 3 owns new maintainability, security, backend, accessibility, and visual
   sensors; Phase 2 only reproduces current evidence independently.
