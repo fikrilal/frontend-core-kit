@@ -188,6 +188,10 @@ was ever activated. No application runtime state or production data changes.
   commit identities were resolved from the official upstream repositories.
 - 2026-08-01: The user explicitly authorized a local commit. Push, hosted CI,
   and repository-rule mutation remain outside current authority.
+- 2026-08-01: The first hosted run exposed a compatibility gap: risk
+  classification rejected an allowlisted pre-v1 completed plan even though the
+  knowledge validator accepts it. The legacy-plan policy is now shared by both
+  validators; only the four named historical plans are exempt.
 
 ## Verification
 

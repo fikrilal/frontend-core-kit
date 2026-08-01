@@ -95,6 +95,31 @@ test("requires changed execution plans to provide valid v1 risk", () => {
   );
 });
 
+test("accepts only allowlisted legacy completed plans without v1 metadata", () => {
+  const legacyPath =
+    "docs/exec-plans/completed/2026-07-30_generic-auth-session-foundation.md";
+  const result = classifyRisk({
+    changedPaths: [legacyPath],
+    planDocuments: [{ path: legacyPath, source: "# Legacy completed plan\n" }],
+  });
+
+  assert.equal(result.risk, "low");
+  assert.equal(result.declaredRisk, null);
+  assert.throws(
+    () =>
+      classifyRisk({
+        changedPaths: ["docs/exec-plans/completed/new-plan.md"],
+        planDocuments: [
+          {
+            path: "docs/exec-plans/completed/new-plan.md",
+            source: "# New completed plan\n",
+          },
+        ],
+      }),
+    /Plan version/,
+  );
+});
+
 test("renders a bounded summary without plan contents", () => {
   const classification = classifyRisk({
     changedPaths: ["src/server/api/client.ts"],

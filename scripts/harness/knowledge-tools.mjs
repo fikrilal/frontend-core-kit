@@ -1,7 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const planFolders = ["active", "queued", "completed"];
+import {
+  isLegacyCompletedPlan,
+  planFolders,
+} from "./execution-plan-policy.mjs";
+
 const requiredPlanSections = [
   "Objective",
   "Current Evidence",
@@ -19,13 +23,6 @@ const requiredPlanSections = [
   "Follow-Up Debt",
 ];
 const validRisks = new Set(["low", "medium", "high"]);
-const legacyCompletedPlans = new Set([
-  "2026-07-28_api-contract-foundation.md",
-  "2026-07-28_password-login-api-client.md",
-  "2026-07-29_generated-runtime-contracts-node24.md",
-  "2026-07-30_generic-auth-session-foundation.md",
-]);
-
 export function collectKnowledgeViolations(root) {
   return [
     ...checkMarkdownLinks(root),
@@ -102,10 +99,7 @@ function checkExecutionPlans(root) {
 
       const version = metadataValue(source, "Plan version");
       if (version === null) {
-        if (
-          folder !== "completed" ||
-          !legacyCompletedPlans.has(path.basename(filePath))
-        ) {
+        if (folder !== "completed" || !isLegacyCompletedPlan(relativeFile)) {
           violations.push(
             `${relativeFile} is missing required metadata "**Plan version:**". Copy the current execution-plan template.`,
           );

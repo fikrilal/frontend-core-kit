@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
+import { isLegacyCompletedPlan } from "./execution-plan-policy.mjs";
+
 const riskOrder = Object.freeze({ low: 0, medium: 1, high: 2 });
 const validRisks = new Set(Object.keys(riskOrder));
 
@@ -209,10 +211,13 @@ function declaredPlanRisk(changedPaths, planDocuments) {
     );
   }
 
-  const reasons = relevantDocuments.map((document) => {
+  const reasons = relevantDocuments.flatMap((document) => {
     const planPath = normalizePath(document.path);
     const version = metadataValue(document.source, "Plan version");
     const risk = metadataValue(document.source, "Risk")?.toLowerCase();
+    if (version === null && isLegacyCompletedPlan(planPath)) {
+      return [];
+    }
     if (version !== "1") {
       throw new Error(
         `${planPath} must declare "**Plan version:** 1" for risk classification.`,
@@ -223,7 +228,7 @@ function declaredPlanRisk(changedPaths, planDocuments) {
         `${planPath} must declare a valid "**Risk:**" value: low, medium, or high.`,
       );
     }
-    return { path: planPath, risk, rule: "execution-plan declaration" };
+    return [{ path: planPath, risk, rule: "execution-plan declaration" }];
   });
 
   return {
