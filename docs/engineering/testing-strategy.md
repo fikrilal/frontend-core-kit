@@ -53,6 +53,13 @@ Playwright covers:
 - an arbitrary nonexistent-route response without naming hypothetical product
   routes.
 
+The local API fixture validates successful login, refresh, logout, and current
+user responses against generated Zod schemas before sending them. Login,
+refresh, and logout request bodies are also generated-schema validated; invalid
+requests receive a safe fixture problem. The OpenAPI snapshot does not yet own
+problem response schemas, so those remain a deliberately small handwritten
+test boundary.
+
 ## Commands
 
 ```bash
@@ -64,6 +71,7 @@ pnpm knowledge:check
 pnpm risk:classify -- --base <revision> --head <revision>
 pnpm test:e2e
 pnpm verify:runtime
+pnpm backend:preflight
 ```
 
 Install Chromium once per machine:
@@ -75,6 +83,13 @@ pnpm exec playwright install chromium
 Playwright runs on port 3100, starts an isolated Next.js dev output directory,
 and a contract-faithful API fixture. The runner does not require Docker or
 reuse a developer server.
+
+`pnpm backend:preflight` is an explicit, read-only developer diagnostic. It
+loads `LAMARA_API_BASE_URL` from the process or `.env.local`, calls only
+`GET /ready`, and validates the JSON with the committed generated schema. Output
+reports only configuration, reachability, HTTP readiness, JSON, or contract
+status; it never prints the configured origin or response body. It is not part
+of default CI and does not prove login or whole-API compatibility.
 
 ## Growth
 

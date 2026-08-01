@@ -66,5 +66,7 @@ The accepted direction is documented in the
    [Independent integration proof](completed/2026-08-01_agent-harness-phase-2.md)
 3. **Completed:**
    [Maintainability fitness](completed/2026-08-01_agent-harness-phase-3-1.md)
+4. **Active:**
+   [Contract fixtures and backend preflight](active/2026-08-01_agent-harness-phase-3-2.md)
 
 Do not introduce product workflows until a real product decision exists.

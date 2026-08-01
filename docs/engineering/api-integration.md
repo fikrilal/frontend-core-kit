@@ -87,11 +87,18 @@ These values are server-only. Never prefix them with `NEXT_PUBLIC_`.
 
 ```bash
 pnpm contracts:check
+pnpm backend:preflight
 ```
 
 The check regenerates TypeScript and Zod artifacts from the committed snapshot
 in a temporary directory and compares exact output. It does not require the
 backend checkout or network access.
+
+The optional preflight is different: it makes one read-only `GET /ready` call
+to the configured backend and validates that response against the committed
+runtime schema. Use it to distinguish local configuration, reachability,
+readiness, malformed JSON, and readiness-contract drift. Its diagnostics are
+sanitized and it neither authenticates nor mutates backend state.
 
 ## Updating the contract
 

@@ -1,6 +1,6 @@
 # Harness Baseline
 
-**Baseline version:** 4
+**Baseline version:** 5
 
 **Captured:** 2026-08-01
 
@@ -23,8 +23,8 @@ listed as missing.
 - Automation: GitHub Actions independently runs risk classification, full
   verification, conditional browser verification, and one aggregate status.
   The workflow is proven on a hosted runner; no protected required check exists.
-- Runtime browser lane: isolated Next.js output and contract-faithful local API
-  fixture; it does not call the real backend.
+- Runtime browser lane: isolated Next.js output and generated-schema-validated
+  local API fixture; it does not call the real backend.
 
 ## Current Sensors
 
@@ -35,7 +35,7 @@ listed as missing.
 | Static analysis | ESLint/TypeScript, calibrated size and complexity caps, and Knip dead-code analysis       | Duplication has a measured baseline but no permanent sensor                     |
 | Architecture    | Environment, fetch, import, feature API, and thin-route checks                            | Regex/static heuristics do not prove all dependency directions                  |
 | API contracts   | Regeneration and byte-drift check from committed OpenAPI snapshot                         | No automatic backend publication or live compatibility lane                     |
-| Behavior        | Vitest, Node fixtures, production build, and Playwright                                   | No mutation score or coverage threshold                                         |
+| Behavior        | Vitest, contract-validated auth fixtures, production build, and Playwright                | No mutation score, coverage threshold, or real-backend behavior lane            |
 | Authentication  | Failure, token, session, refresh, cookie, and browser-flow coverage                       | Default runtime lane uses a fixture rather than the real backend                |
 | Security        | Server-only boundaries, secret-safe API failures, read-only CI, and immutable action pins | No secret scan, dependency audit, or browser security scan                      |
 | Accessibility   | Semantic Testing Library and Playwright queries where tests exist                         | No automated accessibility audit                                                |
@@ -51,6 +51,7 @@ The inventory below is recorded from the verification run in this baseline:
 | Vitest unit/component/server |    60 | Application and server-boundary behavior                 |
 | Contract Node tests          |     6 | Contract tooling and deterministic generation            |
 | Harness Node tests           |    18 | Knowledge, risk, aggregate-status, and workflow fixtures |
+| Testing-tool Node tests      |     7 | Auth fixture contracts and sanitized backend preflight   |
 | Playwright scenarios         |     6 | Public metadata, auth, session, and unknown-route flows  |
 
 Counts describe current test cases, not requirements coverage. They must not be

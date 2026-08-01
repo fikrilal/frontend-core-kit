@@ -19,6 +19,7 @@ export default defineConfig({
     exclude: [
       "scripts/contracts/**",
       "scripts/harness/**",
+      "scripts/testing/**",
       "tests/e2e/**",
       "node_modules/**",
       ".next/**",

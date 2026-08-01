@@ -160,3 +160,12 @@ Duplication is measured periodically instead of adding a permanent dependency.
 The Phase 3.1 baseline found no clones at 8 lines/60 tokens across 49 analyzed
 non-generated files. Promote duplication to a blocking sensor only after a real
 failure or repository growth demonstrates the recurring cost is justified.
+
+## Backend preflight
+
+`pnpm backend:preflight` is a manual, read-only diagnostic for backend-dependent
+local work. It checks API-origin configuration, calls `GET /ready`, and validates
+the result with the generated readiness schema. It prints boundary status only,
+never configuration values or response bodies. Default tests and CI continue to
+use the isolated contract-validated fixture; real-backend CI remains deferred
+until backend startup and data isolation are reproducible.

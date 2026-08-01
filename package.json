@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Public web app for Lamara.",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@11.15.0",
   "engines": {
     "node": ">=24.0.0"
@@ -17,9 +18,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run && pnpm test:contracts && pnpm test:harness",
     "test:contracts": "node --test scripts/contracts/*.test.mjs",
-    "test:harness": "node --test scripts/harness/*.test.mjs",
+    "test:harness": "node --test scripts/harness/*.test.mjs scripts/testing/*.test.mjs",
     "test:watch": "vitest",
     "test:e2e": "node scripts/testing/run-e2e.mjs",
+    "backend:preflight": "node scripts/testing/check-backend-readiness.mjs",
     "contracts:sync": "node scripts/contracts/sync-openapi.mjs",
     "contracts:generate": "node scripts/contracts/generate-openapi.mjs",
     "contracts:check": "node scripts/contracts/check-openapi.mjs",

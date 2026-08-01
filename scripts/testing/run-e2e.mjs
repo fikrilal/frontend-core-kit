@@ -4,6 +4,12 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import process from "node:process";
 
+import {
+  fixtureContracts,
+  parseFixtureContract,
+  tryParseFixtureContract,
+} from "./api-fixture-contracts.mjs";
+
 const apiPort = 4_400;
 let playwright;
 let stopping = false;
@@ -15,37 +21,66 @@ const api = createServer(async (request, response) => {
 
   if (request.method === "POST" && request.url === "/v1/auth/password/login") {
     const body = await readJson(request);
+    const parsed = tryParseFixtureContract(fixtureContracts.loginRequest, body);
+    if (!parsed) return problem(response, 400, "VALIDATION_ERROR");
     if (
-      body?.email !== "user@example.com" ||
-      body?.password !== "test-password"
+      parsed.email !== "user@example.com" ||
+      parsed.password !== "test-password"
     ) {
       return problem(response, 401, "AUTH_INVALID_CREDENTIALS");
     }
 
-    return json(response, 200, {
-      data: {
-        accessToken: accessToken(),
-        refreshToken: "e2e-refresh-token",
-        user: me,
+    return contractJson(
+      response,
+      200,
+      "password login response",
+      fixtureContracts.loginResponse,
+      {
+        data: {
+          accessToken: accessToken(),
+          refreshToken: "e2e-refresh-token",
+          user: me,
+        },
       },
-    });
+    );
   }
 
   if (request.method === "POST" && request.url === "/v1/auth/refresh") {
-    return json(response, 200, {
-      data: {
-        accessToken: accessToken(),
-        refreshToken: "e2e-rotated-refresh-token",
-        user: {
-          id: me.id,
-          email: me.email,
-          emailVerified: me.emailVerified,
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.refreshRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 400, "VALIDATION_ERROR");
+    return contractJson(
+      response,
+      200,
+      "refresh response",
+      fixtureContracts.refreshResponse,
+      {
+        data: {
+          accessToken: accessToken(),
+          refreshToken: "e2e-rotated-refresh-token",
+          user: {
+            id: me.id,
+            email: me.email,
+            emailVerified: me.emailVerified,
+          },
         },
       },
-    });
+    );
   }
 
   if (request.method === "POST" && request.url === "/v1/auth/logout") {
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.logoutRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 400, "VALIDATION_ERROR");
+    parseFixtureContract(
+      "logout response",
+      fixtureContracts.logoutResponse,
+      undefined,
+    );
     response.statusCode = 204;
     response.removeHeader("Content-Type");
     return response.end();
@@ -55,7 +90,15 @@ const api = createServer(async (request, response) => {
     if (!request.headers.authorization?.startsWith("Bearer ")) {
       return problem(response, 401, "AUTH_UNAUTHORIZED");
     }
-    return json(response, 200, { data: me });
+    return contractJson(
+      response,
+      200,
+      "current user response",
+      fixtureContracts.currentUserResponse,
+      {
+        data: me,
+      },
+    );
   }
 
   return problem(response, 404, "NOT_FOUND");
@@ -120,10 +163,19 @@ function json(response, status, body) {
   response.end(JSON.stringify(body));
 }
 
+function contractJson(response, status, boundary, schema, body) {
+  return json(response, status, parseFixtureContract(boundary, schema, body));
+}
+
 function problem(response, status, code) {
   return json(response, status, {
     type: "about:blank",
-    title: status === 401 ? "Unauthorized" : "Not Found",
+    title:
+      status === 400
+        ? "Bad Request"
+        : status === 401
+          ? "Unauthorized"
+          : "Not Found",
     status,
     code,
     traceId: response.getHeader("X-Request-Id"),
