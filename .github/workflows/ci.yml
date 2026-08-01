@@ -1,0 +1,152 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  risk:
+    name: CI Risk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      risk: ${{ steps.classify.outputs.risk }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Classify change risk
+        id: classify
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: >-
+          node scripts/harness/classify-risk.mjs
+          --base "$CI_BASE_SHA"
+          --head "$CI_HEAD_SHA"
+          --github-output "$GITHUB_OUTPUT"
+          --github-summary "$GITHUB_STEP_SUMMARY"
+
+  verify:
+    name: CI Verify
+    needs: risk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      LAMARA_API_BASE_URL: http://127.0.0.1:4400
+      LAMARA_SESSION_TTL_SECONDS: "3600"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run deterministic verification
+        run: pnpm verify
+      - name: Summarize verification
+        if: always()
+        env:
+          STEP_RESULT: ${{ job.status }}
+          CHANGE_RISK: ${{ needs.risk.outputs.risk }}
+        run: |
+          echo "## Deterministic verification" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Result: $STEP_RESULT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Effective risk: $CHANGE_RISK" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Command: \`pnpm verify\`" >> "$GITHUB_STEP_SUMMARY"
+
+  runtime:
+    name: CI Runtime
+    needs: risk
+    if: needs.risk.outputs.risk != 'low'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run browser verification
+        run: pnpm verify:runtime
+      - name: Summarize browser evidence
+        if: always()
+        env:
+          STEP_RESULT: ${{ job.status }}
+          CHANGE_RISK: ${{ needs.risk.outputs.risk }}
+        run: |
+          echo "## Browser verification" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Result: $STEP_RESULT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Effective risk: $CHANGE_RISK" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Command: \`pnpm verify:runtime\`" >> "$GITHUB_STEP_SUMMARY"
+
+  required:
+    name: CI Required
+    if: always()
+    needs: [risk, verify, runtime]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Enforce required outcomes
+        env:
+          CI_RISK_RESULT: ${{ needs.risk.result }}
+          CI_VERIFY_RESULT: ${{ needs.verify.result }}
+          CI_RUNTIME_RESULT: ${{ needs.runtime.result }}
+          CI_EFFECTIVE_RISK: ${{ needs.risk.outputs.risk }}
+        run: node scripts/harness/check-required-ci.mjs
+      - name: Summarize required status
+        if: always()
+        env:
+          STEP_RESULT: ${{ job.status }}
+          CHANGE_RISK: ${{ needs.risk.outputs.risk }}
+        run: |
+          echo "## Required integration status" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Result: $STEP_RESULT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Effective risk: $CHANGE_RISK" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Future required check: \`CI Required\`" >> "$GITHUB_STEP_SUMMARY"

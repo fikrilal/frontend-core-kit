@@ -23,6 +23,7 @@
     "contracts:sync": "node scripts/contracts/sync-openapi.mjs",
     "contracts:generate": "node scripts/contracts/generate-openapi.mjs",
     "contracts:check": "node scripts/contracts/check-openapi.mjs",
+    "risk:classify": "node scripts/harness/classify-risk.mjs",
     "knowledge:check": "node scripts/harness/check-knowledge.mjs",
     "architecture:check": "node scripts/harness/check-architecture.mjs",
     "public-pages:check": "node scripts/harness/check-public-pages.mjs",

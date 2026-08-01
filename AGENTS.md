@@ -108,6 +108,7 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm contracts:check
+pnpm risk:classify -- --base <revision> --head <revision>
 pnpm knowledge:check
 pnpm harness:check
 pnpm test:e2e

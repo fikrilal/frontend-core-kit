@@ -22,6 +22,10 @@ harness:check
 `verify` adds the production build. `verify:runtime` runs Playwright separately
 because browser installation and runtime cost are machine-specific.
 
+CI repeats these commands from a clean checkout. Local results remain repair
+feedback; GitHub Actions is the independent integration run once the workflow
+has been pushed.
+
 ## Contract check
 
 `pnpm contracts:check` regenerates API types and Zod runtime schemas from the
@@ -99,3 +103,43 @@ Never report a gate as passing unless it was actually executed.
 The measured current-state inventory and known sensor gaps live in the
 [harness baseline](harness-baseline.md). Measurements describe the repository;
 they are not quality budgets until evidence supports a threshold.
+
+## Risk classification
+
+`pnpm risk:classify -- --base <revision> --head <revision>` computes the maximum
+of path-derived risk and any changed v1 execution-plan declaration. Automation
+may raise declared risk and never lower it.
+
+| Minimum risk | Changed boundaries                                                                                          |
+| ------------ | ----------------------------------------------------------------------------------------------------------- |
+| High         | CI/harness, auth, authenticated routes, server code, contracts, dependencies, environment/deployment config |
+| Medium       | Other application source, tests, scripts, public assets, and build/test config                              |
+| Low          | Documentation and narrow repository metadata                                                                |
+
+Unknown paths default to medium. Changed execution plans must be v1 documents
+with valid risk metadata at the target revision. The classifier writes only
+path/rule evidence and never configuration values.
+
+## Independent CI
+
+`.github/workflows/ci.yml` runs on pull requests and pushes to `main` with
+read-only repository permission, a pinned Ubuntu runner image, and bounded job
+timeouts:
+
+1. `CI Risk` checks out full history and classifies the change.
+2. `CI Verify` performs a frozen install and runs `pnpm verify` for every risk.
+3. `CI Runtime` installs Chromium and runs `pnpm verify:runtime` for medium/high
+   changes; low-risk changes skip it.
+4. `CI Required` independently checks upstream outcomes and provides one stable
+   aggregate status.
+
+Jobs publish compact Markdown through GitHub's job-summary mechanism. The
+workflow uses no application secrets, backend connection, deployment token, or
+write permission. External actions are pinned to full commit SHAs with readable
+release comments; updates require reviewing and replacing both values.
+
+The workflow is configured but not independently proven until an authorized
+push produces a successful remote run. After that observation, a repository
+administrator can create a rule for `main` requiring the unique `CI Required`
+status. Do not configure that rule before GitHub has observed the status, and do
+not enable auto-merge as part of this phase.

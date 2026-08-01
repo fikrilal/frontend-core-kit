@@ -62,5 +62,7 @@ The accepted direction is documented in the
 
 1. **Completed:**
    [Executable intent and knowledge](completed/2026-08-01_agent-harness-phase-1.md)
+2. **Active:**
+   [Independent integration proof](active/2026-08-01_agent-harness-phase-2.md)
 
 Do not introduce product workflows until a real product decision exists.

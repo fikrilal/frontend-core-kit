@@ -18,6 +18,10 @@ Knowledge-validator fixtures prove valid plan/link acceptance and actionable
 failures for missing plan structure, status mismatches, incomplete completed
 plans, broken links, and unindexed proposals.
 
+Risk-classifier fixtures prove path tiers, declared/path maximum selection,
+unknown-path escalation, invalid-plan failure, Git revision handling,
+secret-safe summaries, aggregate CI outcomes, and stable workflow structure.
+
 HTTP-boundary server tests cover:
 
 - validated API-origin configuration;
@@ -57,6 +61,7 @@ pnpm test:contracts
 pnpm test:harness
 pnpm contracts:check
 pnpm knowledge:check
+pnpm risk:classify -- --base <revision> --head <revision>
 pnpm test:e2e
 pnpm verify:runtime
 ```
