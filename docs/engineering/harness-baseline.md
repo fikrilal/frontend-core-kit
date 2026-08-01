@@ -1,6 +1,6 @@
 # Harness Baseline
 
-**Baseline version:** 3
+**Baseline version:** 4
 
 **Captured:** 2026-08-01
 
@@ -32,7 +32,7 @@ listed as missing.
 | --------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | Intent          | v1 plan schema, lifecycle/link/proposal checks, and deterministic risk classification     | No semantic judgment of plan quality or human authority                         |
 | Formatting      | Prettier check                                                                            | None known for covered file types                                               |
-| Static analysis | ESLint and strict TypeScript                                                              | No complexity, duplication, or dead-export sensor                               |
+| Static analysis | ESLint/TypeScript, calibrated size and complexity caps, and Knip dead-code analysis       | Duplication has a measured baseline but no permanent sensor                     |
 | Architecture    | Environment, fetch, import, feature API, and thin-route checks                            | Regex/static heuristics do not prove all dependency directions                  |
 | API contracts   | Regeneration and byte-drift check from committed OpenAPI snapshot                         | No automatic backend publication or live compatibility lane                     |
 | Behavior        | Vitest, Node fixtures, production build, and Playwright                                   | No mutation score or coverage threshold                                         |
@@ -83,3 +83,20 @@ security, accessibility, or visual sensor.
 
 Phase 3 can now add new quality signals without mistaking configured automation
 for observed delivery confidence.
+
+## Maintainability Measurements
+
+Phase 3.1 measured non-test, non-generated production source before selecting
+controls:
+
+| Metric                      | Observed maximum/result                              | Control                                     |
+| --------------------------- | ---------------------------------------------------- | ------------------------------------------- |
+| Logical file lines          | 317 in `session-service.ts`                          | ESLint maximum 350                          |
+| Logical function lines      | 73 in `readResponse`                                 | ESLint maximum 80                           |
+| Cyclomatic complexity       | 12 in `mapPasswordLoginFailure`                      | ESLint maximum 12                           |
+| Duplicate blocks            | 0 at 8 lines/60 tokens across 49 non-generated files | Recorded only; no recurring dependency      |
+| Unused exports/dependencies | Six unnecessary exports plus generated noise         | Knip gate; generated contracts are excluded |
+
+The maxima are no-regression boundaries, not desired targets. The initial Knip
+cleanup also removed an unused Zod schema that was never executed and therefore
+misrepresented an internal session record as runtime-validated.

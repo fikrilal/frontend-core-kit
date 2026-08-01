@@ -89,6 +89,25 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/switch-exhaustiveness-check": "error",
     },
   },
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/**/*.test.{ts,tsx}",
+      "src/contracts/lamara-api/generated.ts",
+      "src/contracts/lamara-api/runtime.generated.ts",
+    ],
+    rules: {
+      complexity: ["error", 12],
+      "max-lines": [
+        "error",
+        { max: 350, skipBlankLines: true, skipComments: true },
+      ],
+      "max-lines-per-function": [
+        "error",
+        { max: 80, skipBlankLines: true, skipComments: true, IIFEs: true },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

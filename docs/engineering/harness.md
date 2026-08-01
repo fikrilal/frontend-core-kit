@@ -143,3 +143,20 @@ The workflow was independently proven by
 all four jobs passed on a clean hosted runner. A repository administrator can
 now create a rule for `main` requiring the unique `CI Required` status. No
 repository rule or auto-merge policy is currently configured by this phase.
+
+## Maintainability fitness
+
+`pnpm maintainability:check` uses Knip to reject unused files, exports, and
+dependencies. Generated API contracts are excluded because their public surface
+is generator-owned and independently protected by `pnpm contracts:check`.
+
+ESLint caps non-test, non-generated production source at complexity 12, 350
+logical lines per file, and 80 logical lines per function. These measured
+no-regression limits are not desired targets. Prefer extracting a cohesive
+decision or module over disabling a rule; any narrow exception requires a
+recorded reason and owner.
+
+Duplication is measured periodically instead of adding a permanent dependency.
+The Phase 3.1 baseline found no clones at 8 lines/60 tokens across 49 analyzed
+non-generated files. Promote duplication to a blocking sensor only after a real
+failure or repository growth demonstrates the recurring cost is justified.

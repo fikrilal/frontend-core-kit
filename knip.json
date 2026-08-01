@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "includeEntryExports": true,
+  "ignore": [
+    "src/contracts/lamara-api/generated.ts",
+    "src/contracts/lamara-api/runtime.generated.ts"
+  ]
+}

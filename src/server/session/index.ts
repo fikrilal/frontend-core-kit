@@ -6,4 +6,4 @@ export {
   writeSessionCookie,
 } from "./cookie";
 export { getConfiguredSessionService } from "./configured-session";
-export { SessionService, type SessionAccessResult } from "./session-service";
+export type { SessionAccessResult } from "./session-service";

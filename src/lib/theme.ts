@@ -5,7 +5,7 @@ export type ThemePreference = "light" | "dark" | "system";
 export type ResolvedTheme = "light" | "dark";
 
 /** When unset, use light mode (user can still pick dark or system). */
-export const DEFAULT_THEME_PREFERENCE: ThemePreference = "light";
+const DEFAULT_THEME_PREFERENCE: ThemePreference = "light";
 
 export function getStoredThemePreference(): ThemePreference {
   if (typeof window === "undefined") {
@@ -24,7 +24,7 @@ export function getStoredThemePreference(): ThemePreference {
   return DEFAULT_THEME_PREFERENCE;
 }
 
-export function getSystemTheme(): ResolvedTheme {
+function getSystemTheme(): ResolvedTheme {
   if (typeof window === "undefined") {
     return "dark";
   }

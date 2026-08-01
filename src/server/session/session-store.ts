@@ -1,18 +1,14 @@
-import { z } from "zod";
-
-export const sessionRecordSchema = z.object({
-  schemaVersion: z.literal(1),
-  userId: z.string().min(1),
-  accessToken: z.string().min(1),
-  refreshToken: z.string().min(1),
-  accessTokenExpiresAt: z.number().int().positive(),
-  expiresAt: z.number().int().positive(),
-  version: z.number().int().nonnegative(),
-  refreshState: z.enum(["active", "refreshing"]),
-  refreshStartedAt: z.number().int().positive().nullable(),
-});
-
-export type SessionRecord = Readonly<z.infer<typeof sessionRecordSchema>>;
+export type SessionRecord = Readonly<{
+  schemaVersion: 1;
+  userId: string;
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresAt: number;
+  expiresAt: number;
+  version: number;
+  refreshState: "active" | "refreshing";
+  refreshStartedAt: number | null;
+}>;
 
 export type SessionState = SessionRecord["refreshState"];
 

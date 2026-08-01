@@ -7,7 +7,7 @@ import { readSessionConfig } from "@/server/config/env";
 
 import type { EstablishedSession } from "./session-service";
 
-export const sessionCookieName = "lamara_session";
+const sessionCookieName = "lamara_session";
 
 const sessionIdSchema = z
   .string()

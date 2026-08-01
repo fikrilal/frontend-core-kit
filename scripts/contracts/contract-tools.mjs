@@ -11,11 +11,8 @@ import { format, resolveConfig } from "prettier";
 
 const scriptsDirectory = path.dirname(fileURLToPath(import.meta.url));
 
-export const repositoryRoot = path.resolve(scriptsDirectory, "../..");
-export const contractDirectory = path.join(
-  repositoryRoot,
-  "src/contracts/lamara-api",
-);
+const repositoryRoot = path.resolve(scriptsDirectory, "../..");
+const contractDirectory = path.join(repositoryRoot, "src/contracts/lamara-api");
 export const snapshotPath = path.join(contractDirectory, "openapi.yaml");
 export const generatedPath = path.join(contractDirectory, "generated.ts");
 export const runtimeGeneratedPath = path.join(
