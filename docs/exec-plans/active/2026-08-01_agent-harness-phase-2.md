@@ -192,6 +192,11 @@ was ever activated. No application runtime state or production data changes.
   classification rejected an allowlisted pre-v1 completed plan even though the
   knowledge validator accepts it. The legacy-plan policy is now shared by both
   validators; only the four named historical plans are exempt.
+- 2026-08-01: The second hosted run passed risk classification but exposed a
+  clean-install-only pnpm 11 migration issue. The workspace mixed `allowBuilds`
+  with removed `onlyBuiltDependencies` syntax, so strict installs rejected the
+  ignored Sharp and resolver scripts. All three reviewed build dependencies now
+  use the pnpm 11 `allowBuilds` map.
 
 ## Verification
 
