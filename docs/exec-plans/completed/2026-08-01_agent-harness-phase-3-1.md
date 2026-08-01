@@ -1,7 +1,7 @@
 # 2026-08-01 Agent Harness Phase 3.1: Maintainability Fitness
 
 **Plan version:** 1
-**Status:** active
+**Status:** completed
 **Owner:** primary agent
 **Risk:** high
 **Authority:** implement, verify, commit, push, and observe repository-local
@@ -107,8 +107,8 @@ observation loop. Product behavior and external administration remain excluded.
 - [x] Update harness guidance and the measured baseline.
 - [x] Run targeted and full local verification; use hosted CI as the clean
       checkout proof.
-- [ ] Commit, push, observe hosted CI, and record evidence.
-- [ ] Move this plan to `completed/` with no unresolved required work.
+- [x] Commit, push, observe hosted CI, and record evidence.
+- [x] Move this plan to `completed/` with no unresolved required work.
 
 ## Rollout And Rollback
 
@@ -135,6 +135,9 @@ external system is affected.
   hypothetical parser replacement to retaining current architecture checks.
   This records the evidence-based scope reduction instead of silently adding an
   abstraction without a failure case.
+- 2026-08-01: Hosted run
+  [30684371899](https://github.com/Orymu/lamara-frontend/actions/runs/30684371899)
+  passed risk, deterministic, browser, and aggregate jobs from a clean checkout.
 
 ## Verification
 
@@ -143,10 +146,13 @@ external system is affected.
   harness tests.
 - `pnpm verify`: passed under Node `v24.18.0`, including production build and
   the new Knip gate.
+- GitHub Actions run 30684371899: all required jobs passed; `CI Verify` completed
+  in 1 minute 35 seconds.
 
 ## Runtime Evidence
 
 - `pnpm verify:runtime`: passed; all 6 Chromium scenarios succeeded.
+- Hosted `CI Runtime`: passed in 1 minute 8 seconds.
 - No browser-visible behavior changed.
 
 ## Follow-Up Debt

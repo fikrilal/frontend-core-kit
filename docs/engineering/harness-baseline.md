@@ -100,3 +100,6 @@ controls:
 The maxima are no-regression boundaries, not desired targets. The initial Knip
 cleanup also removed an unused Zod schema that was never executed and therefore
 misrepresented an internal session record as runtime-validated.
+
+The complete maintainability gate was independently reproduced in
+[GitHub Actions run 30684371899](https://github.com/Orymu/lamara-frontend/actions/runs/30684371899).
