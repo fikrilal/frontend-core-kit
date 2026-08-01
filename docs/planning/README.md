@@ -1,7 +1,10 @@
 # Planning Documentation
 
-Planning documents are proposals, not current behavior. There are no active
-proposals.
+Planning documents are proposals, not current behavior.
+
+Accepted proposals:
+
+- [Agent-first harness and loop engineering](agent-harness-loop-engineering-proposal.md)
 
 Retired background:
 

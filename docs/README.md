@@ -20,6 +20,7 @@ remain under `docs/planning/`.
 ## Planning and execution
 
 - [Planning index](planning/README.md)
+- [Agent-first harness and loop engineering proposal](planning/agent-harness-loop-engineering-proposal.md)
 - [Execution plans](exec-plans/README.md)
 
 Planning documents are not implementation evidence. When a proposal is
