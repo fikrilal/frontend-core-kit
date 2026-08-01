@@ -66,7 +66,8 @@ Before using unfamiliar Next.js behavior, inspect the installed docs under
 - Keep route files thin. Routes compose feature entry points and metadata.
 - Keep product behavior inside `src/features/` as features are introduced.
 - Keep `src/components/ui/**` business-free.
-- Keep server-only integration code under `src/server/**`.
+- Keep shared server infrastructure under `src/server/**`; keep feature-owned
+  endpoint adapters under `src/features/<feature>/server/**`.
 - Do not read `process.env` outside approved config/runtime files.
 - Do not scatter raw `fetch(...)`; use server adapters or generated contracts.
 - Do not import server-only modules from Client Components.
@@ -107,6 +108,7 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm contracts:check
+pnpm knowledge:check
 pnpm harness:check
 pnpm test:e2e
 ```

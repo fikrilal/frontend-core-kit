@@ -1,6 +1,7 @@
 # Engineering Documentation
 
 - [Harness](harness.md)
+- [Harness baseline](harness-baseline.md)
 - [Testing strategy](testing-strategy.md)
 - [API integration](api-integration.md)
 - [Session management](session-management.md)

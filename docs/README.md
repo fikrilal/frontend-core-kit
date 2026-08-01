@@ -14,6 +14,7 @@ remain under `docs/planning/`.
 - [Design system](design/design-system.md)
 - [Testing strategy](engineering/testing-strategy.md)
 - [Engineering harness](engineering/harness.md)
+- [Harness baseline](engineering/harness-baseline.md)
 - [API integration](engineering/api-integration.md)
 - [Commit conventions](contributing/commit-conventions.md)
 

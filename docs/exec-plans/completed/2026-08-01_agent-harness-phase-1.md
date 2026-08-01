@@ -1,7 +1,7 @@
 # 2026-08-01 Agent Harness Phase 1: Executable Intent And Knowledge
 
 **Plan version:** 1
-**Status:** active
+**Status:** completed
 **Owner:** primary agent
 **Risk:** medium
 **Authority:** implement, verify, and create focused local commits; do not push,
@@ -131,16 +131,16 @@ backend, install external infrastructure, or perform destructive operations.
 
 ## Checklist
 
-- [ ] Strengthen the execution-plan template and workflow documentation.
-- [ ] Clarify shared-infrastructure versus feature-adapter ownership.
-- [ ] Implement a dependency-free knowledge and plan validator.
-- [ ] Add focused positive and negative validator tests.
-- [ ] Integrate the validator into the normal harness and test commands.
-- [ ] Record the current harness baseline and missing sensors.
-- [ ] Run targeted tests while iterating.
-- [ ] Run `pnpm verify` and `pnpm verify:runtime`.
-- [ ] Record exact evidence and deviations.
-- [ ] Move this plan to `completed/` only after all required evidence passes.
+- [x] Strengthen the execution-plan template and workflow documentation.
+- [x] Clarify shared-infrastructure versus feature-adapter ownership.
+- [x] Implement a dependency-free knowledge and plan validator.
+- [x] Add focused positive and negative validator tests.
+- [x] Integrate the validator into the normal harness and test commands.
+- [x] Record the current harness baseline and missing sensors.
+- [x] Run targeted tests while iterating.
+- [x] Run `pnpm verify` and `pnpm verify:runtime`.
+- [x] Record exact evidence and deviations.
+- [x] Move this plan to `completed/` only after all required evidence passes.
 
 ## Rollout And Rollback
 
@@ -157,16 +157,30 @@ rejected attempt. No runtime application state or user data is affected.
 - 2026-08-01: The accepted proposal and user direction authorize Phase 1.
 - 2026-08-01: Phase 1 records missing maintainability sensors rather than adding
   arbitrary thresholds before measurement.
+- 2026-08-01: The first fast-gate run revealed that Vitest discovered the new
+  Node-native harness tests. `scripts/harness/**` is now excluded from Vitest,
+  matching the existing contract-test runner boundary; the dedicated Node suite
+  remains part of `pnpm test`.
+- 2026-08-01: Gate measurements use Node `v24.18.0` from `.nvmrc`; the ambient
+  shell's Node 22 runtime was rejected for baseline evidence.
 
 ## Verification
 
-- Not run yet.
+- `pnpm test:harness`: passed, 7 tests.
+- `pnpm knowledge:check`: passed against the repository.
+- `pnpm install --frozen-lockfile`: passed; lockfile was already current.
+- `pnpm verify:fast`: passed under Node `v24.18.0`; 60 Vitest tests, 6
+  contract-tool tests, and 7 harness tests; measured at 27.06 seconds.
+- `pnpm verify`: passed under Node `v24.18.0`, including the production build;
+  measured at 35.48 seconds.
+- `git diff --check`: passed before final plan completion.
 
 ## Runtime Evidence
 
 - Required because the existing browser gate is part of the current harness,
   even though Phase 1 does not change user-visible behavior.
-- Pending.
+- `pnpm verify:runtime`: passed under Node `v24.18.0`; all 6 Chromium scenarios
+  passed in the isolated fixture lane; command measured at 10.34 seconds.
 
 ## Follow-Up Debt
 

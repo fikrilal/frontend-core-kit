@@ -18,6 +18,7 @@ export default defineConfig({
     environment: "jsdom",
     exclude: [
       "scripts/contracts/**",
+      "scripts/harness/**",
       "tests/e2e/**",
       "node_modules/**",
       ".next/**",

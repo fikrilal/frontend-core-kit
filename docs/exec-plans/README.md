@@ -18,9 +18,24 @@ docs/exec-plans/completed/
 
 1. Copy `docs/exec-plans/_template.md`.
 2. Place the plan in `active/` for current work or `queued/` for future work.
-3. Keep checklist and decisions current during implementation.
-4. Record commands and outcomes before completing the plan.
-5. Move completed plans to `completed/`.
+3. Replace every metadata placeholder. The folder and declared status must
+   agree.
+4. Define observable acceptance scenarios, explicit authority, non-goals, and
+   evidence before implementation starts.
+5. Keep the checklist and decision/deviation log current during implementation.
+6. Record exact commands, outcomes, and runtime evidence before completion.
+7. Check every required item, change status to `completed`, and move the plan
+   to `completed/` in the same change.
+
+New plans use plan schema version 1. `pnpm knowledge:check` validates metadata,
+required sections, lifecycle state, completed-plan evidence, local Markdown
+links, and the planning index. Historical pre-v1 plans remain readable without
+being reformatted, but completed plans may not retain unchecked required work.
+
+Risk and authority are separate. Risk describes potential impact. Authority
+records what the user has allowed for this change and must name exclusions such
+as push, deploy, production mutation, or external communication when relevant.
+A plan never grants permissions that were not already provided.
 
 Tiny docs edits and small one-file mechanical changes do not need execution
 plans.
@@ -45,7 +60,7 @@ Implementation is split into independently reviewable plans:
 The accepted direction is documented in the
 [agent-first harness and loop engineering proposal](../planning/agent-harness-loop-engineering-proposal.md).
 
-1. **Active:**
-   [Executable intent and knowledge](active/2026-08-01_agent-harness-phase-1.md)
+1. **Completed:**
+   [Executable intent and knowledge](completed/2026-08-01_agent-harness-phase-1.md)
 
 Do not introduce product workflows until a real product decision exists.

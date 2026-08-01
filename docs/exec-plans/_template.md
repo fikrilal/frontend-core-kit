@@ -1,39 +1,69 @@
 # YYYY-MM-DD Short Title
 
+**Plan version:** 1
+**Status:** active
+**Owner:** accountable human or agent role
+**Risk:** low | medium | high
+**Authority:** state permitted actions and explicit exclusions
+
 ## Objective
 
-What are we trying to accomplish?
+State the observable outcome and why it matters.
 
-## Acceptance Criteria
+## Current Evidence
 
-- [ ] Concrete observable outcome.
-- [ ] Required verification recorded.
+- Point to the code, behavior, commands, or decisions that establish the
+  starting state.
 
-## Risk Class
+## Decisions And Invariants
 
-`low` | `medium` | `high`
+- Record constraints that implementation must preserve.
+
+## Non-Goals
+
+- Exclude adjacent work that should not be inferred from this plan.
+
+## Acceptance Scenarios
+
+1. Given a concrete starting state, when an action occurs, then an observable
+   result follows.
+
+## Risk And Authority
+
+Explain the risk classification, failure impact, permitted mutations, and
+actions that still require human approval. A plan documents authority; it does
+not grant authority by itself.
 
 ## Impact Areas
 
-- Files, modules, routes, scripts, or docs affected.
+- Files, modules, routes, scripts, docs, data, or external systems affected.
+
+## Verification Matrix
+
+| Acceptance | Evidence                                       |
+| ---------- | ---------------------------------------------- |
+| Outcome    | Command, test, inspection, or runtime artifact |
 
 ## Checklist
 
 - [ ] Implementation step.
 - [ ] Verification step.
 
-## Decisions
+## Rollout And Rollback
 
-- Record important decisions made during implementation.
+Describe how the change becomes active and how to recover safely.
+
+## Decision And Deviation Log
+
+- YYYY-MM-DD: Record important decisions and deviations while executing.
 
 ## Verification
 
-- Command: not run yet
-- Outcome: pending
+- Not run yet.
 
 ## Runtime Evidence
 
-- Not required yet.
+- Not run yet.
 
 ## Follow-Up Debt
 

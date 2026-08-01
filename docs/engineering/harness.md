@@ -28,6 +28,22 @@ because browser installation and runtime cost are machine-specific.
 committed frontend OpenAPI snapshot in a temporary directory and fails on any
 byte-level drift. The gate has no sibling-repository or network dependency.
 
+## Knowledge check
+
+`pnpm knowledge:check` validates mechanically knowable repository intent:
+
+- local Markdown links resolve inside the repository;
+- every planning proposal is present in the planning index;
+- v1 execution plans contain required metadata and sections;
+- plan status agrees with its lifecycle folder;
+- completed plans contain no unresolved required checkbox or placeholder
+  verification evidence.
+
+The validator accepts historical pre-v1 plans without forcing a rewrite. It
+does not decide whether a proposal is correct, whether acceptance scenarios are
+sufficient, or whether a human granted the stated authority. Those remain
+review responsibilities.
+
 ## Architecture check
 
 `scripts/harness/check-architecture.mjs` enforces current stable boundaries:
@@ -79,3 +95,7 @@ Next.js output in `.next-e2e`.
   require full verification, failure-path evidence, and human review.
 
 Never report a gate as passing unless it was actually executed.
+
+The measured current-state inventory and known sensor gaps live in the
+[harness baseline](harness-baseline.md). Measurements describe the repository;
+they are not quality budgets until evidence supports a threshold.

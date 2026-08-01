@@ -12,7 +12,11 @@
 
 Unit and component tests cover theme preference and the theme control. Node
 tests cover contract-source argument validation, snapshot validation, hashing,
-and exact generated-output drift detection.
+exact generated-output drift detection, and the repository knowledge validator.
+
+Knowledge-validator fixtures prove valid plan/link acceptance and actionable
+failures for missing plan structure, status mismatches, incomplete completed
+plans, broken links, and unindexed proposals.
 
 HTTP-boundary server tests cover:
 
@@ -50,7 +54,9 @@ Playwright covers:
 ```bash
 pnpm test
 pnpm test:contracts
+pnpm test:harness
 pnpm contracts:check
+pnpm knowledge:check
 pnpm test:e2e
 pnpm verify:runtime
 ```
