@@ -100,7 +100,7 @@ requested local verification and performs one read-only readiness request.
 - [x] Add sanitized readiness preflight and focused failure tests.
 - [x] Document scope, usage, and diagnostic privacy.
 - [x] Run targeted, full, browser, and real local readiness verification.
-- [ ] Commit locally without pushing.
+- [x] Commit locally without pushing.
 - [ ] Leave the plan active until remote CI is explicitly authorized and proven.
 
 ## Rollout And Rollback
@@ -122,6 +122,8 @@ application state is changed.
 - 2026-08-01: Vitest initially discovered the Node test fixtures and rejected
   them as empty Vitest suites. `scripts/testing/**` now follows the same explicit
   Vitest exclusion as contract and harness Node tests.
+- 2026-08-01: Implementation committed locally as `75640f4`; the branch was not
+  pushed, following explicit user instruction.
 
 ## Verification
 
