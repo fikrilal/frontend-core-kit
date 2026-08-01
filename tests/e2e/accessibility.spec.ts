@@ -44,6 +44,40 @@ test("login form exposes labels, focus order, errors, and no detectable WCAG A/A
   await expectNoAccessibilityViolations(page);
 });
 
+test("registration form exposes labels, password guidance, and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await page.goto("/register");
+  await expectNoAccessibilityViolations(page);
+  await expect(
+    page.getByRole("heading", { name: "Create your account" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Password", { exact: true })).toHaveAttribute(
+    "minlength",
+    "10",
+  );
+  await expect(page.getByLabel("Confirm password")).toHaveAttribute(
+    "autocomplete",
+    "new-password",
+  );
+
+  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.keyboard.press("Tab");
+  await expect(page.getByLabel("Email")).toBeFocused();
+  await expectKeyboardFocusIndicator(page.getByLabel("Email"));
+
+  await page.getByLabel("Email").fill("existing@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("test-password-10");
+  await page.getByLabel("Confirm password").fill("test-password-10");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page.locator("#register-error")).toBeVisible();
+  await expect(page.getByLabel("Email")).toHaveAttribute(
+    "aria-describedby",
+    "register-error",
+  );
+  await expectNoAccessibilityViolations(page);
+});
+
 test("protected route redirects to an accessible login page", async ({
   page,
 }) => {

@@ -39,6 +39,15 @@ export async function AuthenticatedPage() {
               <p className="text-muted-foreground mt-3 text-sm">
                 {result.user.email}
               </p>
+              {!result.user.emailVerified ? (
+                <p
+                  className="border-border bg-muted/40 text-muted-foreground mt-6 rounded-lg border p-3 text-sm"
+                  role="status"
+                >
+                  Check your inbox to verify your email address. Verification is
+                  required before all account features are available.
+                </p>
+              ) : null}
               <p className="text-muted-foreground mt-8 text-sm">
                 Product workflows have not been defined yet.
               </p>

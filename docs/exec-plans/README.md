@@ -27,10 +27,13 @@ docs/exec-plans/completed/
 7. Check every required item, change status to `completed`, and move the plan
    to `completed/` in the same change.
 
-New plans use plan schema version 1. `pnpm knowledge:check` validates metadata,
+New active and queued plans use schema version 2. They declare narrow allowed
+paths, allowed actions, maximum risk, and repair limit in addition to the
+existing plan contract. `pnpm knowledge:check` validates metadata, boundaries,
 required sections, lifecycle state, completed-plan evidence, local Markdown
-links, and the planning index. Historical pre-v1 plans remain readable without
-being reformatted, but completed plans may not retain unchecked required work.
+links, and the planning index. Historical completed plans remain readable
+without being reformatted, but completed plans may not retain unchecked required
+work.
 
 Risk and authority are separate. Risk describes potential impact. Authority
 records what the user has allowed for this change and must name exclusions such
@@ -72,5 +75,15 @@ The accepted direction is documented in the
    [Accessibility fitness](completed/2026-08-01_agent-harness-phase-3-3.md)
 6. **Completed:**
    [Repository-owned visual evidence](completed/2026-08-01_agent-harness-phase-3-4.md)
+7. **Completed:**
+   [Task-oriented verification](completed/2026-08-01_agent-harness-phase-4-1-task-verification.md)
+8. **Completed:**
+   [Scope and repair bounds](completed/2026-08-01_agent-harness-phase-4-2-scope-repair-bounds.md)
+9. **Completed:**
+   [Authorized PR loop](completed/2026-08-01_agent-harness-phase-4-3-authorized-pr-loop.md)
+10. **Completed:**
+    [Password registration](completed/2026-08-01_auth-password-registration.md)
+11. **Active:**
+    [Operating proof](active/2026-08-01_agent-harness-phase-4-4-operating-proof.md)
 
 Do not introduce product workflows until a real product decision exists.

@@ -58,6 +58,25 @@ test("keeps a high plan declaration for medium paths", () => {
   assert.equal(result.risk, "high");
 });
 
+test("includes the active plan risk even when that plan is unchanged", () => {
+  const activePlanPath = "docs/exec-plans/active/plan.md";
+  const result = classifyRisk({
+    changedPaths: ["docs/README.md"],
+    activePlanDocument: { path: activePlanPath, source: plan("high") },
+  });
+
+  assert.equal(result.pathRisk, "low");
+  assert.equal(result.declaredRisk, "high");
+  assert.equal(result.risk, "high");
+  assert.deepEqual(result.reasons, [
+    {
+      path: activePlanPath,
+      risk: "high",
+      rule: "active execution-plan declaration",
+    },
+  ]);
+});
+
 test("defaults unknown paths to medium and rejects paths outside the repository", () => {
   assert.deepEqual(classifyPath("unrecognized.file"), {
     path: "unrecognized.file",
@@ -70,7 +89,7 @@ test("defaults unknown paths to medium and rejects paths outside the repository"
   );
 });
 
-test("requires changed execution plans to provide valid v1 risk", () => {
+test("requires changed execution plans to provide valid V1/V2 risk", () => {
   const planPath = "docs/exec-plans/active/plan.md";
 
   assert.throws(
@@ -267,7 +286,7 @@ test("keeps the GitHub workflow least-privilege and branch-protection ready", ()
 });
 
 function plan(risk) {
-  return `# Plan\n\n**Plan version:** 1\n**Risk:** ${risk}\n`;
+  return `# Plan\n\n**Plan version:** 2\n**Risk:** ${risk}\n`;
 }
 
 function actionPins(workflow, action) {

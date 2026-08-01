@@ -22,6 +22,67 @@ harness:check
 `verify` adds the production build. `verify:runtime` runs Playwright separately
 because browser installation and runtime cost are machine-specific.
 
+## Task verification
+
+Start an active V2 task with `pnpm task:begin`. It captures its base revision,
+active-plan identity, narrow structured boundaries, and pre-existing changed
+paths in ignored `test-results/task-state.json`; it never stashes, restores, or
+claims ownership of those paths. `pnpm task:verify` then requires that baseline,
+checks exact Node and pnpm versions, discovers committed/staged/unstaged/untracked
+paths, rejects new out-of-scope paths, requires `verify` authority, and stops if
+effective risk exceeds the plan's maximum risk.
+
+After scope preflight, task verification runs `verify:fast` for low risk or
+`verify` followed by `verify:runtime` for medium/high risk, stopping after the
+first failed lane. A failure records only its stable boundary code and a
+path/metadata task fingerprint. Repeating the same failure without a meaningful
+task change exhausts the plan's repair limit and escalates before another costly
+run. This is an execution bound, not automatic source repair.
+
+Use `pnpm task:verify -- --base <revision>` only when the task includes commits
+after that base; the default base is `HEAD`. To write sanitized machine evidence,
+use `pnpm task:verify -- --summary test-results/task-verification.json`. The
+summary records only risk/path evidence, executed commands, outcomes, durations,
+and a remediation—not command output, environment values, credentials, cookies,
+or request data. The begin/verify commands write only ignored task-state and
+optional summary evidence; they never format, regenerate snapshots, edit code,
+commit, push, or contact external systems.
+
+The baseline is intentionally path-level. It preserves and identifies user
+changes that existed at `task:begin`, but it cannot determine who changed a line
+inside such a file later. Agents must treat pre-existing out-of-scope paths as
+user-owned and request a boundary change before editing them.
+
+## Draft handoff
+
+`pnpm task:handoff -- --title "type(scope): summary" --dry-run` exercises the
+same preflight without mutating Git or GitHub. The non-dry path re-runs task
+verification, requires a clean task baseline, validates the current named branch
+and `origin`, and requires separate `commit`, `push`, and `draft-pr` action
+authority in the active V2 plan before it can stage only verified task paths,
+create one normal commit, push normally, and create a draft PR. It never
+force-pushes, merges, deploys, comments, or changes review state.
+
+`pnpm task:handoff -- --pr <number> --title "type(scope): repair"` is the
+separate repair-handoff form. It requires `commit`, `push`, and `update-pr`
+authority, and only continues when the given PR is still an open draft whose
+base/head exactly match the local task. The adapter updates its sanitized
+evidence body after a normal push; it does not inspect or override review or CI
+outcomes. A real handoff always needs task-specific human authority for every
+external action.
+
+## Operating evidence
+
+`pnpm harness:evidence` reads the versioned,
+[sanitized operating-evidence ledger](harness-operating-evidence.md) and prints
+aggregates only. It requires each record to cite a completed execution plan and
+uses fixed categorical fields, so it cannot collect prompts, logs, credentials,
+environment values, PR links, source diffs, notes, or review prose. The command
+reports `insufficient` until there are at least three independently reviewed,
+CI-reproduced tasks across two risk classes, including a medium/high task and a
+repair or escalation. Even then, its only outcome is `ready-for-human-review`;
+it never expands autonomy or changes harness policy.
+
 CI repeats these commands from a clean checkout. Local results remain repair
 feedback; GitHub Actions is the independent integration run once the workflow
 has been pushed.
@@ -38,7 +99,8 @@ byte-level drift. The gate has no sibling-repository or network dependency.
 
 - local Markdown links resolve inside the repository;
 - every planning proposal is present in the planning index;
-- v1 execution plans contain required metadata and sections;
+- V2 active/queued execution plans contain required metadata, boundaries, and
+  sections; completed V1 plans remain valid historical evidence;
 - plan status agrees with its lifecycle folder;
 - completed plans contain no unresolved required checkbox or placeholder
   verification evidence.
@@ -118,7 +180,7 @@ they are not quality budgets until evidence supports a threshold.
 ## Risk classification
 
 `pnpm risk:classify -- --base <revision> --head <revision>` computes the maximum
-of path-derived risk and any changed v1 execution-plan declaration. Automation
+of path-derived risk and any changed V1/V2 execution-plan declaration. Automation
 may raise declared risk and never lower it.
 
 | Minimum risk | Changed boundaries                                                                                          |
@@ -127,7 +189,7 @@ may raise declared risk and never lower it.
 | Medium       | Other application source, tests, scripts, public assets, and build/test config                              |
 | Low          | Documentation and narrow repository metadata                                                                |
 
-Unknown paths default to medium. Changed execution plans must be v1 documents
+Unknown paths default to medium. Changed execution plans must be V1/V2 documents
 with valid risk metadata at the target revision. The classifier writes only
 path/rule evidence and never configuration values.
 

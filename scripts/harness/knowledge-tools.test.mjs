@@ -6,7 +6,7 @@ import test from "node:test";
 
 import { collectKnowledgeViolations } from "./knowledge-tools.mjs";
 
-test("accepts a complete v1 active plan and valid local links", () => {
+test("accepts a complete v2 active plan and valid local links", () => {
   withFixture((root) => {
     write(root, "docs/guide.md", "# Guide\n");
     write(root, "docs/README.md", "[Guide](guide.md)\n");
@@ -16,12 +16,12 @@ test("accepts a complete v1 active plan and valid local links", () => {
   });
 });
 
-test("reports missing v1 metadata and sections with remediation", () => {
+test("reports missing v2 metadata and sections with remediation", () => {
   withFixture((root) => {
     write(
       root,
       "docs/exec-plans/active/plan.md",
-      "# Plan\n\n**Plan version:** 1\n**Status:** active\n",
+      "# Plan\n\n**Plan version:** 2\n**Status:** active\n",
     );
 
     const violations = collectKnowledgeViolations(root);
@@ -55,6 +55,22 @@ test("requires the current schema for new plans and content in each section", ()
     assert(
       violations.some((value) =>
         value.includes('empty required section "## Objective"'),
+      ),
+    );
+  });
+});
+
+test("rejects version 1 plans outside completed history", () => {
+  withFixture((root) => {
+    write(
+      root,
+      "docs/exec-plans/active/old.md",
+      validPlan().replace("**Plan version:** 2", "**Plan version:** 1"),
+    );
+
+    assert(
+      collectKnowledgeViolations(root).some((value) =>
+        value.includes("New active and queued plans must use version 2"),
       ),
     );
   });
@@ -181,11 +197,15 @@ function validPlan() {
 
   return `# Plan
 
-**Plan version:** 1
+**Plan version:** 2
 **Status:** active
 **Owner:** agent
 **Risk:** medium
 **Authority:** edit and verify locally
+**Allowed paths:** docs/, scripts/harness/, package.json
+**Allowed actions:** edit, verify
+**Maximum risk:** high
+**Repair limit:** 2
 
 ${sections
   .map((heading) =>

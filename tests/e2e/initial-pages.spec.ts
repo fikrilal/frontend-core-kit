@@ -59,6 +59,64 @@ test("maps a backend login code to safe frontend copy", async ({
   ).toBe(false);
 });
 
+test("maps an existing registration email to safe frontend copy", async ({
+  context,
+  page,
+}) => {
+  await page.goto("/register");
+  await page.getByLabel("Email").fill("existing@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("test-password-10");
+  await page.getByLabel("Confirm password").fill("test-password-10");
+  await page.getByRole("button", { name: "Create account" }).click();
+
+  await expect(
+    page.getByText("An account with this email already exists."),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/register$/);
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(false);
+});
+
+test("registers a user with an opaque cookie and verification guidance", async ({
+  context,
+  page,
+}) => {
+  await page.goto("/register");
+  await page.getByLabel("Email").fill("new-user@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("test-password-10");
+  await page.getByLabel("Confirm password").fill("test-password-10");
+  await page.getByRole("button", { name: "Create account" }).click();
+
+  await expect(page).toHaveURL(/\/app$/);
+  await expect(
+    page.getByRole("heading", { name: "You are signed in." }),
+  ).toBeVisible();
+  await expect(page.getByText("new-user@example.com")).toBeVisible();
+  await expect(page.locator('[role="status"]')).toContainText(
+    "Check your inbox to verify your email address.",
+  );
+
+  const sessionCookie = (await context.cookies()).find(
+    (cookie) => cookie.name === "lamara_session",
+  );
+  expect(sessionCookie).toMatchObject({
+    httpOnly: true,
+    sameSite: "Lax",
+  });
+  const browserOwnedState = await page.evaluate(() => ({
+    html: document.documentElement.outerHTML,
+    localStorage: Object.entries(localStorage),
+    sessionStorage: Object.entries(sessionStorage),
+  }));
+  expect(JSON.stringify(browserOwnedState)).not.toContain(
+    "e2e-registration-refresh-token",
+  );
+  expect(JSON.stringify(browserOwnedState)).not.toContain(".signature");
+});
+
 test("signs in with an opaque cookie and signs out", async ({
   context,
   page,
