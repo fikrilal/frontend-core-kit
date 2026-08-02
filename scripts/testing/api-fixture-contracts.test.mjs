@@ -57,6 +57,35 @@ test("accepts a contract-valid password reset request", () => {
   );
 });
 
+test("accepts a contract-valid password reset confirmation", () => {
+  assert.deepEqual(
+    parseFixtureContract(
+      "password reset confirmation request",
+      fixtureContracts.resetConfirmRequest,
+      { token: "reset-token", newPassword: "new-password-10" },
+    ),
+    { token: "reset-token", newPassword: "new-password-10" },
+  );
+  assert.equal(
+    parseFixtureContract(
+      "password reset confirmation response",
+      fixtureContracts.resetConfirmResponse,
+      undefined,
+    ),
+    undefined,
+  );
+});
+
+test("rejects a malformed password reset confirmation request", () => {
+  assert.equal(
+    tryParseFixtureContract(fixtureContracts.resetConfirmRequest, {
+      token: "reset-token",
+      newPassword: "short",
+    }),
+    null,
+  );
+});
+
 test("returns no request data when an incoming fixture request is invalid", () => {
   assert.equal(
     tryParseFixtureContract(fixtureContracts.loginRequest, {

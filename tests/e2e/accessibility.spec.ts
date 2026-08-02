@@ -103,6 +103,51 @@ test("password reset form exposes safe feedback and no detectable WCAG A/AA viol
   await expectNoAccessibilityViolations(page);
 });
 
+test("password reset confirmation exposes password guidance and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await page.goto("/reset-password?token=valid-reset-token");
+  await expectNoAccessibilityViolations(page);
+  await expect(
+    page.getByRole("heading", { name: "Choose a new password" }),
+  ).toBeVisible();
+  await expect(
+    page.getByLabel("New password", { exact: true }),
+  ).toHaveAttribute("minlength", "10");
+  await expect(page.getByLabel("Confirm new password")).toHaveAttribute(
+    "autocomplete",
+    "new-password",
+  );
+
+  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.keyboard.press("Tab");
+  await expect(page.getByLabel("New password", { exact: true })).toBeFocused();
+  await expectKeyboardFocusIndicator(
+    page.getByLabel("New password", { exact: true }),
+  );
+  await page.keyboard.press("Tab");
+  await expect(page.getByLabel("Confirm new password")).toBeFocused();
+
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("new-password-10");
+  await page.getByLabel("Confirm new password").fill("different-password");
+  await page.getByRole("button", { name: "Update password" }).click();
+  const error = page.locator("#password-reset-confirmation-error");
+  await expect(error).toBeVisible();
+  await expect(
+    page.getByLabel("New password", { exact: true }),
+  ).toHaveAttribute(
+    "aria-describedby",
+    "password-reset-confirmation-password-hint password-reset-confirmation-error",
+  );
+  await expect(page.getByLabel("Confirm new password")).toHaveAttribute(
+    "aria-describedby",
+    "password-reset-confirmation-error",
+  );
+  await expectNoAccessibilityViolations(page);
+});
+
 test("protected route redirects to an accessible login page", async ({
   page,
 }) => {

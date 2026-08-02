@@ -125,6 +125,111 @@ test("maps password reset rate limiting to safe frontend copy", async ({
   ).toBe(false);
 });
 
+test("confirms a password reset and redirects without a session", async ({
+  context,
+  page,
+}) => {
+  await page.goto("/reset-password?token=valid-reset-token");
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("new-password-10");
+  await page.getByLabel("Confirm new password").fill("new-password-10");
+  await page.getByRole("button", { name: "Update password" }).click();
+
+  await expect(page).toHaveURL(/\/login\?reset=success$/);
+  await expect(page.getByRole("status")).toContainText(
+    "Your password has been reset. Sign in with your new password.",
+  );
+  expect(page.url()).not.toContain("valid-reset-token");
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(false);
+  const browserOwnedState = await page.evaluate(() => ({
+    localStorage: Object.entries(localStorage),
+    sessionStorage: Object.entries(sessionStorage),
+  }));
+  expect(JSON.stringify(browserOwnedState)).not.toContain("valid-reset-token");
+});
+
+test("maps invalid and expired reset tokens to safe frontend copy", async ({
+  context,
+  page,
+}) => {
+  for (const token of ["invalid-reset-token", "expired-reset-token"]) {
+    await page.goto(`/reset-password?token=${token}`);
+    await page
+      .getByLabel("New password", { exact: true })
+      .fill("new-password-10");
+    await page.getByLabel("Confirm new password").fill("new-password-10");
+    await page.getByRole("button", { name: "Update password" }).click();
+
+    await expect(
+      page.getByText(
+        "This password reset link is invalid or expired. Request a new one.",
+      ),
+    ).toBeVisible();
+    await expect(page).toHaveURL(
+      new RegExp(`/reset-password\\?token=${token}$`),
+    );
+    await expect(page.locator("body")).not.toContainText(
+      "AUTH_PASSWORD_RESET_TOKEN",
+    );
+  }
+
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(false);
+});
+
+test("rejects a missing reset token without calling the API", async ({
+  page,
+}) => {
+  let confirmationRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/v1/auth/password/reset/confirm")) {
+      confirmationRequests += 1;
+    }
+  });
+
+  await page.goto("/reset-password");
+  await expect(
+    page.getByRole("status").filter({
+      hasText: "This password reset link is invalid or expired.",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Request a new reset link" }),
+  ).toBeVisible();
+  expect(confirmationRequests).toBe(0);
+});
+
+test("rejects mismatched reset passwords before calling the API", async ({
+  page,
+}) => {
+  let confirmationRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/v1/auth/password/reset/confirm")) {
+      confirmationRequests += 1;
+    }
+  });
+
+  await page.goto("/reset-password?token=valid-reset-token");
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("new-password-10");
+  await page.getByLabel("Confirm new password").fill("different-password");
+  await page.getByRole("button", { name: "Update password" }).click();
+
+  await expect(
+    page.getByText("Enter a matching password of at least 10 characters."),
+  ).toBeVisible();
+  expect(confirmationRequests).toBe(0);
+});
+
 test("registers a user with an opaque cookie and verification guidance", async ({
   context,
   page,
