@@ -58,7 +58,9 @@ Implementation is split into independently reviewable plans:
 4. **Completed:**
    [Generic auth and session foundation](completed/2026-07-30_generic-auth-session-foundation.md)
 5. **Active:**
-   [Password reset request](active/2026-08-01_password-reset-request.md)
+   [Password reset confirmation](active/2026-08-02_password-reset-confirmation.md)
+6. **Queued:**
+   [Password reset request](queued/2026-08-01_password-reset-request.md)
 
 ## Agent Harness Sequence
 
