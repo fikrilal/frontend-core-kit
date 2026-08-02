@@ -1,7 +1,7 @@
 # 2026-08-01 Agent Harness Phase 4.4: Operating Proof
 
 **Plan version:** 2
-**Status:** queued
+**Status:** completed
 **Owner:** primary agent with independent reviewer for future operating conclusions
 **Risk:** medium
 **Authority:** implement and verify repository-local, read-only operating-evidence
@@ -22,10 +22,10 @@ reviewed recommendation on whether Phase 5 optimization is justified.
 
 - Phases 4.1 through 4.3 are implementation-complete; their Node 24 real-task
   and separately authorized live-handoff proof remain explicit follow-up debt.
-- The versioned evidence ledger contains two independently reviewed,
-  high-risk, CI-reproduced auth records: registration and password-reset
-  confirmation. It is still an honest report of insufficient evidence because
-  the required sample and risk diversity are not complete.
+- The versioned evidence ledger contains three independently reviewed,
+  high-risk, CI-reproduced auth records: registration, password-reset
+  confirmation, and email verification. The deterministic report remains
+  insufficient because the sample has no second risk class.
 - The registration record covers repair attempts and human review. The
   password-reset confirmation record covers a first-pass hosted gate and human
   review; the sample remains too small to draw conclusions about the loop or
@@ -41,10 +41,15 @@ reviewed recommendation on whether Phase 5 optimization is justified.
 - A delegated agent may collect and normalize read-only evidence because it
   should not be the same actor that designed the policy or implemented every
   sampled task. The primary agent and human owner review conclusions.
-- Evaluate at least three completed, independently reviewed repository tasks
-  spanning at least two risk classes, with at least one medium/high task and one
-  task that required a repair or escalation. Do not invent product work merely
-  to satisfy the sample.
+- The default operating-proof threshold remains at least three completed,
+  independently reviewed repository tasks spanning at least two risk classes,
+  with at least one medium/high task and one task that required a repair or
+  escalation. Do not invent product work merely to satisfy the sample.
+- The human owner explicitly accepts this three-task, high-risk-only sample as
+  sufficient to begin a narrow Phase 5 planning exercise. This is a bounded
+  deviation from the default diversity threshold; it does not change the
+  deterministic report, expand autonomy, or authorize automatic merge or
+  deployment.
 - Record bounded aggregates and categorical reasons only: first-pass/eventual
   outcome, attempts, failed boundary, elapsed gate time, scope/risk escalation,
   human intervention category, false positive, and CI reproduction.
@@ -110,8 +115,9 @@ remain subject to primary-agent and human review.
       reproduction.
 - [x] Record the password-reset confirmation task after hosted CI reproduction
       and human review.
-- [ ] Collect at least three diverse real-task records.
-- [ ] Classify repairs, escalations, false positives, and interventions.
+- [x] Collect at least three real-task records and record the approved
+      high-risk-only limitation.
+- [x] Classify repairs, escalations, false positives, and interventions.
 - [x] Publish a bounded insufficient-evidence report and recommendation.
 - [x] Run full and runtime repository verification after this documentation update.
 
@@ -135,13 +141,17 @@ approval.
 - 2026-08-02: Queue operating proof while the high-risk email-verification
   slice is implemented; resume evidence collection after that task reaches
   independent review and hosted CI.
+- 2026-08-03: The human owner accepted the three independently reviewed,
+  CI-reproduced high-risk records as sufficient to begin a narrow Phase 5
+  planning exercise. Preserve the default risk-diversity warning and do not
+  expand autonomy until a second risk class is observed.
 
 ## Verification
 
 - `node --test scripts/harness/operating-evidence.test.mjs` passed (3 tests).
-- `pnpm harness:evidence` passed and reported one eligible record with
-  `insufficient` status because the minimum sample and risk diversity are not
-  complete; the first record also supplies a repair outcome.
+- `pnpm harness:evidence` passed and reported three eligible records with
+  `insufficient` status only because the default second-risk-class requirement
+  is not complete; the sample includes a repair outcome.
 - `pnpm verify` passed (format, contracts, lint, typecheck, tests, build, and
   harness checks); `pnpm verify:runtime` passed (18 Chromium checks). The local
   shell emitted the expected Node 22 engine warning while CI remains Node 24.
@@ -151,7 +161,9 @@ approval.
   GitHub Actions run `30732854708`; CI Risk, Verify, Runtime, and Required all
   passed.
 - `pnpm knowledge:check`, `pnpm harness:evidence`, `git diff --check`, and
-  `pnpm verify` passed after activating this plan and adding the second record.
+  `pnpm verify:fast` passed after adding the email-verification record and
+  recording the approved deviation. Hosted CI independently reproduced the
+  lifecycle change on run `30740777479`; all required jobs passed.
   The local shell emitted the expected Node 22 engine warning; the repository
   requires Node 24 or newer. The evidence report remains `insufficient` with
   two reviewed high-risk records and no second risk class.
@@ -163,7 +175,9 @@ approval.
 
 ## Follow-Up Debt
 
-- Phase 5 starts only if this evidence supports a narrow, reviewable improvement.
+- Phase 5 is limited to a narrow, reviewable improvement and does not expand
+  autonomy, merge authority, or deployment authority.
 - Collect one additional real, independently reviewed, CI-reproduced task from
-  a second risk class before changing this plan to completed or proposing
-  Phase 5. Keep at least one repair/escalation record in the sample.
+  a second risk class before changing harness policy, enabling auto-merge, or
+  treating the operating proof as broadly representative. Keep at least one
+  repair/escalation record in the sample.
