@@ -9,5 +9,6 @@
 - [API foundation coverage and roadmap](api-foundation-roadmap.md)
 
 The generated contract/runtime-schema, typed HTTP client, and single-instance
-web-session boundaries are implemented. `/login` and `/app` are infrastructure
-proofs; product features remain undecided.
+web-session boundaries are implemented. `/login`, `/register`,
+`/forgot-password`, and `/app` are infrastructure proofs; product features
+remain undecided.

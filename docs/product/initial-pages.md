@@ -14,6 +14,8 @@ not be invented by the frontend.
 The auth/session foundation also includes:
 
 - `/login`: password authentication;
+- `/register`: password account creation with verification guidance;
+- `/forgot-password`: non-enumerating password-reset request;
 - `/app`: generic authenticated proof using the current-user API.
 
 These routes prove infrastructure only. `/app` is not a product dashboard and
