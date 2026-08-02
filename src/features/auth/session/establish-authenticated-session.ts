@@ -6,7 +6,7 @@ import {
   writeSessionCookie,
 } from "@/server/session";
 
-import { logoutRemoteSession } from "./server/auth-api";
+import { logoutRemoteSession } from "../server/auth-api";
 
 export type AuthSessionInput = Readonly<{
   userId: string;

@@ -5,13 +5,13 @@ import { z } from "zod";
 
 import { passwordRegisterRequestDtoPasswordMin } from "@/contracts/lamara-api/runtime";
 
-import { establishAuthenticatedSession } from "./establish-authenticated-session";
+import { establishAuthenticatedSession } from "../session/establish-authenticated-session";
 import type { RegisterActionState } from "./register-state";
 import {
   registerWithPassword,
   type PasswordRegisterInput,
-} from "./server/auth-api";
-import { mapPasswordRegisterFailure } from "./server/password-register-failure";
+} from "../server/auth-api";
+import { mapPasswordRegisterFailure } from "./password-register-failure";
 
 const registerInputSchema = z
   .object({

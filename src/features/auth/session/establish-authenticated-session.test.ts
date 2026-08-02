@@ -19,7 +19,7 @@ vi.mock("@/server/session", () => ({
   writeSessionCookie: mocks.writeSessionCookie,
 }));
 
-vi.mock("./server/auth-api", () => ({
+vi.mock("../server/auth-api", () => ({
   logoutRemoteSession: mocks.logoutRemoteSession,
 }));
 
