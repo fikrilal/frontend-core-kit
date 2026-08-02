@@ -8,8 +8,8 @@ The frontend has:
 - generated TypeScript operation types and Zod runtime schemas;
 - a typed, server-only `openapi-fetch` client;
 - Lamara-specific response normalization;
-- auth adapters for password login, registration, password-reset request,
-  refresh, logout, and current user.
+- auth adapters for password login, registration, password-reset request and
+  confirmation, refresh, logout, and current user.
 
 The auth Server Actions and protected Server Component invoke these adapters
 through the process-memory session boundary. No Client Component imports the
@@ -58,6 +58,13 @@ the response with `AuthPasswordLoginResponse`.
 The password-reset request adapter derives its input from
 `operations["auth.password.reset.request"]`, calls the generated path, and
 validates the required empty `204` response without parsing a JSON body.
+
+The password-reset confirmation adapter follows the same boundary for
+`operations["auth.password.reset.confirm"]`. It sends the frontend-owned reset
+token and new password to `/v1/auth/password/reset/confirm` and accepts only
+the generated empty `204` response. The token is supplied by the
+`/reset-password?token=...` link, handled by the server action, and is never
+persisted by the frontend.
 
 `openapi-fetch` owns request construction and JSON serialization. The small
 Lamara boundary adds request IDs and normalizes JSON-compatible content types,
