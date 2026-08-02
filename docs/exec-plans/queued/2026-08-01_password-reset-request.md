@@ -1,7 +1,7 @@
 # 2026-08-01 Password Reset Request
 
 **Plan version:** 2
-**Status:** active
+**Status:** queued
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the public password-reset-request slice
@@ -121,7 +121,8 @@ The public request route becomes available with the frontend deployment and
 does not alter backend state outside the backend's existing email enqueue
 operation. Roll back by reverting the route, action, adapter, fixture, tests,
 and login link together. Reset confirmation remains unavailable until a
-separate plan defines its token handling and product copy.
+separate plan defines its token handling and product copy. That follow-up is
+now tracked in the active password-reset-confirmation plan.
 
 ## Decision And Deviation Log
 
@@ -135,6 +136,9 @@ separate plan defines its token handling and product copy.
   Playwright runner while executing the browser lane. The feature gates remain
   valid, but the harness state location needs a separate maintenance fix before
   task verification can span a browser run.
+- 2026-08-02: Queue this completed implementation while independent review and
+  hosted CI remain outstanding; password-reset confirmation is tracked by a
+  separate active plan.
 
 ## Verification
 
@@ -154,8 +158,8 @@ separate plan defines its token handling and product copy.
 
 ## Follow-Up Debt
 
-- Decide and implement password-reset confirmation only after token transport,
-  expiry, invalid-token copy, and session-revocation behavior are reviewed.
+- Complete independent review and hosted CI for the request and confirmation
+  slices before treating recovery as production-ready.
 - Move the task baseline/summary artifacts outside Playwright's cleaned output
   directory before relying on `pnpm task:verify` for browser-backed tasks.
 - Record this completed task in the Phase 4.4 ledger only after independent
