@@ -6,6 +6,16 @@ export const metadata: Metadata = {
   title: "Sign in",
 };
 
-export default function LoginRoute() {
-  return <LoginPage />;
+type LoginSearchParams = Promise<{
+  reset?: string | string[] | undefined;
+}>;
+
+export default async function LoginRoute({
+  searchParams,
+}: Readonly<{
+  searchParams: LoginSearchParams;
+}>) {
+  const { reset } = await searchParams;
+
+  return <LoginPage passwordResetCompleted={reset === "success"} />;
 }

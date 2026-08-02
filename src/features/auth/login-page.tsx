@@ -4,7 +4,11 @@ import { LamaraMark } from "@/components/brand/lamara-mark";
 
 import { LoginForm } from "./login-form";
 
-export function LoginPage() {
+export function LoginPage({
+  passwordResetCompleted = false,
+}: Readonly<{
+  passwordResetCompleted?: boolean;
+}> = {}) {
   return (
     <main className="bg-muted/35 flex min-h-svh items-center justify-center px-4 py-12">
       <section
@@ -31,6 +35,17 @@ export function LoginPage() {
             Use your Lamara account to continue.
           </p>
         </div>
+
+        {passwordResetCompleted ? (
+          <p
+            aria-live="polite"
+            className="border-border bg-muted/35 text-muted-foreground mb-5 rounded-lg border p-3 text-sm"
+            id="password-reset-complete"
+            role="status"
+          >
+            Your password has been reset. Sign in with your new password.
+          </p>
+        ) : null}
 
         <LoginForm />
 

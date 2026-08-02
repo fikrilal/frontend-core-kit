@@ -16,6 +16,7 @@ import {
 const passwordLoginPath = "/v1/auth/password/login" as const;
 const passwordRegisterPath = "/v1/auth/password/register" as const;
 const passwordResetRequestPath = "/v1/auth/password/reset/request" as const;
+const passwordResetConfirmPath = "/v1/auth/password/reset/confirm" as const;
 const currentUserPath = "/v1/me" as const;
 const logoutPath = "/v1/auth/logout" as const;
 const authRequestTimeoutMs = 10_000;
@@ -23,6 +24,7 @@ const authRequestTimeoutMs = 10_000;
 type PasswordLoginOperation = operations["auth.password.login"];
 type PasswordRegisterOperation = operations["auth.password.register"];
 type PasswordResetRequestOperation = operations["auth.password.reset.request"];
+type PasswordResetConfirmOperation = operations["auth.password.reset.confirm"];
 type PasswordLoginEnvelope =
   PasswordLoginOperation["responses"][200]["content"]["application/json"];
 type PasswordRegisterEnvelope =
@@ -38,6 +40,8 @@ export type PasswordRegisterInput =
   PasswordRegisterOperation["requestBody"]["content"]["application/json"];
 export type PasswordResetRequestInput =
   PasswordResetRequestOperation["requestBody"]["content"]["application/json"];
+export type PasswordResetConfirmInput =
+  PasswordResetConfirmOperation["requestBody"]["content"]["application/json"];
 export type PasswordRegisterData = PasswordRegisterEnvelope["data"];
 export type CurrentUserData = CurrentUserEnvelope["data"];
 
@@ -60,6 +64,20 @@ export async function requestPasswordReset(
 ): Promise<ApiResult<undefined>> {
   const client = createConfiguredLamaraApiClient();
   const request = client.POST(passwordResetRequestPath, {
+    body: input,
+    cache: "no-store",
+    parseAs: "text",
+    signal: AbortSignal.timeout(authRequestTimeoutMs),
+  });
+
+  return readEmptyApiResult(request);
+}
+
+export async function confirmPasswordReset(
+  input: PasswordResetConfirmInput,
+): Promise<ApiResult<undefined>> {
+  const client = createConfiguredLamaraApiClient();
+  const request = client.POST(passwordResetConfirmPath, {
     body: input,
     cache: "no-store",
     parseAs: "text",
