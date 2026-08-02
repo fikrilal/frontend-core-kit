@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   getCurrentUser,
+  confirmPasswordReset,
   loginWithPassword,
   logoutRemoteSession,
   requestPasswordReset,
@@ -9,6 +10,7 @@ import {
   type CurrentUserData,
   type PasswordLoginData,
   type PasswordLoginInput,
+  type PasswordResetConfirmInput,
   type PasswordResetRequestInput,
   type PasswordRegisterData,
   type PasswordRegisterInput,
@@ -29,6 +31,11 @@ const registerInput = {
 const passwordResetRequestInput = {
   email: "dante@example.com",
 } satisfies PasswordResetRequestInput;
+
+const passwordResetConfirmInput = {
+  token: "reset-token",
+  newPassword: "new-correct-password",
+} satisfies PasswordResetConfirmInput;
 
 const loginData = {
   accessToken: "access-token",
@@ -168,6 +175,39 @@ describe("auth API", () => {
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
     expect(await captured.json()).toEqual(passwordResetRequestInput);
+  });
+
+  it("uses the generated confirmation contract and validates the empty response", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(
+        new Response(null, {
+          status: 204,
+          headers: { "X-Request-Id": "backend-request-id" },
+        }),
+      );
+    });
+
+    const result = await confirmPasswordReset(passwordResetConfirmInput);
+
+    expect(result).toEqual({
+      ok: true,
+      data: undefined,
+      status: 204,
+      traceId: "backend-request-id",
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe(
+      "https://api.lamara.dev/v1/auth/password/reset/confirm",
+    );
+    expect(captured.method).toBe("POST");
+    expect(captured.cache).toBe("no-store");
+    expect(await captured.json()).toEqual(passwordResetConfirmInput);
   });
 
   it("rejects invalid login data without returning token values", async () => {
