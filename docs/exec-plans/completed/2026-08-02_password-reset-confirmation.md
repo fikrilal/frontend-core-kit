@@ -1,7 +1,7 @@
 # 2026-08-02 Password Reset Confirmation
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the public password-reset-confirmation
@@ -133,7 +133,7 @@ production rollout.
       persistence or leakage.
 - [x] Update truthful API, testing, and initial-page documentation.
 - [x] Run full and runtime verification and record exact outcomes.
-- [ ] Move this plan to completed only after independent review and hosted CI.
+- [x] Move this plan to completed after independent review and hosted CI.
 
 ## Rollout And Rollback
 
@@ -155,6 +155,9 @@ but its emails must not be considered actionable until the route is deployed.
   verify persistence boundaries through clean redirect, cookie, local-storage,
   and session-storage assertions rather than treating the required form value
   as durable browser state.
+- 2026-08-02: Hosted CI run `30732854708` passed the risk, deterministic,
+  browser-runtime, and required-status jobs. Human review approved the token,
+  error-mapping, and backend-parity boundaries.
 
 ## Verification
 
@@ -164,6 +167,8 @@ but its emails must not be considered actionable until the route is deployed.
   tests before the full gate.
 - `pnpm verify` passed with 97 Vitest tests, 6 contract tests, 59
   harness/fixture tests, production build, and all repository fitness checks.
+- Hosted CI independently reproduced the change on GitHub Actions run
+  `30732854708`; CI Risk, CI Verify, CI Runtime, and CI Required all passed.
 
 ## Runtime Evidence
 
@@ -176,5 +181,6 @@ but its emails must not be considered actionable until the route is deployed.
 - Add a referrer-policy/header decision before enabling third-party analytics on
   the reset route.
 - Repair task baseline storage so `pnpm task:verify` can span Playwright runs.
-- Record this completed task in the Phase 4.4 operating ledger only after
-  independent review and hosted CI reproduction.
+- Record this completed task in the Phase 4.4 operating ledger with bounded
+  task metrics; the ledger must remain insufficient until a third task from a
+  second risk class is independently reviewed and CI-reproduced.

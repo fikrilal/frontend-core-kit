@@ -57,10 +57,12 @@ Implementation is split into independently reviewable plans:
    [Generated runtime contracts and Node 24](completed/2026-07-29_generated-runtime-contracts-node24.md)
 4. **Completed:**
    [Generic auth and session foundation](completed/2026-07-30_generic-auth-session-foundation.md)
-5. **Active:**
-   [Password reset confirmation](active/2026-08-02_password-reset-confirmation.md)
+5. **Completed:**
+   [Password reset confirmation](completed/2026-08-02_password-reset-confirmation.md)
 6. **Queued:**
    [Password reset request](queued/2026-08-01_password-reset-request.md)
+7. **Active:**
+   [Email verification](active/2026-08-02_email-verification.md)
 
 ## Agent Harness Sequence
 
