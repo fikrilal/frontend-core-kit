@@ -2,13 +2,13 @@ import Link from "next/link";
 
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
-import { LoginForm } from "./login-form";
+import { PasswordResetRequestForm } from "./password-reset-request-form";
 
-export function LoginPage() {
+export function PasswordResetRequestPage() {
   return (
     <main className="bg-muted/35 flex min-h-svh items-center justify-center px-4 py-12">
       <section
-        aria-labelledby="login-heading"
+        aria-labelledby="password-reset-heading"
         className="border-border bg-background w-full max-w-sm rounded-2xl border p-7 shadow-sm"
       >
         <Link
@@ -23,33 +23,22 @@ export function LoginPage() {
         <div className="mb-7 space-y-2">
           <h1
             className="text-2xl font-semibold tracking-tight"
-            id="login-heading"
+            id="password-reset-heading"
           >
-            Sign in
+            Reset your password
           </h1>
           <p className="text-muted-foreground text-sm">
-            Use your Lamara account to continue.
+            Enter your email and we&apos;ll send instructions if an account
+            exists.
           </p>
         </div>
 
-        <LoginForm />
-
-        <p className="text-muted-foreground mt-5 text-center text-sm">
-          <Link
-            className="text-foreground font-medium underline"
-            href="/forgot-password"
-          >
-            Forgot your password?
-          </Link>
-        </p>
+        <PasswordResetRequestForm />
 
         <p className="text-muted-foreground mt-6 text-center text-sm">
-          Need an account?{" "}
-          <Link
-            className="text-foreground font-medium underline"
-            href="/register"
-          >
-            Create one
+          Remember your password?{" "}
+          <Link className="text-foreground font-medium underline" href="/login">
+            Sign in
           </Link>
         </p>
       </section>

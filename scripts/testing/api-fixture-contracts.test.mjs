@@ -38,6 +38,25 @@ test("accepts a contract-valid password registration request", () => {
   );
 });
 
+test("accepts a contract-valid password reset request", () => {
+  assert.deepEqual(
+    parseFixtureContract(
+      "password reset request",
+      fixtureContracts.resetRequest,
+      { email: "user@example.com" },
+    ),
+    { email: "user@example.com" },
+  );
+  assert.equal(
+    parseFixtureContract(
+      "password reset response",
+      fixtureContracts.resetResponse,
+      undefined,
+    ),
+    undefined,
+  );
+});
+
 test("returns no request data when an incoming fixture request is invalid", () => {
   assert.equal(
     tryParseFixtureContract(fixtureContracts.loginRequest, {

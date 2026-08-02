@@ -34,6 +34,24 @@ test("login page and its failure state match their visual baselines", async ({
   await expect(page).toHaveScreenshot("login-error.png", screenshotOptions);
 });
 
+test("password reset page and its success state match their visual baselines", async ({
+  page,
+}) => {
+  await openWithTheme(page, "/forgot-password", "light");
+  await expect(page).toHaveScreenshot(
+    "password-reset-request.png",
+    screenshotOptions,
+  );
+
+  await page.getByLabel("Email").fill("user@example.com");
+  await page.getByRole("button", { name: "Send reset instructions" }).click();
+  await expect(page.getByRole("status")).toBeVisible();
+  await expect(page).toHaveScreenshot(
+    "password-reset-request-success.png",
+    screenshotOptions,
+  );
+});
+
 test("registration page and its failure state match their visual baselines", async ({
   page,
 }) => {
