@@ -6,8 +6,8 @@ import { z } from "zod";
 import { PasswordResetConfirmRequestDto } from "@/contracts/lamara-api/runtime";
 
 import type { PasswordResetConfirmationActionState } from "./password-reset-confirmation-state";
-import { confirmPasswordReset } from "./server/auth-api";
-import { mapPasswordResetConfirmationFailure } from "./server/password-reset-confirmation-failure";
+import { confirmPasswordReset } from "../server/auth-api";
+import { mapPasswordResetConfirmationFailure } from "./password-reset-confirmation-failure";
 
 const passwordResetConfirmationInputSchema =
   PasswordResetConfirmRequestDto.extend({

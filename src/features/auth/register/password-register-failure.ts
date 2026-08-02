@@ -2,18 +2,17 @@ import "server-only";
 
 import type { ApiResult } from "@/server/api";
 
-import type { PasswordResetConfirmationError } from "../password-reset-confirmation-state";
+import type { RegisterError } from "./register-state";
 
 type FailedApiResult = Extract<ApiResult<unknown>, { ok: false }>;
 
-export function mapPasswordResetConfirmationFailure(
+export function mapPasswordRegisterFailure(
   result: FailedApiResult,
-): PasswordResetConfirmationError {
+): RegisterError {
   if (result.failure.kind === "problem") {
     switch (result.failure.problem.code) {
-      case "AUTH_PASSWORD_RESET_TOKEN_INVALID":
-      case "AUTH_PASSWORD_RESET_TOKEN_EXPIRED":
-        return "invalidToken";
+      case "AUTH_EMAIL_ALREADY_EXISTS":
+        return "emailAlreadyExists";
       case "VALIDATION_FAILED":
         return "invalidInput";
       default:
@@ -23,9 +22,10 @@ export function mapPasswordResetConfirmationFailure(
 
   switch (result.status) {
     case 400:
-      return "invalidToken";
     case 422:
       return "invalidInput";
+    case 409:
+      return "emailAlreadyExists";
     case null:
     default:
       return "unavailable";

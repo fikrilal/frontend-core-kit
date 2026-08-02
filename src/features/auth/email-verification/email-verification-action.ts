@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import { VerifyEmailRequestDto } from "@/contracts/lamara-api/runtime";
 
 import type { EmailVerificationActionState } from "./email-verification-state";
-import { verifyEmail } from "./server/auth-api";
-import { mapEmailVerificationFailure } from "./server/email-verification-failure";
+import { verifyEmail } from "../server/auth-api";
+import { mapEmailVerificationFailure } from "./email-verification-failure";
 
 const emailVerificationInputSchema = VerifyEmailRequestDto.extend({
   // The backend DTO requires one character, but the generated OpenAPI schema

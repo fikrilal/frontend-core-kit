@@ -2,7 +2,7 @@ import "server-only";
 
 import type { ApiResult } from "@/server/api";
 
-import type { EmailVerificationError } from "../email-verification-state";
+import type { EmailVerificationError } from "./email-verification-state";
 
 type FailedApiResult = Extract<ApiResult<unknown>, { ok: false }>;
 

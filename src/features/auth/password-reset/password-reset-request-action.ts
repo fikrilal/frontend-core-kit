@@ -3,8 +3,8 @@
 import { z } from "zod";
 
 import type { PasswordResetRequestActionState } from "./password-reset-request-state";
-import { requestPasswordReset } from "./server/auth-api";
-import { mapPasswordResetRequestFailure } from "./server/password-reset-request-failure";
+import { requestPasswordReset } from "../server/auth-api";
+import { mapPasswordResetRequestFailure } from "./password-reset-request-failure";
 
 const passwordResetRequestInputSchema = z.object({
   email: z.string().trim().pipe(z.email()),

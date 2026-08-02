@@ -14,11 +14,11 @@ vi.mock("next/navigation", () => ({
   redirect: mocks.redirect,
 }));
 
-vi.mock("./establish-authenticated-session", () => ({
+vi.mock("../session/establish-authenticated-session", () => ({
   establishAuthenticatedSession: mocks.establishAuthenticatedSession,
 }));
 
-vi.mock("./server/auth-api", () => ({
+vi.mock("../server/auth-api", () => ({
   registerWithPassword: mocks.registerWithPassword,
 }));
 

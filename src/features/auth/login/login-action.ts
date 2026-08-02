@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import type { LoginActionState } from "./login-state";
-import { establishAuthenticatedSession } from "./establish-authenticated-session";
-import { loginWithPassword } from "./server/auth-api";
-import { mapPasswordLoginFailure } from "./server/password-login-failure";
+import { establishAuthenticatedSession } from "../session/establish-authenticated-session";
+import { loginWithPassword } from "../server/auth-api";
+import { mapPasswordLoginFailure } from "./password-login-failure";
 
 const loginInputSchema = z.object({
   email: z.email().trim(),
