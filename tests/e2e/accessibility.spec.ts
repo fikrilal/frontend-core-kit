@@ -148,6 +148,35 @@ test("password reset confirmation exposes password guidance and no detectable WC
   await expectNoAccessibilityViolations(page);
 });
 
+test("email verification exposes a labelled action and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await page.goto("/verify-email?token=valid-verification-token");
+  await expectNoAccessibilityViolations(page);
+  await expect(
+    page.getByRole("heading", { name: "Verify your email" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Verify email" }),
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.keyboard.press("Tab");
+  const verifyButton = page.getByRole("button", { name: "Verify email" });
+  await expect(verifyButton).toBeFocused();
+  await expectKeyboardFocusIndicator(verifyButton);
+
+  await page.goto("/verify-email?token=invalid-verification-token");
+  await page.getByRole("button", { name: "Verify email" }).click();
+  const error = page.locator("#email-verification-error");
+  await expect(error).toBeVisible();
+  await expect(verifyButton).toHaveAttribute(
+    "aria-describedby",
+    "email-verification-error",
+  );
+  await expectNoAccessibilityViolations(page);
+});
+
 test("protected route redirects to an accessible login page", async ({
   page,
 }) => {

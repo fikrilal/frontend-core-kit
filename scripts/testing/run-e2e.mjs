@@ -80,6 +80,37 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  if (request.method === "POST" && request.url === "/v1/auth/email/verify") {
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.emailVerifyRequest,
+      await readJson(request),
+    );
+    if (!parsed || parsed.token.length === 0) {
+      return problem(response, 400, "VALIDATION_FAILED");
+    }
+    if (parsed.token === "invalid-verification-token") {
+      return problem(response, 400, "AUTH_EMAIL_VERIFICATION_TOKEN_INVALID");
+    }
+    if (parsed.token === "expired-verification-token") {
+      return problem(response, 400, "AUTH_EMAIL_VERIFICATION_TOKEN_EXPIRED");
+    }
+    if (
+      parsed.token !== "valid-verification-token" &&
+      parsed.token !== "already-verified-token"
+    ) {
+      return problem(response, 400, "AUTH_EMAIL_VERIFICATION_TOKEN_INVALID");
+    }
+
+    parseFixtureContract(
+      "email verification response",
+      fixtureContracts.emailVerifyResponse,
+      undefined,
+    );
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
   if (
     request.method === "POST" &&
     request.url === "/v1/auth/password/reset/request"

@@ -39,6 +39,13 @@ test("login page and its failure state match their visual baselines", async ({
     "login-password-reset-success.png",
     screenshotOptions,
   );
+
+  await openWithTheme(page, "/login?verified=success", "light");
+  await expect(page.locator("#email-verification-complete")).toBeVisible();
+  await expect(page).toHaveScreenshot(
+    "login-email-verification-success.png",
+    screenshotOptions,
+  );
 });
 
 test("password reset page and its success state match their visual baselines", async ({
@@ -79,6 +86,28 @@ test("password reset confirmation page and its error state match their visual ba
   ).toBeVisible();
   await expect(page).toHaveScreenshot(
     "password-reset-confirmation-error.png",
+    screenshotOptions,
+  );
+});
+
+test("email verification page and its error state match their visual baselines", async ({
+  page,
+}) => {
+  await openWithTheme(
+    page,
+    "/verify-email?token=valid-verification-token",
+    "light",
+  );
+  await expect(page).toHaveScreenshot(
+    "email-verification.png",
+    screenshotOptions,
+  );
+
+  await page.goto("/verify-email?token=expired-verification-token");
+  await page.getByRole("button", { name: "Verify email" }).click();
+  await expect(page.locator("#email-verification-error")).toBeVisible();
+  await expect(page).toHaveScreenshot(
+    "email-verification-error.png",
     screenshotOptions,
   );
 });
