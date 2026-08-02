@@ -103,6 +103,38 @@ const api = createServer(async (request, response) => {
     return response.end();
   }
 
+  if (
+    request.method === "POST" &&
+    request.url === "/v1/auth/password/reset/confirm"
+  ) {
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.resetConfirmRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 400, "VALIDATION_FAILED");
+    if (parsed.token === "invalid-reset-token") {
+      return problem(response, 400, "AUTH_PASSWORD_RESET_TOKEN_INVALID");
+    }
+    if (parsed.token === "expired-reset-token") {
+      return problem(response, 400, "AUTH_PASSWORD_RESET_TOKEN_EXPIRED");
+    }
+    if (
+      parsed.token !== "valid-reset-token" ||
+      parsed.newPassword !== "new-password-10"
+    ) {
+      return problem(response, 400, "AUTH_PASSWORD_RESET_TOKEN_INVALID");
+    }
+
+    parseFixtureContract(
+      "password reset confirmation response",
+      fixtureContracts.resetConfirmResponse,
+      undefined,
+    );
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
   if (request.method === "POST" && request.url === "/v1/auth/refresh") {
     const parsed = tryParseFixtureContract(
       fixtureContracts.refreshRequest,

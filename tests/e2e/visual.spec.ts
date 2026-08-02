@@ -32,6 +32,13 @@ test("login page and its failure state match their visual baselines", async ({
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.locator("#login-error")).toBeVisible();
   await expect(page).toHaveScreenshot("login-error.png", screenshotOptions);
+
+  await openWithTheme(page, "/login?reset=success", "light");
+  await expect(page.locator("#password-reset-complete")).toBeVisible();
+  await expect(page).toHaveScreenshot(
+    "login-password-reset-success.png",
+    screenshotOptions,
+  );
 });
 
 test("password reset page and its success state match their visual baselines", async ({
@@ -48,6 +55,30 @@ test("password reset page and its success state match their visual baselines", a
   await expect(page.getByRole("status")).toBeVisible();
   await expect(page).toHaveScreenshot(
     "password-reset-request-success.png",
+    screenshotOptions,
+  );
+});
+
+test("password reset confirmation page and its error state match their visual baselines", async ({
+  page,
+}) => {
+  await openWithTheme(page, "/reset-password?token=valid-reset-token", "light");
+  await expect(page).toHaveScreenshot(
+    "password-reset-confirmation.png",
+    screenshotOptions,
+  );
+
+  await page.goto("/reset-password?token=expired-reset-token");
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("new-password-10");
+  await page.getByLabel("Confirm new password").fill("new-password-10");
+  await page.getByRole("button", { name: "Update password" }).click();
+  await expect(
+    page.locator("#password-reset-confirmation-error"),
+  ).toBeVisible();
+  await expect(page).toHaveScreenshot(
+    "password-reset-confirmation-error.png",
     screenshotOptions,
   );
 });
