@@ -80,6 +80,29 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  if (
+    request.method === "POST" &&
+    request.url === "/v1/auth/password/reset/request"
+  ) {
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.resetRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 400, "VALIDATION_FAILED");
+    if (parsed.email === "rate-limited@example.com") {
+      return problem(response, 429, "RATE_LIMITED");
+    }
+
+    parseFixtureContract(
+      "password reset response",
+      fixtureContracts.resetResponse,
+      undefined,
+    );
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
   if (request.method === "POST" && request.url === "/v1/auth/refresh") {
     const parsed = tryParseFixtureContract(
       fixtureContracts.refreshRequest,
@@ -224,7 +247,9 @@ function problem(response, status, code) {
           ? "Unauthorized"
           : status === 409
             ? "Conflict"
-            : "Not Found",
+            : status === 429
+              ? "Too Many Requests"
+              : "Not Found",
     status,
     code,
     traceId: response.getHeader("X-Request-Id"),

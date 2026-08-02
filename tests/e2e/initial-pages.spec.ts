@@ -80,6 +80,51 @@ test("maps an existing registration email to safe frontend copy", async ({
   ).toBe(false);
 });
 
+test("requests reset instructions without revealing account existence", async ({
+  context,
+  page,
+}) => {
+  const messages = [];
+
+  for (const email of ["user@example.com", "unknown@example.com"]) {
+    await page.goto("/forgot-password");
+    await page.getByLabel("Email").fill(email);
+    await page.getByRole("button", { name: "Send reset instructions" }).click();
+
+    const status = page.getByRole("status");
+    await expect(status).toContainText(
+      "If an account exists for that email, you'll receive password reset instructions shortly.",
+    );
+    messages.push(await status.textContent());
+    expect(
+      (await context.cookies()).some(
+        (cookie) => cookie.name === "lamara_session",
+      ),
+    ).toBe(false);
+  }
+
+  expect(messages[0]).toBe(messages[1]);
+});
+
+test("maps password reset rate limiting to safe frontend copy", async ({
+  context,
+  page,
+}) => {
+  await page.goto("/forgot-password");
+  await page.getByLabel("Email").fill("rate-limited@example.com");
+  await page.getByRole("button", { name: "Send reset instructions" }).click();
+
+  await expect(
+    page.getByText("Too many requests. Please wait and try again."),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/forgot-password$/);
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(false);
+});
+
 test("registers a user with an opaque cookie and verification guidance", async ({
   context,
   page,

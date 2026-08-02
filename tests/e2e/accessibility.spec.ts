@@ -78,6 +78,31 @@ test("registration form exposes labels, password guidance, and no detectable WCA
   await expectNoAccessibilityViolations(page);
 });
 
+test("password reset form exposes safe feedback and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await page.goto("/forgot-password");
+  await expectNoAccessibilityViolations(page);
+  await expect(
+    page.getByRole("heading", { name: "Reset your password" }),
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.keyboard.press("Tab");
+  await expect(page.getByLabel("Email")).toBeFocused();
+  await expectKeyboardFocusIndicator(page.getByLabel("Email"));
+
+  await page.getByLabel("Email").fill("rate-limited@example.com");
+  await page.getByRole("button", { name: "Send reset instructions" }).click();
+  const error = page.locator("#password-reset-error");
+  await expect(error).toBeVisible();
+  await expect(page.getByLabel("Email")).toHaveAttribute(
+    "aria-describedby",
+    "password-reset-error",
+  );
+  await expectNoAccessibilityViolations(page);
+});
+
 test("protected route redirects to an accessible login page", async ({
   page,
 }) => {
