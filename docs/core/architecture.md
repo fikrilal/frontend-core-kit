@@ -58,6 +58,29 @@ API; feature internals may import their own private modules. The session layer
 does not depend on the auth feature, which prevents shared server
 infrastructure from depending upward on user-facing code.
 
+### Auth feature layout
+
+Auth is organized by user flow rather than by file type. Each flow keeps its
+page, form, Server Action, state, tests, and flow-specific failure mapper
+together:
+
+```text
+src/features/auth/
+  index.ts                         public route entry points
+  server/                          shared contract-backed auth API adapters
+  login/                           sign-in flow
+  register/                        account-creation flow
+  password-reset/                  request and confirmation flows
+  email-verification/              public verification-link flow
+  session/                         session establishment, loading, logout
+```
+
+`server/` is intentionally small. It owns the shared `auth-api.ts` adapter and
+its transport-contract tests; a failure mapper stays beside the flow state it
+produces instead of becoming a generic server bucket. The root `index.ts` only
+exports route-level pages, so App Router files remain thin and flow internals
+stay private.
+
 ## Contract and request boundary
 
 ```text

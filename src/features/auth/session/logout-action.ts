@@ -8,7 +8,7 @@ import {
   readSessionCookie,
 } from "@/server/session";
 
-import { logoutRemoteSession } from "./server/auth-api";
+import { logoutRemoteSession } from "../server/auth-api";
 
 export async function logoutAction(): Promise<never> {
   const sessionId = await readSessionCookie();

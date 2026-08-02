@@ -26,7 +26,7 @@ vi.mock("@/server/session", () => ({
   readSessionCookie: mocks.readSessionCookie,
 }));
 
-vi.mock("./server/auth-api", () => ({
+vi.mock("../server/auth-api", () => ({
   getCurrentUser: mocks.getCurrentUser,
 }));
 

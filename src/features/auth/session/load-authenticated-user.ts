@@ -9,7 +9,7 @@ import {
   type SessionAccessResult,
 } from "@/server/session";
 
-import { getCurrentUser, type CurrentUserData } from "./server/auth-api";
+import { getCurrentUser, type CurrentUserData } from "../server/auth-api";
 
 export type AuthenticatedUserResult =
   | Readonly<{ ok: true; user: CurrentUserData }>
