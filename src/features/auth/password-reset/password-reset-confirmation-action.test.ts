@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
   redirect: mocks.redirect,
 }));
 
-vi.mock("./server/auth-api", () => ({
+vi.mock("../server/auth-api", () => ({
   confirmPasswordReset: mocks.confirmPasswordReset,
 }));
 
