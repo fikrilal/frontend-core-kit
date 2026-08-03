@@ -57,6 +57,34 @@ test("accepts a contract-valid password reset request", () => {
   );
 });
 
+test("accepts a contract-valid email verification request", () => {
+  assert.deepEqual(
+    parseFixtureContract(
+      "email verification request",
+      fixtureContracts.emailVerifyRequest,
+      { token: "verification-token" },
+    ),
+    { token: "verification-token" },
+  );
+  assert.equal(
+    parseFixtureContract(
+      "email verification response",
+      fixtureContracts.emailVerifyResponse,
+      undefined,
+    ),
+    undefined,
+  );
+});
+
+test("rejects a malformed email verification request", () => {
+  assert.equal(
+    tryParseFixtureContract(fixtureContracts.emailVerifyRequest, {
+      token: 42,
+    }),
+    null,
+  );
+});
+
 test("accepts a contract-valid password reset confirmation", () => {
   assert.deepEqual(
     parseFixtureContract(

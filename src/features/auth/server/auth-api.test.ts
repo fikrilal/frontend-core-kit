@@ -7,7 +7,9 @@ import {
   logoutRemoteSession,
   requestPasswordReset,
   registerWithPassword,
+  verifyEmail,
   type CurrentUserData,
+  type EmailVerifyInput,
   type PasswordLoginData,
   type PasswordLoginInput,
   type PasswordResetConfirmInput,
@@ -27,6 +29,10 @@ const registerInput = {
   email: "new-user@example.com",
   password: "correct horse battery staple",
 } satisfies PasswordRegisterInput;
+
+const emailVerifyInput = {
+  token: "verification-token",
+} satisfies EmailVerifyInput;
 
 const passwordResetRequestInput = {
   email: "dante@example.com",
@@ -142,6 +148,37 @@ describe("auth API", () => {
     expect(captured.headers.get("x-request-id")).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
     );
+  });
+
+  it("uses the generated email-verification contract and validates the empty response", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(
+        new Response(null, {
+          status: 204,
+          headers: { "X-Request-Id": "backend-request-id" },
+        }),
+      );
+    });
+
+    const result = await verifyEmail(emailVerifyInput);
+
+    expect(result).toEqual({
+      ok: true,
+      data: undefined,
+      status: 204,
+      traceId: "backend-request-id",
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe("https://api.lamara.dev/v1/auth/email/verify");
+    expect(captured.method).toBe("POST");
+    expect(captured.cache).toBe("no-store");
+    expect(await captured.json()).toEqual(emailVerifyInput);
   });
 
   it("uses the generated endpoint contract and validates the empty reset response", async () => {

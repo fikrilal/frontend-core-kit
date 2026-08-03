@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 type LoginSearchParams = Promise<{
   reset?: string | string[] | undefined;
+  verified?: string | string[] | undefined;
 }>;
 
 export default async function LoginRoute({
@@ -15,7 +16,12 @@ export default async function LoginRoute({
 }: Readonly<{
   searchParams: LoginSearchParams;
 }>) {
-  const { reset } = await searchParams;
+  const { reset, verified } = await searchParams;
 
-  return <LoginPage passwordResetCompleted={reset === "success"} />;
+  return (
+    <LoginPage
+      emailVerificationCompleted={verified === "success"}
+      passwordResetCompleted={reset === "success"}
+    />
+  );
 }
