@@ -22,9 +22,10 @@ after the task and its evidence have been independently reviewed.
 
 ## Current Report
 
-Two eligible records have been collected for the password-registration and
-password-reset-confirmation tasks. Both were independently reviewed and
-reproduced in hosted CI; the registration task completed after repair, while
-the confirmation task completed on its first hosted gate. Phase 4.4 still has
-insufficient evidence: one additional reviewed task from a second risk class
+Three eligible records have been collected for password registration,
+password-reset confirmation, and email verification. All three were
+independently reviewed and reproduced in hosted CI; registration completed
+after repair, while the two reset/verification tasks completed on their first
+hosted gate. Phase 4.4 still has insufficient evidence because all three
+records are high-risk; one additional reviewed task from a second risk class
 is required before a Phase 5 recommendation can be considered.
