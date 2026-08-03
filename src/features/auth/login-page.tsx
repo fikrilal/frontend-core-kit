@@ -5,8 +5,10 @@ import { LamaraMark } from "@/components/brand/lamara-mark";
 import { LoginForm } from "./login-form";
 
 export function LoginPage({
+  emailVerificationCompleted = false,
   passwordResetCompleted = false,
 }: Readonly<{
+  emailVerificationCompleted?: boolean;
   passwordResetCompleted?: boolean;
 }> = {}) {
   return (
@@ -44,6 +46,15 @@ export function LoginPage({
             role="status"
           >
             Your password has been reset. Sign in with your new password.
+          </p>
+        ) : emailVerificationCompleted ? (
+          <p
+            aria-live="polite"
+            className="border-border bg-muted/35 text-muted-foreground mb-5 rounded-lg border p-3 text-sm"
+            id="email-verification-complete"
+            role="status"
+          >
+            Your email has been verified. Sign in to continue.
           </p>
         ) : null}
 

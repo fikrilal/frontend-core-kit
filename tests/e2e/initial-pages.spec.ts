@@ -185,6 +185,102 @@ test("maps invalid and expired reset tokens to safe frontend copy", async ({
   ).toBe(false);
 });
 
+test("verifies an email and redirects without a new session", async ({
+  context,
+  page,
+}) => {
+  await page.goto("/verify-email?token=valid-verification-token");
+  await expect(
+    page.getByRole("heading", { name: "Verify your email" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Verify email" }).click();
+
+  await expect(page).toHaveURL(/\/login\?verified=success$/);
+  await expect(page.getByRole("status")).toContainText(
+    "Your email has been verified. Sign in to continue.",
+  );
+  expect(page.url()).not.toContain("valid-verification-token");
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(false);
+  const browserOwnedState = await page.evaluate(() => ({
+    localStorage: Object.entries(localStorage),
+    sessionStorage: Object.entries(sessionStorage),
+  }));
+  expect(JSON.stringify(browserOwnedState)).not.toContain(
+    "valid-verification-token",
+  );
+});
+
+test("treats an already-verified email as a successful verification", async ({
+  page,
+}) => {
+  await page.goto("/verify-email?token=already-verified-token");
+  await page.getByRole("button", { name: "Verify email" }).click();
+
+  await expect(page).toHaveURL(/\/login\?verified=success$/);
+});
+
+test("maps invalid and expired email verification tokens to safe copy", async ({
+  context,
+  page,
+}) => {
+  for (const token of [
+    "invalid-verification-token",
+    "expired-verification-token",
+  ]) {
+    await page.goto(`/verify-email?token=${token}`);
+    await page.getByRole("button", { name: "Verify email" }).click();
+
+    await expect(
+      page.getByText(
+        "This email verification link is invalid or expired. Return to sign in.",
+      ),
+    ).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/verify-email\\?token=${token}$`));
+    await expect(page.locator("body")).not.toContainText(
+      "AUTH_EMAIL_VERIFICATION_TOKEN",
+    );
+  }
+
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(false);
+});
+
+test("rejects a missing or repeated email verification token without calling the API", async ({
+  page,
+}) => {
+  let verificationRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/v1/auth/email/verify")) {
+      verificationRequests += 1;
+    }
+  });
+
+  await page.goto("/verify-email");
+  await expect(
+    page.getByRole("status").filter({
+      hasText: "This email verification link is invalid or expired.",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Return to sign in" }),
+  ).toBeVisible();
+
+  await page.goto("/verify-email?token=valid-verification-token&token=other");
+  await expect(
+    page.getByRole("status").filter({
+      hasText: "This email verification link is invalid or expired.",
+    }),
+  ).toBeVisible();
+  expect(verificationRequests).toBe(0);
+});
+
 test("rejects a missing reset token without calling the API", async ({
   page,
 }) => {
