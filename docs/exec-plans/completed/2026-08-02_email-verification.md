@@ -1,7 +1,7 @@
 # 2026-08-02 Email Verification
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the public email-verification slice
@@ -139,7 +139,7 @@ copy, and production rollout.
       persistence or leakage.
 - [x] Update truthful API, testing, and initial-page documentation.
 - [x] Run full and runtime verification and record exact outcomes.
-- [ ] Move this plan to completed only after independent review and hosted CI.
+- [x] Move this plan to completed after independent review and hosted CI.
 
 ## Rollout And Rollback
 
@@ -161,6 +161,9 @@ be considered actionable until this route is deployed.
 - 2026-08-02: Keep invalid-link copy honest while resend remains out of scope;
   the route returns users to sign in instead of promising an unimplemented
   resend action.
+- 2026-08-03: Pull request #2 was independently reviewed and merged. Hosted
+  CI run `30739192007` passed CI Risk, CI Verify, CI Runtime, and CI Required;
+  the bounded task record is now eligible for the Phase 4.4 ledger.
 
 ## Verification
 
@@ -177,6 +180,8 @@ be considered actionable until this route is deployed.
   verification service are unchanged from the snapshot source revision.
 - The local shell emitted the expected Node 22 engine warning; the repository
   requires Node 24 or newer.
+- Hosted CI independently reproduced the change on GitHub Actions run
+  `30739192007`; CI Risk, CI Verify, CI Runtime, and CI Required all passed.
 
 ## Runtime Evidence
 
@@ -193,6 +198,6 @@ be considered actionable until this route is deployed.
   session, and rate-limit behavior receives a separate execution plan.
 - Add a referrer-policy/header decision before enabling third-party analytics
   on the verification route.
-- Resume Phase 4.4 operating evidence after this plan completes and receives
-  independent review and hosted CI reproduction.
-- Run hosted CI and obtain human review before moving this plan to completed.
+- The Phase 4.4 ledger records this task as independently reviewed and
+  CI-reproduced. The operating-proof conclusion remains insufficient until a
+  real task from a second risk class is observed.
