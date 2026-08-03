@@ -49,8 +49,9 @@ Playwright covers:
 - manifest, robots, sitemap, icon, and social-image endpoints;
 - protected-route redirection;
 - password login, registration, non-enumerating password-reset requests,
-  password-reset confirmation, clean reset redirect, opaque-cookie properties,
-  authenticated current-user rendering, and logout;
+  password-reset confirmation, email verification, clean reset/verification
+  redirects, opaque-cookie properties, authenticated current-user rendering,
+  and logout;
 - an arbitrary nonexistent-route response without naming hypothetical product
   routes.
 - Axe scans for detectable WCAG 2 A/AA and 2.1 A/AA violations across the
@@ -60,8 +61,8 @@ Playwright covers:
   document titles, headings, and page landmarks.
 - repository-owned visual comparisons for light/dark landing, default/error
   login, password-reset request/success, password-reset confirmation/error,
-  login-reset-success, and authenticated-foundation states at a fixed desktop
-  viewport.
+  email-verification/error, login-reset-success, login-verification-success,
+  and authenticated-foundation states at a fixed desktop viewport.
 
 Axe catches a useful subset of accessibility defects; it does not certify WCAG
 conformance. Human keyboard, zoom/reflow, reduced-motion, and

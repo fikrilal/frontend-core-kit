@@ -22,12 +22,13 @@ reviewed recommendation on whether Phase 5 optimization is justified.
 
 - Phases 4.1 through 4.3 are implementation-complete; their Node 24 real-task
   and separately authorized live-handoff proof remain explicit follow-up debt.
-- The versioned evidence ledger contains one independently reviewed,
-  high-risk, CI-reproduced registration record. It is still an honest report
-  of insufficient evidence because the required sample and risk diversity are
-  not complete.
-- The first record now covers repair attempts, first-pass success, and human
-  review, but the sample is too small to draw conclusions about the loop or
+- The versioned evidence ledger contains two independently reviewed,
+  high-risk, CI-reproduced auth records: registration and password-reset
+  confirmation. It is still an honest report of insufficient evidence because
+  the required sample and risk diversity are not complete.
+- The registration record covers repair attempts and human review. The
+  password-reset confirmation record covers a first-pass hosted gate and human
+  review; the sample remains too small to draw conclusions about the loop or
   compare risk classes.
 - The proposal rejects commit count and raw coverage percentage as success
   metrics and requires feedback about the loop itself.
@@ -107,6 +108,8 @@ remain subject to primary-agent and human review.
 - [x] Implement the sanitized evidence schema and eligible-task rules.
 - [x] Record the first independently reviewed task after hosted CI
       reproduction.
+- [x] Record the password-reset confirmation task after hosted CI reproduction
+      and human review.
 - [ ] Collect at least three diverse real-task records.
 - [ ] Classify repairs, escalations, false positives, and interventions.
 - [x] Publish a bounded insufficient-evidence report and recommendation.
@@ -126,6 +129,12 @@ approval.
 - 2026-08-01: Evidence records are fixed categorical fields with a completed-plan
   source link; free-form fields are rejected to prevent raw logs, prompts, and
   private review material from entering the ledger.
+- 2026-08-02: Activate operating proof after the password-reset confirmation
+  plan received human review and hosted CI reproduction. Keep the conclusion
+  insufficient until a real task from a second risk class is recorded.
+- 2026-08-02: Queue operating proof while the high-risk email-verification
+  slice is implemented; resume evidence collection after that task reaches
+  independent review and hosted CI.
 
 ## Verification
 
@@ -138,6 +147,14 @@ approval.
   shell emitted the expected Node 22 engine warning while CI remains Node 24.
 - Hosted CI independently reproduced the registration task on GitHub Actions
   run `30695230750`; CI Risk, Verify, Runtime, and Required all passed.
+- Hosted CI independently reproduced the password-reset confirmation task on
+  GitHub Actions run `30732854708`; CI Risk, Verify, Runtime, and Required all
+  passed.
+- `pnpm knowledge:check`, `pnpm harness:evidence`, `git diff --check`, and
+  `pnpm verify` passed after activating this plan and adding the second record.
+  The local shell emitted the expected Node 22 engine warning; the repository
+  requires Node 24 or newer. The evidence report remains `insufficient` with
+  two reviewed high-risk records and no second risk class.
 
 ## Runtime Evidence
 
@@ -147,6 +164,6 @@ approval.
 ## Follow-Up Debt
 
 - Phase 5 starts only if this evidence supports a narrow, reviewable improvement.
-- Collect two additional real, independently reviewed, CI-reproduced tasks
-  across a second risk class before changing this plan to completed or
-  proposing Phase 5. Keep at least one repair/escalation record in the sample.
+- Collect one additional real, independently reviewed, CI-reproduced task from
+  a second risk class before changing this plan to completed or proposing
+  Phase 5. Keep at least one repair/escalation record in the sample.
