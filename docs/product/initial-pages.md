@@ -18,6 +18,8 @@ The auth/session foundation also includes:
 - `/forgot-password`: non-enumerating password-reset request;
 - `/reset-password?token=...`: password-reset confirmation with a clean
   redirect back to sign in;
+- `/verify-email?token=...`: public email verification with a clean redirect
+  back to sign in;
 - `/app`: generic authenticated proof using the current-user API.
 
 These routes prove infrastructure only. `/app` is not a product dashboard and
