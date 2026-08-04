@@ -85,6 +85,17 @@ test("rejects a malformed email verification request", () => {
   );
 });
 
+test("accepts an empty email verification resend response", () => {
+  assert.equal(
+    parseFixtureContract(
+      "email verification resend response",
+      fixtureContracts.emailVerificationResendResponse,
+      undefined,
+    ),
+    undefined,
+  );
+});
+
 test("accepts a contract-valid password reset confirmation", () => {
   assert.deepEqual(
     parseFixtureContract(

@@ -138,6 +138,21 @@ test("authenticated foundation matches its visual baseline", async ({
   await expect(page).toHaveScreenshot("authenticated.png", screenshotOptions);
 });
 
+test("unverified authenticated foundation matches its visual baseline", async ({
+  page,
+}) => {
+  await openWithTheme(page, "/register", "light");
+  await page.getByLabel("Email").fill("new-user@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("test-password-10");
+  await page.getByLabel("Confirm password").fill("test-password-10");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+  await expect(page).toHaveScreenshot(
+    "authenticated-unverified.png",
+    screenshotOptions,
+  );
+});
+
 async function openWithTheme(
   page: Page,
   path: string,
