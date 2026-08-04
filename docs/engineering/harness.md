@@ -76,12 +76,13 @@ external action.
 `pnpm harness:evidence` reads the versioned,
 [sanitized operating-evidence ledger](harness-operating-evidence.md) and prints
 aggregates only. It requires each record to cite a completed execution plan and
-uses fixed categorical fields, so it cannot collect prompts, logs, credentials,
-environment values, PR links, source diffs, notes, or review prose. The command
-reports `insufficient` until there are at least three independently reviewed,
-CI-reproduced tasks across two risk classes, including a medium/high task and a
-repair or escalation. Even then, its only outcome is `ready-for-human-review`;
-it never expands autonomy or changes harness policy.
+uses fixed categorical fields, including the failed verification boundary, so it
+cannot collect prompts, logs, credentials, environment values, PR links, source
+diffs, notes, or review prose. The command reports `insufficient` until there are
+at least three independently reviewed, CI-reproduced tasks across two risk
+classes, including a medium/high task and a repair or escalation. Even then, its
+only outcome is `ready-for-human-review`; it never expands autonomy or changes
+harness policy.
 
 CI repeats these commands from a clean checkout. Local results remain repair
 feedback; GitHub Actions is the independent integration run once the workflow

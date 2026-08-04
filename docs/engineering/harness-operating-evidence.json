@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "records": [
     {
       "id": "auth-password-registration",
@@ -10,6 +10,7 @@
       "attempts": 3,
       "gateDurationSeconds": 122,
       "repairOrEscalation": "repair",
+      "failureBoundary": "unknown",
       "humanIntervention": "review",
       "falsePositive": false,
       "ciReproduced": true,
@@ -24,6 +25,7 @@
       "attempts": 1,
       "gateDurationSeconds": 134,
       "repairOrEscalation": "none",
+      "failureBoundary": "none",
       "humanIntervention": "review",
       "falsePositive": false,
       "ciReproduced": true,
@@ -38,6 +40,7 @@
       "attempts": 1,
       "gateDurationSeconds": 154,
       "repairOrEscalation": "none",
+      "failureBoundary": "none",
       "humanIntervention": "review",
       "falsePositive": false,
       "ciReproduced": true,
