@@ -197,6 +197,33 @@ test("authenticated foundation has landmarks and no detectable WCAG A/AA violati
   await expectNoAccessibilityViolations(page);
 });
 
+test("unverified authenticated foundation exposes a resend action and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await page.goto("/register");
+  await page.getByLabel("Email").fill("new-user@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("test-password-10");
+  await page.getByLabel("Confirm password").fill("test-password-10");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+  await expectNoAccessibilityViolations(page);
+
+  const resend = page.getByRole("button", {
+    name: "Resend verification email",
+  });
+  await page.getByRole("button", { name: "Sign out" }).focus();
+  await page.keyboard.press("Tab");
+  await expect(resend).toBeFocused();
+  await expectKeyboardFocusIndicator(resend);
+  await resend.click();
+  await expect(
+    page.getByRole("status").filter({
+      hasText: "A new verification email is on its way.",
+    }),
+  ).toBeVisible();
+  await expectNoAccessibilityViolations(page);
+});
+
 async function expectNoAccessibilityViolations(page: Page) {
   const results = await new AxePlaywrightBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

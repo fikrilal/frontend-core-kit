@@ -32,7 +32,9 @@ The following are not current stack commitments:
 
 Select these only through the staged execution plans. The generated client
 supports the contract's methods. Implemented adapters remain limited to the
-authentication proof: password login, refresh, logout, and current user.
+authentication proof: password login and registration, email verification and
+resend, password-reset request and confirmation, refresh, logout, and current
+user.
 
 ## Framework guidance
 

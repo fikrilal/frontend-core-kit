@@ -22,6 +22,10 @@ The auth/session foundation also includes:
   back to sign in;
 - `/app`: generic authenticated proof using the current-user API.
 
+When the current user is not email-verified, `/app` also provides a
+server-owned resend-verification action with safe success and rate-limit
+feedback. This remains authentication infrastructure, not a product workflow.
+
 These routes prove infrastructure only. `/app` is not a product dashboard and
 must not introduce navigation, reports, account management, or wedding
 features.

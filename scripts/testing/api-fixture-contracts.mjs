@@ -1,5 +1,6 @@
 import {
   AuthEmailVerifyResponse,
+  AuthEmailVerificationResendResponse,
   AuthLogoutResponse,
   AuthPasswordResetConfirmResponse,
   AuthPasswordResetRequestResponse,
@@ -23,6 +24,7 @@ export const fixtureContracts = Object.freeze({
   registerResponse: AuthPasswordRegisterResponse,
   emailVerifyRequest: VerifyEmailRequestDto,
   emailVerifyResponse: AuthEmailVerifyResponse,
+  emailVerificationResendResponse: AuthEmailVerificationResendResponse,
   resetRequest: PasswordResetRequestDto,
   resetResponse: AuthPasswordResetRequestResponse,
   resetConfirmRequest: PasswordResetConfirmRequestDto,
