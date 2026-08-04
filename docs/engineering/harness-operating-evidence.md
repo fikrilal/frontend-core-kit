@@ -9,11 +9,14 @@ report. With fewer than three eligible records, the command reports
 `insufficient` and names only missing evidence categories. It never recommends
 autonomy expansion automatically.
 
-Each record in [the JSON ledger](harness-operating-evidence.json) contains only:
+Each record in [the JSON ledger](harness-operating-evidence.json) uses schema
+version 2 and contains only:
 
 - a lower-case task identifier and a local completed-plan path;
 - risk, first-pass/eventual outcome, attempt count, and total gate duration;
 - categorical repair/escalation and human-intervention reasons;
+- a categorical failed verification boundary (`none`, `unknown`, `preflight`,
+  `fast`, `full`, or `runtime`);
 - boolean false-positive, CI-reproduction, and independent-review markers.
 
 Do not store prompts, source diffs, raw logs, credentials, environment values,
@@ -26,6 +29,12 @@ Three eligible records have been collected for password registration,
 password-reset confirmation, and email verification. All three were
 independently reviewed and reproduced in hosted CI; registration completed
 after repair, while the two reset/verification tasks completed on their first
-hosted gate. Phase 4.4 still has insufficient evidence because all three
-records are high-risk; one additional reviewed task from a second risk class
-is required before a Phase 5 recommendation can be considered.
+hosted gate. The historical registration boundary is explicitly `unknown`
+because the original evidence did not preserve a safe lane category; it is not
+inferred. Phase 4.4 still has insufficient evidence because all three records
+are high-risk; one additional reviewed task from a second risk class is
+required before broader operating claims or autonomy decisions.
+
+The human owner accepted this bounded limitation for narrow Phase 5 planning
+only. Phase 5 must first improve the quality of future repair evidence and must
+not expand merge or deployment autonomy.

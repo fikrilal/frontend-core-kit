@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const evidencePath = "docs/engineering/harness-operating-evidence.json";
+const evidenceSchemaVersion = 2;
 const risks = new Set(["low", "medium", "high"]);
 const outcomes = new Set(["completed", "blocked"]);
 const events = new Set([
@@ -19,6 +20,14 @@ const interventions = new Set([
   "security",
   "tooling",
   "external",
+]);
+const failureBoundaries = new Set([
+  "none",
+  "unknown",
+  "preflight",
+  "fast",
+  "full",
+  "runtime",
 ]);
 
 export function readOperatingEvidence(root) {
@@ -46,6 +55,10 @@ export function summarizeOperatingEvidence(evidence) {
     records,
     (record) => record.humanIntervention,
   );
+  const failureBoundaryCounts = countBy(
+    records,
+    (record) => record.failureBoundary,
+  );
   const attempts = records.reduce(
     (total, record) => total + record.attempts,
     0,
@@ -71,6 +84,7 @@ export function summarizeOperatingEvidence(evidence) {
     outcomeCounts,
     eventCounts,
     interventionCounts,
+    failureBoundaryCounts,
   };
 }
 
@@ -137,6 +151,7 @@ export function renderOperatingReport({ summary, assessment }) {
     renderCounts("Outcome", summary.outcomeCounts),
     renderCounts("Repair or escalation", summary.eventCounts),
     renderCounts("Human intervention", summary.interventionCounts),
+    renderCounts("Failure boundary", summary.failureBoundaryCounts),
     "",
     "## Evidence Gaps",
     "",
@@ -159,12 +174,12 @@ export function renderOperatingReport({ summary, assessment }) {
 function validateEvidence({ root, evidence }) {
   if (
     !evidence ||
-    evidence.schemaVersion !== 1 ||
+    evidence.schemaVersion !== evidenceSchemaVersion ||
     !Array.isArray(evidence.records)
   ) {
     throw evidenceError(
       "evidence-schema",
-      "Operating evidence must use schema version 1 with a records array.",
+      `Operating evidence must use schema version ${evidenceSchemaVersion} with a records array.`,
       `Copy the tracked ${evidencePath} structure before adding reviewed records.`,
     );
   }
@@ -208,10 +223,20 @@ function validateRecord({ root, record }) {
   }
   if (
     !events.has(record.repairOrEscalation) ||
-    !interventions.has(record.humanIntervention)
+    !interventions.has(record.humanIntervention) ||
+    !failureBoundaries.has(record.failureBoundary)
   ) {
     throw recordError(
-      "Repair/escalation and human intervention must use approved categories.",
+      "Repair/escalation, human intervention, and failure boundary must use approved categories.",
+    );
+  }
+  if (
+    (record.repairOrEscalation === "none" &&
+      record.failureBoundary !== "none") ||
+    (record.repairOrEscalation !== "none" && record.failureBoundary === "none")
+  ) {
+    throw recordError(
+      'Failure boundary must be "none" only when no repair or escalation occurred.',
     );
   }
   for (const name of [
@@ -246,6 +271,7 @@ function validateRecord({ root, record }) {
     "attempts",
     "gateDurationSeconds",
     "repairOrEscalation",
+    "failureBoundary",
     "humanIntervention",
     "falsePositive",
     "ciReproduced",
@@ -279,7 +305,11 @@ function renderCounts(label, counts) {
 function deriveSteering(summary) {
   const signals = [];
   if ((summary.eventCounts.repair ?? 0) > 0) {
-    signals.push("repair outcomes → harness maintainer: inspect diagnostics");
+    signals.push(
+      (summary.failureBoundaryCounts.unknown ?? 0) > 0
+        ? "repair outcomes with unknown boundaries → harness maintainer: capture a verification lane category on the next reviewed task"
+        : "repair outcomes → harness maintainer: inspect the recorded verification boundary",
+    );
   }
   if (
     (summary.eventCounts.scope ?? 0) > 0 ||
