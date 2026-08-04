@@ -63,6 +63,8 @@ Implementation is split into independently reviewable plans:
    [Password reset request](queued/2026-08-01_password-reset-request.md)
 7. **Completed:**
    [Email verification](completed/2026-08-02_email-verification.md)
+8. **Active:**
+   [Email verification resend](active/2026-08-02_email-verification-resend.md)
 
 ## Agent Harness Sequence
 
@@ -91,9 +93,11 @@ The accepted direction is documented in the
     [Password registration](completed/2026-08-01_auth-password-registration.md)
 11. **Completed:**
     [Operating proof](completed/2026-08-01_agent-harness-phase-4-4-operating-proof.md)
-12. **Active:**
-    [Harness evidence lifecycle reconciliation](active/2026-08-03_harness-evidence-lifecycle.md)
-13. **Queued:**
+12. **Completed:**
+    [Harness evidence lifecycle reconciliation](completed/2026-08-03_harness-evidence-lifecycle.md)
+13. **Completed:**
+    [Repair boundary diagnostics](completed/2026-08-03_phase-5-repair-boundary-diagnostics.md)
+14. **Queued:**
     [Controlled hill climbing](queued/2026-08-03_agent-harness-phase-5-controlled-hill-climbing.md)
 
 Do not introduce product workflows until a real product decision exists.

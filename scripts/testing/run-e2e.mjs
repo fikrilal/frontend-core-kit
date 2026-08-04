@@ -13,6 +13,7 @@ import {
 const apiPort = 4_400;
 let playwright;
 let stopping = false;
+const resendAttempts = new Map();
 
 const api = createServer(async (request, response) => {
   const requestId = request.headers["x-request-id"] ?? crypto.randomUUID();
@@ -104,6 +105,37 @@ const api = createServer(async (request, response) => {
     parseFixtureContract(
       "email verification response",
       fixtureContracts.emailVerifyResponse,
+      undefined,
+    );
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
+  if (
+    request.method === "POST" &&
+    request.url === "/v1/auth/email/verification/resend"
+  ) {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const attempts = (resendAttempts.get(accessTokenValue) ?? 0) + 1;
+    resendAttempts.set(accessTokenValue, attempts);
+    if (attempts > 1) {
+      return problem(response, 429, "RATE_LIMITED");
+    }
+
+    parseFixtureContract(
+      "email verification resend response",
+      fixtureContracts.emailVerificationResendResponse,
       undefined,
     );
     response.statusCode = 204;

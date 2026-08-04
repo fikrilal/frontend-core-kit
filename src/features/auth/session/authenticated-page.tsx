@@ -1,5 +1,6 @@
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
+import { EmailVerificationResendForm } from "../email-verification/email-verification-resend-form";
 import { loadAuthenticatedUser } from "./load-authenticated-user";
 import { logoutAction } from "./logout-action";
 
@@ -40,13 +41,13 @@ export async function AuthenticatedPage() {
                 {result.user.email}
               </p>
               {!result.user.emailVerified ? (
-                <p
-                  className="border-border bg-muted/40 text-muted-foreground mt-6 rounded-lg border p-3 text-sm"
-                  role="status"
-                >
-                  Check your inbox to verify your email address. Verification is
-                  required before all account features are available.
-                </p>
+                <div className="border-border bg-muted/40 text-muted-foreground mt-6 rounded-lg border p-3 text-sm">
+                  <p role="status">
+                    Check your inbox to verify your email address. Verification
+                    is required before all account features are available.
+                  </p>
+                  <EmailVerificationResendForm />
+                </div>
               ) : null}
               <p className="text-muted-foreground mt-8 text-sm">
                 Product workflows have not been defined yet.

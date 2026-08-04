@@ -18,6 +18,8 @@ const passwordRegisterPath = "/v1/auth/password/register" as const;
 const emailVerifyPath = "/v1/auth/email/verify" as const;
 const passwordResetRequestPath = "/v1/auth/password/reset/request" as const;
 const passwordResetConfirmPath = "/v1/auth/password/reset/confirm" as const;
+const emailVerificationResendPath =
+  "/v1/auth/email/verification/resend" as const;
 const currentUserPath = "/v1/me" as const;
 const logoutPath = "/v1/auth/logout" as const;
 const authRequestTimeoutMs = 10_000;
@@ -70,6 +72,22 @@ export async function verifyEmail(
   const request = client.POST(emailVerifyPath, {
     body: input,
     cache: "no-store",
+    parseAs: "text",
+    signal: AbortSignal.timeout(authRequestTimeoutMs),
+  });
+
+  return readEmptyApiResult(request);
+}
+
+export async function resendEmailVerification(
+  accessToken: string,
+): Promise<ApiResult<undefined>> {
+  const client = createConfiguredLamaraApiClient();
+  const request = client.POST(emailVerificationResendPath, {
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
     parseAs: "text",
     signal: AbortSignal.timeout(authRequestTimeoutMs),
   });

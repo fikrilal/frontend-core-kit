@@ -1,7 +1,7 @@
 # 2026-08-03 Harness Evidence Lifecycle Reconciliation
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for evidence conclusions
 **Risk:** low
 **Authority:** reconcile repository documentation after the merged email-
@@ -31,10 +31,8 @@ application task merely to satisfy the Phase 4.4 sample.
   Required. Its wall-clock duration was 154 seconds.
 - The email-verification plan is still under `active/` even though its human
   review and hosted CI gates are complete.
-- The evidence ledger has two independently reviewed high-risk auth records.
-  Adding email verification will make three records, but all three remain
-  high-risk, so the report must continue to state that a second risk class is
-  missing.
+- The evidence ledger now has three independently reviewed high-risk auth
+  records. The report continues to state that a second risk class is missing.
 
 ## Decisions And Invariants
 
@@ -45,7 +43,8 @@ application task merely to satisfy the Phase 4.4 sample.
   hosted and human-review evidence is recorded.
 - Preserve the Phase 4.4 acceptance threshold: three reviewed records,
   multiple risk classes, repair/escalation evidence, and CI reproduction.
-- Do not mark Phase 4.4 complete or start Phase 5 in this task.
+- Preserve the human-approved bounded Phase 4.4 closure and queued Phase 5
+  planning plan without expanding autonomy.
 - Keep the execution-plan index, evidence report, and plan status consistent.
 
 ## Non-Goals
@@ -96,12 +95,12 @@ Phase 4.4 conclusion or Phase 5 policy proposal.
 
 ## Checklist
 
-- [ ] Move the reviewed email-verification plan to `completed/`.
-- [ ] Add its bounded record to the operating-evidence ledger.
-- [ ] Update the evidence report and execution-plan index.
-- [ ] Verify the report remains insufficient only for risk diversity.
-- [ ] Run knowledge, harness-evidence, and diff checks.
-- [ ] Move this plan to completed only after independent review and hosted CI.
+- [x] Move the reviewed email-verification plan to `completed/`.
+- [x] Add its bounded record to the operating-evidence ledger.
+- [x] Update the evidence report and execution-plan index.
+- [x] Verify the report remains insufficient only for risk diversity.
+- [x] Run knowledge, harness-evidence, and diff checks.
+- [x] Move this plan to completed after independent review and hosted CI.
 
 ## Rollout And Rollback
 
@@ -116,17 +115,25 @@ external state is affected.
   Phase 4.4 evidence contract.
 - 2026-08-03: Keep Phase 4.4 queued until a separate real task from another
   risk class is independently reviewed and CI-reproduced.
+- 2026-08-03: The lifecycle reconciliation received independent review and
+  hosted CI reproduction in pull request #3. Close this plan now that its
+  documentation and evidence work is complete; preserve the second-risk-class
+  limitation for Phase 5.
 
 ## Verification
 
-Not run yet.
+- `pnpm knowledge:check` passed.
+- `pnpm harness:evidence` passed and reported three eligible records with
+  `insufficient` status only for the missing second risk class.
+- `pnpm verify:fast` passed after the lifecycle and evidence updates.
+- `git diff --check` passed.
 
 ## Runtime Evidence
 
-Not applicable; this task changes no browser-visible behavior.
+- Not applicable; this task changed no browser-visible behavior.
 
 ## Follow-Up Debt
 
-- Complete one naturally occurring task from a second risk class, then record
-  that task and close Phase 4.4 in a separate reviewed change.
+- Complete one naturally occurring task from a second risk class before making
+  broader operating claims or considering autonomy expansion.
 - Do not create synthetic product work solely to satisfy evidence diversity.

@@ -13,7 +13,7 @@ import {
 } from "./operating-evidence.mjs";
 
 test("reports insufficient evidence without inventing a recommendation", () => {
-  const summary = summarizeOperatingEvidence({ schemaVersion: 1, records: [] });
+  const summary = summarizeOperatingEvidence({ schemaVersion: 2, records: [] });
   const assessment = evaluateOperatingProof(summary);
 
   assert.equal(assessment.status, "insufficient");
@@ -23,7 +23,7 @@ test("reports insufficient evidence without inventing a recommendation", () => {
 
 test("accepts a reviewed, diverse operating sample for human review only", () => {
   const summary = summarizeOperatingEvidence({
-    schemaVersion: 1,
+    schemaVersion: 2,
     records: [
       record({ id: "task-low", risk: "low", firstPass: true }),
       record({
@@ -32,6 +32,7 @@ test("accepts a reviewed, diverse operating sample for human review only", () =>
         firstPass: false,
         attempts: 2,
         repairOrEscalation: "repair",
+        failureBoundary: "full",
       }),
       record({ id: "task-high", risk: "high", humanIntervention: "review" }),
     ],
@@ -42,7 +43,8 @@ test("accepts a reviewed, diverse operating sample for human review only", () =>
   assert.equal(assessment.status, "ready-for-human-review");
   assert.match(report, /Eligible records:\*\* 3/);
   assert.match(report, /Human review may decide/);
-  assert.match(report, /repair outcomes → harness maintainer/);
+  assert.match(report, /Failure boundary — full: 1/);
+  assert.match(report, /recorded verification boundary/);
   assert.doesNotMatch(report, /task-medium-repair/);
 });
 
@@ -50,7 +52,7 @@ test("rejects missing plan sources and free-form fields", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "lamara-evidence-"));
   try {
     write(root, "docs/engineering/harness-operating-evidence.json", {
-      schemaVersion: 1,
+      schemaVersion: 2,
       records: [record({ plan: "docs/exec-plans/completed/missing.md" })],
     });
     assert.throws(
@@ -60,12 +62,35 @@ test("rejects missing plan sources and free-form fields", () => {
 
     write(root, "docs/exec-plans/completed/task.md", "# Completed\n");
     write(root, "docs/engineering/harness-operating-evidence.json", {
-      schemaVersion: 1,
+      schemaVersion: 2,
       records: [
         {
           ...record({ plan: "docs/exec-plans/completed/task.md" }),
           notes: "raw output must not be stored",
         },
+      ],
+    });
+    assert.throws(
+      () => readOperatingEvidence(root),
+      failureWithCode("evidence-record"),
+    );
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("rejects a boundary that is inconsistent with repair state", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lamara-evidence-"));
+  try {
+    write(root, "docs/exec-plans/completed/task.md", "# Completed\n");
+    write(root, "docs/engineering/harness-operating-evidence.json", {
+      schemaVersion: 2,
+      records: [
+        record({
+          plan: "docs/exec-plans/completed/task.md",
+          repairOrEscalation: "repair",
+          failureBoundary: "none",
+        }),
       ],
     });
     assert.throws(
@@ -86,6 +111,7 @@ function record({
   attempts = 1,
   gateDurationSeconds = 30,
   repairOrEscalation = "none",
+  failureBoundary = "none",
   humanIntervention = "none",
   falsePositive = false,
   ciReproduced = true,
@@ -100,6 +126,7 @@ function record({
     attempts,
     gateDurationSeconds,
     repairOrEscalation,
+    failureBoundary,
     humanIntervention,
     falsePositive,
     ciReproduced,
