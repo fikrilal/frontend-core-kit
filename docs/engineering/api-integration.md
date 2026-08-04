@@ -9,7 +9,8 @@ The frontend has:
 - a typed, server-only `openapi-fetch` client;
 - Lamara-specific response normalization;
 - auth adapters for password login, registration, password-reset request and
-  confirmation, email verification, refresh, logout, and current user.
+  confirmation, email verification and resend, refresh, logout, and current
+  user.
 
 The auth Server Actions and protected Server Component invoke these adapters
 through the process-memory session boundary. No Client Component imports the
@@ -73,6 +74,14 @@ response. The token is supplied by the `/verify-email?token=...` link, handled
 by the server action, and is never persisted by the frontend. The endpoint does
 not mint a session; success redirects to sign in so a later login obtains fresh
 email-verification claims.
+
+The email-verification-resend adapter follows the same boundary for
+`operations["auth.email.verification.resend"]`. It sends no request body and
+attaches the access token obtained from the server-owned session to
+`/v1/auth/email/verification/resend`. It accepts only the generated empty
+`204` response. The authenticated Server Action owns session access, one
+eligible `401` refresh/retry, and safe rate-limit/unavailable UI states; the
+browser never receives or stores the access token.
 
 `openapi-fetch` owns request construction and JSON serialization. The small
 Lamara boundary adds request IDs and normalizes JSON-compatible content types,

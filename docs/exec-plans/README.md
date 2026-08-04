@@ -63,6 +63,8 @@ Implementation is split into independently reviewable plans:
    [Password reset request](queued/2026-08-01_password-reset-request.md)
 7. **Completed:**
    [Email verification](completed/2026-08-02_email-verification.md)
+8. **Active:**
+   [Email verification resend](active/2026-08-02_email-verification-resend.md)
 
 ## Agent Harness Sequence
 

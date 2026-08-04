@@ -363,6 +363,56 @@ test("registers a user with an opaque cookie and verification guidance", async (
   expect(JSON.stringify(browserOwnedState)).not.toContain(".signature");
 });
 
+test("resends verification email and maps rate limiting to safe copy", async ({
+  context,
+  page,
+}) => {
+  await page.goto("/register");
+  await page.getByLabel("Email").fill("new-user@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("test-password-10");
+  await page.getByLabel("Confirm password").fill("test-password-10");
+  await page.getByRole("button", { name: "Create account" }).click();
+
+  await expect(page).toHaveURL(/\/app$/);
+  const resend = page.getByRole("button", {
+    name: "Resend verification email",
+  });
+  await expect(resend).toBeVisible();
+
+  await resend.click();
+  await expect(
+    page.getByRole("status").filter({
+      hasText: "A new verification email is on its way.",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Send another verification email" }),
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", { name: "Send another verification email" })
+    .click();
+  await expect(page.locator("#email-verification-resend-error")).toContainText(
+    "A verification email was requested recently. Please wait and try again.",
+  );
+  await expect(page).toHaveURL(/\/app$/);
+
+  const browserOwnedState = await page.evaluate(() => ({
+    html: document.documentElement.outerHTML,
+    localStorage: Object.entries(localStorage),
+    sessionStorage: Object.entries(sessionStorage),
+  }));
+  expect(JSON.stringify(browserOwnedState)).not.toContain(
+    "e2e-registration-refresh-token",
+  );
+  expect(JSON.stringify(browserOwnedState)).not.toContain(".signature");
+  expect(
+    (await context.cookies()).some(
+      (cookie) => cookie.name === "lamara_session",
+    ),
+  ).toBe(true);
+});
+
 test("signs in with an opaque cookie and signs out", async ({
   context,
   page,

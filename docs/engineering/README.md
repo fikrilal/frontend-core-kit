@@ -10,5 +10,5 @@
 
 The generated contract/runtime-schema, typed HTTP client, and single-instance
 web-session boundaries are implemented. `/login`, `/register`,
-`/forgot-password`, `/reset-password?token=...`, and `/app` are infrastructure
-proofs; product features remain undecided.
+`/forgot-password`, `/reset-password?token=...`, `/verify-email?token=...`, and
+`/app` are infrastructure proofs; product features remain undecided.

@@ -50,8 +50,9 @@ Playwright covers:
 - protected-route redirection;
 - password login, registration, non-enumerating password-reset requests,
   password-reset confirmation, email verification, clean reset/verification
-  redirects, opaque-cookie properties, authenticated current-user rendering,
-  and logout;
+  redirects, authenticated email-verification resend success and rate-limit
+  feedback, opaque-cookie properties, authenticated current-user rendering, and
+  logout;
 - an arbitrary nonexistent-route response without naming hypothetical product
   routes.
 - Axe scans for detectable WCAG 2 A/AA and 2.1 A/AA violations across the
@@ -69,9 +70,11 @@ conformance. Human keyboard, zoom/reflow, reduced-motion, and
 assistive-technology review remain necessary as the product surface grows.
 
 The local API fixture validates successful login, refresh, logout, current
-user, and empty password-reset responses against generated Zod schemas before
-sending them. Login, registration, password-reset request/confirmation,
-refresh, and logout bodies are also generated-schema validated; invalid
+user, and empty password-reset/email-verification responses against generated
+Zod schemas before sending them. Login, registration, password-reset
+request/confirmation, refresh, and logout bodies are also generated-schema
+validated; authenticated resend requests require a fixture bearer token and
+return a deterministic rate-limit response on a repeated request. Invalid
 requests receive a safe fixture problem.
 The OpenAPI snapshot does not yet own problem response schemas, so those remain
 a deliberately small handwritten test boundary.
