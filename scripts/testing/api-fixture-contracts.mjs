@@ -12,9 +12,11 @@ import {
   PasswordResetConfirmRequestDto,
   PasswordLoginRequestDto,
   PasswordRegisterRequestDto,
+  PatchMeRequestDto,
   RefreshRequestDto,
   VerifyEmailRequestDto,
   UsersMeGetResponse,
+  UsersMePatchResponse,
 } from "../../src/contracts/lamara-api/runtime.generated.ts";
 
 export const fixtureContracts = Object.freeze({
@@ -34,6 +36,8 @@ export const fixtureContracts = Object.freeze({
   logoutRequest: LogoutRequestDto,
   logoutResponse: AuthLogoutResponse,
   currentUserResponse: UsersMeGetResponse,
+  patchMeRequest: PatchMeRequestDto,
+  patchMeResponse: UsersMePatchResponse,
 });
 
 export function parseFixtureContract(boundary, schema, value) {

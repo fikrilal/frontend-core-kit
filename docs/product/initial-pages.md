@@ -20,11 +20,17 @@ The auth/session foundation also includes:
   redirect back to sign in;
 - `/verify-email?token=...`: public email verification with a clean redirect
   back to sign in;
-- `/app`: generic authenticated proof using the current-user API.
+- `/app`: generic authenticated proof using the current-user API;
+- `/app/profile`: authenticated profile editor for display name, given name,
+  and family name through `PATCH /v1/me`.
 
 When the current user is not email-verified, `/app` also provides a
 server-owned resend-verification action with safe success and rate-limit
 feedback. This remains authentication infrastructure, not a product workflow.
+
+`/app/profile` is an authenticated account-infrastructure surface: it edits the
+profile fields already exposed by the current-user API. It is not a product
+dashboard or an account-management suite.
 
 These routes prove infrastructure only. `/app` is not a product dashboard and
 must not introduce navigation, reports, account management, or wedding
