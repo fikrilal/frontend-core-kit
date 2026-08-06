@@ -257,6 +257,44 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  if (request.method === "PATCH" && request.url === "/v1/me") {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.patchMeRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 422, "VALIDATION_FAILED");
+    if (parsed.profile.displayName === "conflict-display-name") {
+      return problem(response, 409, "CONFLICT");
+    }
+
+    const user = { ...(tokenUsers.get(accessTokenValue) ?? me) };
+    user.profile = {
+      ...user.profile,
+      displayName: parsed.profile.displayName ?? user.profile.displayName,
+      givenName: parsed.profile.givenName ?? user.profile.givenName,
+      familyName: parsed.profile.familyName ?? user.profile.familyName,
+    };
+    tokenUsers.set(accessTokenValue, user);
+
+    return contractJson(
+      response,
+      200,
+      "patch me response",
+      fixtureContracts.patchMeResponse,
+      { data: user },
+    );
+  }
+
   return problem(response, 404, "NOT_FOUND");
 });
 

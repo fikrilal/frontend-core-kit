@@ -224,6 +224,34 @@ test("unverified authenticated foundation exposes a resend action and no detecta
   await expectNoAccessibilityViolations(page);
 });
 
+test("profile editor exposes labelled fields, focus order, and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await signIn(page);
+  await page.goto("/app/profile");
+  await expect(page).toHaveTitle("Profile | Lamara");
+  await expectNoAccessibilityViolations(page);
+
+  const displayName = page.getByLabel("Display name");
+  await expect(displayName).toHaveValue("Example User");
+  await displayName.focus();
+  await expectKeyboardFocusIndicator(displayName);
+  await page.keyboard.press("Tab");
+  await expect(page.getByLabel("Given name")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByLabel("Family name")).toBeFocused();
+
+  await displayName.fill("conflict-display-name");
+  await page.getByRole("button", { name: "Save profile" }).click();
+  const error = page.locator("#update-profile-error");
+  await expect(error).toBeVisible();
+  await expect(displayName).toHaveAttribute(
+    "aria-describedby",
+    "update-profile-error",
+  );
+  await expectNoAccessibilityViolations(page);
+});
+
 async function expectNoAccessibilityViolations(page: Page) {
   const results = await new AxePlaywrightBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
