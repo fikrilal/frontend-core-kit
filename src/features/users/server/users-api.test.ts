@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   listSessions,
   patchCurrentUser,
+  requestAccountDeletion,
   revokeSession,
   type PatchMeData,
   type PatchMeInput,
@@ -196,6 +197,40 @@ describe("users API", () => {
     }
     expect(captured.url).toBe(
       "https://api.lamara.dev/v1/me/sessions/session-1/revoke",
+    );
+    expect(captured.method).toBe("POST");
+    expect(captured.cache).toBe("no-store");
+    expect(captured.headers.get("authorization")).toBe("Bearer access-token");
+    expect(await captured.text()).toBe("");
+  });
+
+  it("requests account deletion through the empty-response contract", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(
+        new Response(null, {
+          status: 204,
+          headers: { "X-Request-Id": "backend-request-id" },
+        }),
+      );
+    });
+
+    const result = await requestAccountDeletion("access-token");
+
+    expect(result).toEqual({
+      ok: true,
+      data: undefined,
+      status: 204,
+      traceId: "backend-request-id",
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe(
+      "https://api.lamara.dev/v1/me/account-deletion/request",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");

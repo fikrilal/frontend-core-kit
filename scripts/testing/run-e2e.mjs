@@ -25,6 +25,24 @@ const api = createServer(async (request, response) => {
     const parsed = tryParseFixtureContract(fixtureContracts.loginRequest, body);
     if (!parsed) return problem(response, 400, "VALIDATION_ERROR");
     if (
+      parsed.email === "pending@example.com" &&
+      parsed.password === "test-password"
+    ) {
+      return contractJson(
+        response,
+        200,
+        "password login response",
+        fixtureContracts.loginResponse,
+        {
+          data: {
+            accessToken: accessToken(pendingDeletionMe),
+            refreshToken: "e2e-refresh-token",
+            user: pendingDeletionMe,
+          },
+        },
+      );
+    }
+    if (
       parsed.email !== "user@example.com" ||
       parsed.password !== "test-password"
     ) {
@@ -66,6 +84,30 @@ const api = createServer(async (request, response) => {
       return problem(response, 400, "AUTH_CURRENT_PASSWORD_INVALID");
     }
 
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
+  if (
+    request.method === "POST" &&
+    request.url === "/v1/me/account-deletion/request"
+  ) {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    parseFixtureContract(
+      "account deletion request response",
+      fixtureContracts.accountDeletionRequestResponse,
+      undefined,
+    );
     response.statusCode = 204;
     response.removeHeader("Content-Type");
     return response.end();
@@ -481,6 +523,16 @@ const me = {
     profileImageFileId: null,
   },
   roles: ["USER"],
+};
+
+const pendingDeletionMe = {
+  ...me,
+  email: "pending@example.com",
+  id: "e2e-pending-deletion-user-id",
+  accountDeletion: {
+    requestedAt: "2026-07-10T12:34:56.789Z",
+    scheduledFor: "2026-08-09T12:34:56.789Z",
+  },
 };
 
 const sessions = [

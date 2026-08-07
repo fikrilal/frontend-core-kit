@@ -212,6 +212,23 @@ test("change-password page and its error state match their visual baselines", as
   );
 });
 
+test("account-deletion request page matches its visual baseline", async ({
+  page,
+}) => {
+  await openWithTheme(page, "/login", "light");
+  await page.getByLabel("Email").fill("user@example.com");
+  await page.getByLabel("Password").fill("test-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+
+  await page.goto("/app/account-deletion");
+  await expect(page).toHaveTitle("Delete account | Lamara");
+  await expect(page).toHaveScreenshot(
+    "account-deletion-request.png",
+    screenshotOptions,
+  );
+});
+
 async function openWithTheme(
   page: Page,
   path: string,

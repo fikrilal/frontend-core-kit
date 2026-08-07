@@ -27,7 +27,9 @@ The auth/session foundation also includes:
   through `GET /v1/me/sessions`, with per-session revocation through
   `POST /v1/me/sessions/{sessionId}/revoke`;
 - `/app/password`: authenticated change-password form through
-  `POST /v1/auth/password/change`.
+  `POST /v1/auth/password/change`;
+- `/app/account-deletion`: authenticated account-deletion request through
+  `POST /v1/me/account-deletion/request`.
 
 When the current user is not email-verified, `/app` also provides a
 server-owned resend-verification action with safe success and rate-limit
@@ -36,7 +38,8 @@ feedback. This remains authentication infrastructure, not a product workflow.
 `/app/profile` is an authenticated account-infrastructure surface: it edits the
 profile fields already exposed by the current-user API. `/app/sessions` lists
 the devices signed in to the account and lets the user revoke non-current
-sessions. `/app/password` changes the account password. None of these is a
+sessions. `/app/password` changes the account password. `/app/account-deletion`
+schedules account deletion with a 30-day grace period. None of these is a
 product dashboard or an account-management suite.
 
 These routes prove infrastructure only. `/app` is not a product dashboard and

@@ -302,6 +302,20 @@ test("change-password form exposes labels, password guidance, and no detectable 
   await expectNoAccessibilityViolations(page);
 });
 
+test("account-deletion request surface has landmarks and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await signIn(page);
+  await page.goto("/app/account-deletion");
+  await expect(page).toHaveTitle("Delete account | Lamara");
+  await expect(page.getByRole("main")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Request account deletion" }),
+  ).toBeVisible();
+  await expectNoAccessibilityViolations(page);
+});
+
 async function expectNoAccessibilityViolations(page: Page) {
   const results = await new AxePlaywrightBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

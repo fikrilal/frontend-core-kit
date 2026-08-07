@@ -71,8 +71,12 @@ Implementation is split into independently reviewable plans:
     [List current user sessions](completed/2026-08-07_list-current-user-sessions.md)
 11. **Completed:**
     [Revoke current user session](completed/2026-08-07_revoke-current-user-session.md)
-12. **Active:**
-    [Change current user password](active/2026-08-07_change-current-user-password.md)
+12. **Completed:**
+    [Change current user password](completed/2026-08-07_change-current-user-password.md)
+13. **Active:**
+    [Request account deletion](active/2026-08-07_request-account-deletion.md)
+14. **Active:**
+    [Cancel account deletion](active/2026-08-07_cancel-account-deletion.md)
 
 ## Agent Harness Sequence
 

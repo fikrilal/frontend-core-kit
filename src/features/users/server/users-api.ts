@@ -15,6 +15,7 @@ import {
 const currentUserPath = "/v1/me" as const;
 const sessionsPath = "/v1/me/sessions" as const;
 const revokeSessionPath = "/v1/me/sessions/{sessionId}/revoke" as const;
+const accountDeletionRequestPath = "/v1/me/account-deletion/request" as const;
 const usersRequestTimeoutMs = 10_000;
 
 type PatchMeOperation = operations["users.me.patch"];
@@ -79,6 +80,22 @@ export async function revokeSession(
     },
     params: {
       path: { sessionId },
+    },
+    parseAs: "text",
+    signal: AbortSignal.timeout(usersRequestTimeoutMs),
+  });
+
+  return readEmptyApiResult(request);
+}
+
+export async function requestAccountDeletion(
+  accessToken: string,
+): Promise<ApiResult<undefined>> {
+  const client = createConfiguredLamaraApiClient();
+  const request = client.POST(accountDeletionRequestPath, {
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
     },
     parseAs: "text",
     signal: AbortSignal.timeout(usersRequestTimeoutMs),

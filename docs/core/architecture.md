@@ -26,7 +26,9 @@ Implemented routes:
 - `/app/sessions`: authenticated sessions list through `GET /v1/me/sessions`
   with per-session revocation through `POST /v1/me/sessions/{sessionId}/revoke`;
 - `/app/password`: authenticated change-password form through
-  `POST /v1/auth/password/change`.
+  `POST /v1/auth/password/change`;
+- `/app/account-deletion`: authenticated account-deletion request through
+  `POST /v1/me/account-deletion/request`.
 
 Theme preference is the only client-owned application state and lives in
 `localStorage`. Authentication state is server-owned.
@@ -98,7 +100,8 @@ src/features/users/
   index.ts                         public route entry points
   server/                          shared contract-backed users API adapters
   profile/                         profile update flow
-  sessions/                        sessions list flow
+  sessions/                        sessions list and revoke flows
+  account-deletion/                account-deletion request flow
 ```
 
 The existing auth `session/` flow continues to own session establishment and
