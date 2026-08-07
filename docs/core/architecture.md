@@ -22,7 +22,8 @@ Implemented routes:
 - `/`: generic under-development landing page;
 - `/login`: email/password login;
 - `/app`: protected current-user proof, not a product dashboard;
-- `/app/profile`: authenticated profile editor through `PATCH /v1/me`.
+- `/app/profile`: authenticated profile editor through `PATCH /v1/me`;
+- `/app/sessions`: authenticated sessions list through `GET /v1/me/sessions`.
 
 Theme preference is the only client-owned application state and lives in
 `localStorage`. Authentication state is server-owned.
@@ -93,6 +94,7 @@ src/features/users/
   index.ts                         public route entry points
   server/                          shared contract-backed users API adapters
   profile/                         profile update flow
+  sessions/                        sessions list flow
 ```
 
 The existing auth `session/` flow continues to own session establishment and

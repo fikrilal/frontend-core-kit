@@ -17,6 +17,7 @@ import {
   VerifyEmailRequestDto,
   UsersMeGetResponse,
   UsersMePatchResponse,
+  UsersMeSessionsListResponse,
 } from "../../src/contracts/lamara-api/runtime.generated.ts";
 
 export const fixtureContracts = Object.freeze({
@@ -38,6 +39,7 @@ export const fixtureContracts = Object.freeze({
   currentUserResponse: UsersMeGetResponse,
   patchMeRequest: PatchMeRequestDto,
   patchMeResponse: UsersMePatchResponse,
+  sessionsListResponse: UsersMeSessionsListResponse,
 });
 
 export function parseFixtureContract(boundary, schema, value) {

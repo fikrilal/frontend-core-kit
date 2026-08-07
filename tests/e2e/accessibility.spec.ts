@@ -252,6 +252,23 @@ test("profile editor exposes labelled fields, focus order, and no detectable WCA
   await expectNoAccessibilityViolations(page);
 });
 
+test("sessions list has landmarks, labelled statuses, and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await signIn(page);
+  await page.goto("/app/sessions");
+  await expect(page).toHaveTitle("Sessions | Lamara");
+  await expect(page.getByRole("main")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  await expect(
+    page.getByRole("status").filter({ hasText: "active" }),
+  ).toHaveCount(1);
+  await expect(
+    page.getByRole("status").filter({ hasText: "revoked" }),
+  ).toHaveCount(1);
+  await expectNoAccessibilityViolations(page);
+});
+
 async function expectNoAccessibilityViolations(page: Page) {
   const results = await new AxePlaywrightBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
