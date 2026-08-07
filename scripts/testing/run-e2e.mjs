@@ -257,6 +257,29 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  if (request.method === "GET" && request.url === "/v1/me/sessions") {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    return contractJson(
+      response,
+      200,
+      "sessions list response",
+      fixtureContracts.sessionsListResponse,
+      {
+        data: sessions,
+        meta: { hasMore: false, limit: 25 },
+      },
+    );
+  }
+
   if (request.method === "PATCH" && request.url === "/v1/me") {
     if (!request.headers.authorization?.startsWith("Bearer ")) {
       return problem(response, 401, "UNAUTHORIZED");
@@ -403,6 +426,35 @@ const me = {
   },
   roles: ["USER"],
 };
+
+const sessions = [
+  {
+    createdAt: "2026-01-10T12:34:56.789Z",
+    current: true,
+    deviceId: "device-a",
+    deviceName: "Dante's iPhone",
+    expiresAt: "2026-02-10T12:34:56.789Z",
+    id: "e2e-session-current",
+    ip: "203.0.113.10",
+    lastSeenAt: "2026-01-10T12:34:56.789Z",
+    revokedAt: null,
+    status: "active",
+    userAgent: "Mozilla/5.0 (iPhone)",
+  },
+  {
+    createdAt: "2026-01-05T08:00:00.000Z",
+    current: false,
+    deviceId: "device-b",
+    deviceName: "Dante's MacBook",
+    expiresAt: "2026-02-05T08:00:00.000Z",
+    id: "e2e-session-old",
+    ip: "198.51.100.7",
+    lastSeenAt: "2026-01-08T20:15:00.000Z",
+    revokedAt: "2026-01-09T09:30:00.000Z",
+    status: "revoked",
+    userAgent: "Mozilla/5.0 (Macintosh)",
+  },
+];
 
 const registeredMe = {
   ...me,

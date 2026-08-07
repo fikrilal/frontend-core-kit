@@ -174,6 +174,18 @@ test("profile editor and its saved state match their visual baselines", async ({
   await expect(page).toHaveScreenshot("profile-saved.png", screenshotOptions);
 });
 
+test("sessions list matches its visual baseline", async ({ page }) => {
+  await openWithTheme(page, "/login", "light");
+  await page.getByLabel("Email").fill("user@example.com");
+  await page.getByLabel("Password").fill("test-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+
+  await page.goto("/app/sessions");
+  await expect(page).toHaveTitle("Sessions | Lamara");
+  await expect(page).toHaveScreenshot("sessions.png", screenshotOptions);
+});
+
 async function openWithTheme(
   page: Page,
   path: string,

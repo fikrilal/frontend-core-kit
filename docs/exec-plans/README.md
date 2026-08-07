@@ -65,8 +65,10 @@ Implementation is split into independently reviewable plans:
    [Email verification](completed/2026-08-02_email-verification.md)
 8. **Completed:**
    [Email verification resend](completed/2026-08-02_email-verification-resend.md)
-9. **Active:**
-   [Patch current user profile](active/2026-08-06_patch-current-user-profile.md)
+9. **Completed:**
+   [Patch current user profile](completed/2026-08-06_patch-current-user-profile.md)
+10. **Active:**
+    [List current user sessions](active/2026-08-07_list-current-user-sessions.md)
 
 ## Agent Harness Sequence
 
