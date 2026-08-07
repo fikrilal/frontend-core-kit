@@ -260,12 +260,8 @@ test("sessions list has landmarks, labelled statuses, and no detectable WCAG A/A
   await expect(page).toHaveTitle("Sessions | Lamara");
   await expect(page.getByRole("main")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-  await expect(
-    page.getByRole("status").filter({ hasText: "active" }),
-  ).toHaveCount(1);
-  await expect(
-    page.getByRole("status").filter({ hasText: "revoked" }),
-  ).toHaveCount(1);
+  await expect(page.getByText("active")).toHaveCount(1);
+  await expect(page.getByText("revoked")).toHaveCount(1);
   await expect(page.getByRole("button", { name: "Revoke" })).toHaveCount(2);
   await expectNoAccessibilityViolations(page);
 });

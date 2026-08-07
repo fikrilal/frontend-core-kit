@@ -62,10 +62,7 @@ export async function SessionsPage() {
                       </p>
                     )}
                   </div>
-                  <span
-                    className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs capitalize"
-                    role="status"
-                  >
+                  <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs capitalize">
                     {session.status}
                   </span>
                 </div>

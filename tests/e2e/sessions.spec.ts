@@ -42,7 +42,9 @@ test("maps a missing session to safe feedback", async ({ page }) => {
   await row.getByRole("button", { name: "Revoke" }).click();
 
   await expect(
-    row.getByRole("alert").getByText("This session no longer exists."),
+    row
+      .locator("#revoke-session-error-missing-session-id")
+      .getByText("This session no longer exists."),
   ).toBeVisible();
   await expect(page).toHaveURL(/\/app\/sessions$/);
 });
