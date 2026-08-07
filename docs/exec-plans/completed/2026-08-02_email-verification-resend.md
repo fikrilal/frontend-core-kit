@@ -1,7 +1,7 @@
 # 2026-08-02 Email Verification Resend
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the authenticated email-verification-resend slice against the committed generated contract; do not change backend behavior, send real verification emails, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -121,7 +121,7 @@ required for auth behavior, copy, and production rollout.
 - [x] Add unit, accessibility, browser, and visual coverage.
 - [x] Update truthful API, testing, product-foundation, and execution-plan docs.
 - [x] Run full and runtime verification and record exact outcomes.
-- [ ] Move this plan to `completed/` only after verification and review.
+- [x] Move this plan to `completed/` only after verification and review.
 
 ## Rollout And Rollback
 

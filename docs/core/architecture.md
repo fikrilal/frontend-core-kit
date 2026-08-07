@@ -21,7 +21,10 @@ Implemented routes:
 
 - `/`: generic under-development landing page;
 - `/login`: email/password login;
-- `/app`: protected current-user proof, not a product dashboard.
+- `/app`: protected current-user proof, not a product dashboard;
+- `/app/profile`: authenticated profile editor through `PATCH /v1/me`;
+- `/app/sessions`: authenticated sessions list through `GET /v1/me/sessions`
+  with per-session revocation through `POST /v1/me/sessions/{sessionId}/revoke`.
 
 Theme preference is the only client-owned application state and lives in
 `localStorage`. Authentication state is server-owned.
@@ -34,7 +37,8 @@ src/app/
 
 src/features/
   User-visible behavior. Marketing owns the public page. Auth owns login,
-  protected loading, logout, and its endpoint adapters.
+  protected loading, logout, and its endpoint adapters. Users owns the
+  authenticated profile flow and its endpoint adapters.
 
 src/components/
   Cross-page layout, branding, theme behavior, and business-free primitives.
@@ -80,6 +84,22 @@ its transport-contract tests; a failure mapper stays beside the flow state it
 produces instead of becoming a generic server bucket. The root `index.ts` only
 exports route-level pages, so App Router files remain thin and flow internals
 stay private.
+
+### Users feature layout
+
+The users feature follows the same per-flow organization and owns the
+authenticated `/v1/me/*` account surface, starting with profile:
+
+```text
+src/features/users/
+  index.ts                         public route entry points
+  server/                          shared contract-backed users API adapters
+  profile/                         profile update flow
+  sessions/                        sessions list flow
+```
+
+The existing auth `session/` flow continues to own session establishment and
+loading; the users feature adds profile editing without touching it.
 
 ## Contract and request boundary
 

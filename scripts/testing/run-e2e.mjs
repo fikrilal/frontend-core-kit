@@ -257,6 +257,98 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  if (request.method === "GET" && request.url === "/v1/me/sessions") {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    return contractJson(
+      response,
+      200,
+      "sessions list response",
+      fixtureContracts.sessionsListResponse,
+      {
+        data: sessions,
+        meta: { hasMore: false, limit: 25 },
+      },
+    );
+  }
+
+  const revokeMatch = request.url.match(
+    /^\/v1\/me\/sessions\/([^/]+)\/revoke$/,
+  );
+  if (request.method === "POST" && revokeMatch) {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const targetSessionId = decodeURIComponent(revokeMatch[1]);
+    if (targetSessionId === "missing-session-id") {
+      return problem(response, 404, "NOT_FOUND");
+    }
+
+    const session = sessions.find((item) => item.id === targetSessionId);
+    if (!session) {
+      return problem(response, 404, "NOT_FOUND");
+    }
+    session.revokedAt = new Date().toISOString();
+    session.status = "revoked";
+
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
+  if (request.method === "PATCH" && request.url === "/v1/me") {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.patchMeRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 422, "VALIDATION_FAILED");
+    if (parsed.profile.displayName === "conflict-display-name") {
+      return problem(response, 409, "CONFLICT");
+    }
+
+    const user = { ...(tokenUsers.get(accessTokenValue) ?? me) };
+    user.profile = {
+      ...user.profile,
+      displayName: parsed.profile.displayName ?? user.profile.displayName,
+      givenName: parsed.profile.givenName ?? user.profile.givenName,
+      familyName: parsed.profile.familyName ?? user.profile.familyName,
+    };
+    tokenUsers.set(accessTokenValue, user);
+
+    return contractJson(
+      response,
+      200,
+      "patch me response",
+      fixtureContracts.patchMeResponse,
+      { data: user },
+    );
+  }
+
   return problem(response, 404, "NOT_FOUND");
 });
 
@@ -365,6 +457,48 @@ const me = {
   },
   roles: ["USER"],
 };
+
+const sessions = [
+  {
+    createdAt: "2026-01-10T12:34:56.789Z",
+    current: true,
+    deviceId: "device-a",
+    deviceName: "Dante's iPhone",
+    expiresAt: "2026-02-10T12:34:56.789Z",
+    id: "e2e-session-current",
+    ip: "203.0.113.10",
+    lastSeenAt: "2026-01-10T12:34:56.789Z",
+    revokedAt: null,
+    status: "active",
+    userAgent: "Mozilla/5.0 (iPhone)",
+  },
+  {
+    createdAt: "2026-01-05T08:00:00.000Z",
+    current: false,
+    deviceId: "device-b",
+    deviceName: "Dante's MacBook",
+    expiresAt: "2026-02-05T08:00:00.000Z",
+    id: "e2e-session-old",
+    ip: "198.51.100.7",
+    lastSeenAt: "2026-01-08T20:15:00.000Z",
+    revokedAt: "2026-01-09T09:30:00.000Z",
+    status: "revoked",
+    userAgent: "Mozilla/5.0 (Macintosh)",
+  },
+  {
+    createdAt: "2026-01-01T00:00:00.000Z",
+    current: false,
+    deviceId: "device-c",
+    deviceName: "Unknown device",
+    expiresAt: "2026-02-01T00:00:00.000Z",
+    id: "missing-session-id",
+    ip: "192.0.2.1",
+    lastSeenAt: "2026-01-02T10:00:00.000Z",
+    revokedAt: null,
+    status: "expired",
+    userAgent: null,
+  },
+];
 
 const registeredMe = {
   ...me,
