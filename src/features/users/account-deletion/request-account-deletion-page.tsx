@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
 import { loadAuthenticatedUser } from "../../auth/session/load-authenticated-user";
+import { CancelAccountDeletionForm } from "./cancel-account-deletion-form";
 import { RequestAccountDeletionForm } from "./request-account-deletion-form";
 
 export async function RequestAccountDeletionPage() {
@@ -37,9 +38,12 @@ export async function RequestAccountDeletionPage() {
         </div>
 
         {result.ok && result.user.accountDeletion ? (
-          <p className="text-muted-foreground text-sm">
-            A deletion request is already in progress.
-          </p>
+          <>
+            <p className="text-muted-foreground text-sm">
+              A deletion request is already in progress.
+            </p>
+            <CancelAccountDeletionForm />
+          </>
         ) : (
           <RequestAccountDeletionForm />
         )}

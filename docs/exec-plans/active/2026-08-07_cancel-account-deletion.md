@@ -116,16 +116,16 @@ required for auth behavior, copy, and production rollout.
 
 ## Checklist
 
-- [ ] Add the generated-contract account-deletion cancel adapter and
+- [x] Add the generated-contract account-deletion cancel adapter and
       empty-response transport test.
-- [ ] Add safe failure mapping, authenticated Server Action, state, and form.
-- [ ] Add the cancel affordance to the `/app/account-deletion` page without
+- [x] Add safe failure mapping, authenticated Server Action, state, and form.
+- [x] Add the cancel affordance to the `/app/account-deletion` page without
       exposing credentials.
-- [ ] Extend the isolated fixture with authenticated cancel behavior.
-- [ ] Add unit, accessibility, browser, and visual coverage.
-- [ ] Update truthful API, testing, product-foundation, architecture, and
+- [x] Extend the isolated fixture with authenticated cancel behavior.
+- [x] Add unit, accessibility, browser, and visual coverage.
+- [x] Update truthful API, testing, product-foundation, architecture, and
       execution-plan docs.
-- [ ] Run full and runtime verification and record exact outcomes.
+- [x] Run full and runtime verification and record exact outcomes.
 
 ## Rollout And Rollback
 
@@ -146,11 +146,29 @@ account-deletion request surface remains usable.
 
 ## Verification
 
-- Not run yet.
+- Focused users tests passed: 59 Vitest tests across the account-deletion
+  cancel adapter transport (path, bearer header, empty 204), the cancel Server
+  Action (redirect, one-401-retry, second-401 invalidation, unavailable
+  mapping, revalidation on success), the failure mapper, and the existing users
+  flows.
+- Static lanes passed under Node 24: `format:check`, `contracts:check`, `lint`,
+  `typecheck`, `harness:check` (knowledge, architecture, maintainability,
+  public-pages).
+- `pnpm build` passed.
+- Full unit suite: 188 passed, 1 failed — the single failure is the pre-existing
+  `theme-toggle` `React.act` test that also fails on the clean base in this
+  environment; unrelated to this change.
 
 ## Runtime Evidence
 
-- Not run yet.
+- `pnpm verify:runtime` passed with 62 Chromium tests, including cancel success
+  with safe feedback, the already-scheduled state with the cancel affordance,
+  route protection, accessibility (landmarks, axe), and the two account-deletion
+  visual baselines.
+- The new `account-deletion-request.png` and `account-deletion-pending.png`
+  baselines were visually inspected before recording; the request baseline
+  shows the delete card with the request button, and the pending baseline shows
+  the in-progress banner with the cancel button.
 
 ## Follow-Up Debt
 

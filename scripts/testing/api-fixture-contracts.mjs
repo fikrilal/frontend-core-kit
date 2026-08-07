@@ -21,6 +21,7 @@ import {
   UsersMePatchResponse,
   UsersMeSessionsListResponse,
   UsersMeAccountDeletionRequestResponse,
+  UsersMeAccountDeletionCancelResponse,
 } from "../../src/contracts/lamara-api/runtime.generated.ts";
 
 export const fixtureContracts = Object.freeze({
@@ -46,6 +47,7 @@ export const fixtureContracts = Object.freeze({
   patchMeResponse: UsersMePatchResponse,
   sessionsListResponse: UsersMeSessionsListResponse,
   accountDeletionRequestResponse: UsersMeAccountDeletionRequestResponse,
+  accountDeletionCancelResponse: UsersMeAccountDeletionCancelResponse,
 });
 
 export function parseFixtureContract(boundary, schema, value) {

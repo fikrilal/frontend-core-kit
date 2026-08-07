@@ -115,6 +115,30 @@ const api = createServer(async (request, response) => {
 
   if (
     request.method === "POST" &&
+    request.url === "/v1/me/account-deletion/cancel"
+  ) {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    parseFixtureContract(
+      "account deletion cancel response",
+      fixtureContracts.accountDeletionCancelResponse,
+      undefined,
+    );
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
+  if (
+    request.method === "POST" &&
     request.url === "/v1/auth/password/register"
   ) {
     const body = await readJson(request);

@@ -316,6 +316,22 @@ test("account-deletion request surface has landmarks and no detectable WCAG A/AA
   await expectNoAccessibilityViolations(page);
 });
 
+test("account-deletion pending state exposes a cancel action and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("pending@example.com");
+  await page.getByLabel("Password").fill("test-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+
+  await page.goto("/app/account-deletion");
+  await expect(
+    page.getByRole("button", { name: "Cancel account deletion" }),
+  ).toBeVisible();
+  await expectNoAccessibilityViolations(page);
+});
+
 async function expectNoAccessibilityViolations(page: Page) {
   const results = await new AxePlaywrightBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

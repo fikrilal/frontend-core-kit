@@ -73,8 +73,8 @@ Implementation is split into independently reviewable plans:
     [Revoke current user session](completed/2026-08-07_revoke-current-user-session.md)
 12. **Completed:**
     [Change current user password](completed/2026-08-07_change-current-user-password.md)
-13. **Active:**
-    [Request account deletion](active/2026-08-07_request-account-deletion.md)
+13. **Completed:**
+    [Request account deletion](completed/2026-08-07_request-account-deletion.md)
 14. **Active:**
     [Cancel account deletion](active/2026-08-07_cancel-account-deletion.md)
 

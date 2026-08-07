@@ -1,7 +1,7 @@
 # 2026-08-07 Request Account Deletion
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the authenticated `POST /v1/me/account-deletion/request` slice against the committed generated contract; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -172,7 +172,7 @@ existing authenticated foundation remains usable.
 ## Runtime Evidence
 
 - `pnpm verify:runtime` passed with 59 Chromium tests, including account-deletion
-  request success, the pending-deletion state (via a fixture user with
+  request success, the already-scheduled state (via a fixture user with
   `accountDeletion` set), route protection, accessibility (landmarks, axe), and
   the new account-deletion visual baseline.
 - The new `account-deletion-request.png` baseline was visually inspected before

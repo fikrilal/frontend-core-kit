@@ -28,7 +28,8 @@ Implemented routes:
 - `/app/password`: authenticated change-password form through
   `POST /v1/auth/password/change`;
 - `/app/account-deletion`: authenticated account-deletion request through
-  `POST /v1/me/account-deletion/request`.
+  `POST /v1/me/account-deletion/request`, with cancellation of a pending
+  request through `POST /v1/me/account-deletion/cancel`.
 
 Theme preference is the only client-owned application state and lives in
 `localStorage`. Authentication state is server-owned.
