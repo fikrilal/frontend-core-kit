@@ -280,6 +280,37 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  const revokeMatch = request.url.match(
+    /^\/v1\/me\/sessions\/([^/]+)\/revoke$/,
+  );
+  if (request.method === "POST" && revokeMatch) {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const targetSessionId = decodeURIComponent(revokeMatch[1]);
+    if (targetSessionId === "missing-session-id") {
+      return problem(response, 404, "NOT_FOUND");
+    }
+
+    const session = sessions.find((item) => item.id === targetSessionId);
+    if (!session) {
+      return problem(response, 404, "NOT_FOUND");
+    }
+    session.revokedAt = new Date().toISOString();
+    session.status = "revoked";
+
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
   if (request.method === "PATCH" && request.url === "/v1/me") {
     if (!request.headers.authorization?.startsWith("Bearer ")) {
       return problem(response, 401, "UNAUTHORIZED");
@@ -453,6 +484,19 @@ const sessions = [
     revokedAt: "2026-01-09T09:30:00.000Z",
     status: "revoked",
     userAgent: "Mozilla/5.0 (Macintosh)",
+  },
+  {
+    createdAt: "2026-01-01T00:00:00.000Z",
+    current: false,
+    deviceId: "device-c",
+    deviceName: "Unknown device",
+    expiresAt: "2026-02-01T00:00:00.000Z",
+    id: "missing-session-id",
+    ip: "192.0.2.1",
+    lastSeenAt: "2026-01-02T10:00:00.000Z",
+    revokedAt: null,
+    status: "expired",
+    userAgent: null,
   },
 ];
 
