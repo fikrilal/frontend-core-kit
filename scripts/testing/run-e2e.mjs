@@ -139,6 +139,48 @@ const api = createServer(async (request, response) => {
 
   if (
     request.method === "POST" &&
+    request.url === "/v1/me/profile-image/upload"
+  ) {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.profileImageUploadRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 422, "VALIDATION_FAILED");
+    if (parsed.sizeBytes === 123) {
+      return problem(response, 429, "RATE_LIMITED");
+    }
+
+    return contractJson(
+      response,
+      200,
+      "profile image upload response",
+      fixtureContracts.profileImageUploadResponse,
+      {
+        data: {
+          expiresAt: "2026-08-07T12:40:00.000Z",
+          fileId: "e2e-profile-image-file-id",
+          upload: {
+            headers: { "Content-Type": parsed.contentType },
+            method: "PUT",
+            url: "https://r2.example.com/e2e-upload",
+          },
+        },
+      },
+    );
+  }
+
+  if (
+    request.method === "POST" &&
     request.url === "/v1/auth/password/register"
   ) {
     const body = await readJson(request);

@@ -1564,6 +1564,8 @@ components:
           example: https://<r2-presigned-url>
         headers:
           type: object
+          additionalProperties:
+            type: string
           example:
             Content-Type: image/webp
           description: Headers that must be sent with the upload request.

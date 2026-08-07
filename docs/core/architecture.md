@@ -22,7 +22,8 @@ Implemented routes:
 - `/`: generic under-development landing page;
 - `/login`: email/password login;
 - `/app`: protected current-user proof, not a product dashboard;
-- `/app/profile`: authenticated profile editor through `PATCH /v1/me`;
+- `/app/profile`: authenticated profile editor through `PATCH /v1/me`, with a
+  profile-image upload-plan action through `POST /v1/me/profile-image/upload`;
 - `/app/sessions`: authenticated sessions list through `GET /v1/me/sessions`
   with per-session revocation through `POST /v1/me/sessions/{sessionId}/revoke`;
 - `/app/password`: authenticated change-password form through
@@ -101,6 +102,7 @@ src/features/users/
   index.ts                         public route entry points
   server/                          shared contract-backed users API adapters
   profile/                         profile update flow
+  profile-image/                   profile image upload-plan flow
   sessions/                        sessions list and revoke flows
   account-deletion/                account-deletion request flow
 ```

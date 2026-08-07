@@ -983,7 +983,9 @@ export type components = {
        *       "Content-Type": "image/webp"
        *     }
        */
-      readonly headers: Record<string, never>;
+      readonly headers: {
+        readonly [key: string]: string;
+      };
       /**
        * @example PUT
        * @enum {string}

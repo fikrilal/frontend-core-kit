@@ -1,7 +1,7 @@
 # 2026-08-07 Cancel Account Deletion
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the authenticated `POST /v1/me/account-deletion/cancel` slice against the committed generated contract; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -165,10 +165,9 @@ account-deletion request surface remains usable.
   with safe feedback, the already-scheduled state with the cancel affordance,
   route protection, accessibility (landmarks, axe), and the two account-deletion
   visual baselines.
-- The new `account-deletion-request.png` and `account-deletion-pending.png`
-  baselines were visually inspected before recording; the request baseline
-  shows the delete card with the request button, and the pending baseline shows
-  the in-progress banner with the cancel button.
+- The two account-deletion baselines were visually inspected before recording;
+  the request baseline shows the delete card with the request button, and the
+  in-progress baseline shows the banner with the cancel button.
 
 ## Follow-Up Debt
 

@@ -2,12 +2,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   cancelAccountDeletion,
+  createProfileImageUploadPlan,
   listSessions,
   patchCurrentUser,
   requestAccountDeletion,
   revokeSession,
   type PatchMeData,
   type PatchMeInput,
+  type ProfileImageUploadData,
+  type ProfileImageUploadInput,
   type SessionsListData,
 } from "./users-api";
 
@@ -62,6 +65,21 @@ const sessions = [
     userAgent: "Mozilla/5.0 (Macintosh)",
   },
 ] satisfies SessionsListData;
+
+const uploadPlanInput = {
+  contentType: "image/webp",
+  sizeBytes: 123456,
+} satisfies ProfileImageUploadInput;
+
+const uploadPlanData = {
+  expiresAt: "2026-01-10T12:40:00.000Z",
+  fileId: "file-id",
+  upload: {
+    headers: { "Content-Type": "image/webp" },
+    method: "PUT",
+    url: "https://r2.example.com/upload",
+  },
+} satisfies ProfileImageUploadData;
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -271,6 +289,37 @@ describe("users API", () => {
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("authorization")).toBe("Bearer access-token");
     expect(await captured.text()).toBe("");
+  });
+
+  it("creates a profile image upload plan with a bearer token and validates the envelope", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(jsonResponse({ data: uploadPlanData }));
+    });
+
+    const result = await createProfileImageUploadPlan(
+      uploadPlanInput,
+      "access-token",
+    );
+
+    expect(result).toMatchObject({
+      ok: true,
+      data: uploadPlanData,
+      status: 200,
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe(
+      "https://api.lamara.dev/v1/me/profile-image/upload",
+    );
+    expect(captured.method).toBe("POST");
+    expect(captured.cache).toBe("no-store");
+    expect(captured.headers.get("authorization")).toBe("Bearer access-token");
+    expect(await captured.json()).toEqual(uploadPlanInput);
   });
 });
 

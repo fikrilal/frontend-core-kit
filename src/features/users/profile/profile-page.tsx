@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
 import { loadAuthenticatedUser } from "../../auth/session/load-authenticated-user";
+import { ProfileImageUploadPlanForm } from "../profile-image/upload-plan-form";
 import { UpdateProfileForm } from "./update-profile-form";
 
 export async function ProfilePage() {
@@ -36,11 +37,16 @@ export async function ProfilePage() {
         </div>
 
         {result.ok ? (
-          <UpdateProfileForm
-            displayName={result.user.profile.displayName}
-            givenName={result.user.profile.givenName}
-            familyName={result.user.profile.familyName}
-          />
+          <>
+            <UpdateProfileForm
+              displayName={result.user.profile.displayName}
+              givenName={result.user.profile.givenName}
+              familyName={result.user.profile.familyName}
+            />
+            <div className="border-border bg-muted/40 mt-6 rounded-lg border p-4">
+              <ProfileImageUploadPlanForm />
+            </div>
+          </>
         ) : (
           <p className="text-muted-foreground text-sm">
             Your profile is temporarily unavailable. Try again in a moment.

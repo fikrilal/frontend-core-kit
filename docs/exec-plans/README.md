@@ -75,8 +75,16 @@ Implementation is split into independently reviewable plans:
     [Change current user password](completed/2026-08-07_change-current-user-password.md)
 13. **Completed:**
     [Request account deletion](completed/2026-08-07_request-account-deletion.md)
-14. **Active:**
-    [Cancel account deletion](active/2026-08-07_cancel-account-deletion.md)
+14. **Completed:**
+    [Cancel account deletion](completed/2026-08-07_cancel-account-deletion.md)
+15. **Active:**
+    [Profile image upload plan](active/2026-08-07_profile-image-upload-plan.md)
+16. **Queued:**
+    [Profile image upload complete](queued/2026-08-07_profile-image-upload-complete.md)
+17. **Queued:**
+    [Profile image url](queued/2026-08-07_profile-image-url.md)
+18. **Queued:**
+    [Profile image clear](queued/2026-08-07_profile-image-clear.md)
 
 ## Agent Harness Sequence
 

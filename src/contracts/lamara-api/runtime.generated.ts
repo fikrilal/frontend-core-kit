@@ -350,7 +350,7 @@ export const PresignedUploadDto = zod.object({
   method: zod.enum(["PUT"]),
   url: zod.string(),
   headers: zod
-    .looseObject({})
+    .record(zod.string(), zod.string())
     .describe("Headers that must be sent with the upload request."),
 });
 

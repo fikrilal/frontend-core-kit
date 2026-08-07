@@ -4,6 +4,7 @@ import type { operations } from "@/contracts/lamara-api";
 import {
   UsersMePatchResponse,
   UsersMeSessionsListResponse,
+  UsersMeProfileImageUploadResponse,
 } from "@/contracts/lamara-api/runtime";
 import {
   createConfiguredLamaraApiClient,
@@ -17,6 +18,7 @@ const sessionsPath = "/v1/me/sessions" as const;
 const revokeSessionPath = "/v1/me/sessions/{sessionId}/revoke" as const;
 const accountDeletionRequestPath = "/v1/me/account-deletion/request" as const;
 const accountDeletionCancelPath = "/v1/me/account-deletion/cancel" as const;
+const profileImageUploadPath = "/v1/me/profile-image/upload" as const;
 const usersRequestTimeoutMs = 10_000;
 
 type PatchMeOperation = operations["users.me.patch"];
@@ -27,6 +29,9 @@ type SessionsListEnvelope =
   SessionsListOperation["responses"][200]["content"]["application/json"];
 type RevokeSessionOperation = operations["users.me.sessions.revoke"];
 type RevokeSessionPath = RevokeSessionOperation["parameters"]["path"];
+type ProfileImageUploadOperation = operations["users.me.profileImage.upload"];
+type ProfileImageUploadEnvelope =
+  ProfileImageUploadOperation["responses"][200]["content"]["application/json"];
 
 export type PatchMeInput =
   PatchMeOperation["requestBody"]["content"]["application/json"];
@@ -34,6 +39,9 @@ export type PatchMeData = PatchMeEnvelope["data"];
 export type SessionsListData = SessionsListEnvelope["data"];
 export type SessionsListMeta = SessionsListEnvelope["meta"];
 export type RevokeSessionInput = RevokeSessionPath["sessionId"];
+export type ProfileImageUploadInput =
+  ProfileImageUploadOperation["requestBody"]["content"]["application/json"];
+export type ProfileImageUploadData = ProfileImageUploadEnvelope["data"];
 
 export async function patchCurrentUser(
   input: PatchMeInput,
@@ -119,4 +127,22 @@ export async function cancelAccountDeletion(
   });
 
   return readEmptyApiResult(request);
+}
+
+export async function createProfileImageUploadPlan(
+  input: ProfileImageUploadInput,
+  accessToken: string,
+): Promise<ApiResult<ProfileImageUploadData>> {
+  const client = createConfiguredLamaraApiClient();
+  const request = client.POST(profileImageUploadPath, {
+    body: input,
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    parseAs: "text",
+    signal: AbortSignal.timeout(usersRequestTimeoutMs),
+  });
+
+  return readApiResult(request, UsersMeProfileImageUploadResponse);
 }
