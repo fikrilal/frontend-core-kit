@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
 import { loadSessions } from "./load-sessions";
+import { RevokeSessionForm } from "./revoke-session-form";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -68,6 +69,9 @@ export async function SessionsPage() {
                     {session.status}
                   </span>
                 </div>
+                {session.current ? null : (
+                  <RevokeSessionForm sessionId={session.id} />
+                )}
               </li>
             ))}
           </ul>

@@ -266,6 +266,7 @@ test("sessions list has landmarks, labelled statuses, and no detectable WCAG A/A
   await expect(
     page.getByRole("status").filter({ hasText: "revoked" }),
   ).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Revoke" })).toHaveCount(2);
   await expectNoAccessibilityViolations(page);
 });
 

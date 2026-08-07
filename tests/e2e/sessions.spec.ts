@@ -16,6 +16,37 @@ test("lists the current user sessions", async ({ page }) => {
   await expect(page.getByText("revoked")).toBeVisible();
 });
 
+test("revokes a session and shows safe success feedback", async ({ page }) => {
+  await signIn(page);
+
+  await page.goto("/app/sessions");
+
+  // The current session has no revoke affordance.
+  const currentRow = page.locator("li", { hasText: "Dante's iPhone" });
+  await expect(currentRow.getByRole("button", { name: "Revoke" })).toHaveCount(
+    0,
+  );
+
+  const oldRow = page.locator("li", { hasText: "Dante's MacBook" });
+  await oldRow.getByRole("button", { name: "Revoke" }).click();
+
+  await expect(oldRow.getByRole("status").getByText("Revoked.")).toBeVisible();
+  await expect(oldRow.getByRole("button", { name: "Revoke" })).toBeDisabled();
+});
+
+test("maps a missing session to safe feedback", async ({ page }) => {
+  await signIn(page);
+
+  await page.goto("/app/sessions");
+  const row = page.locator("li", { hasText: "Unknown device" });
+  await row.getByRole("button", { name: "Revoke" }).click();
+
+  await expect(
+    row.getByRole("alert").getByText("This session no longer exists."),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/app\/sessions$/);
+});
+
 test("protects the sessions route", async ({ page }) => {
   await page.goto("/app/sessions");
   await expect(page).toHaveURL(/\/login$/);
