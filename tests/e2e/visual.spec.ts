@@ -186,6 +186,32 @@ test("sessions list matches its visual baseline", async ({ page }) => {
   await expect(page).toHaveScreenshot("sessions.png", screenshotOptions);
 });
 
+test("change-password page and its error state match their visual baselines", async ({
+  page,
+}) => {
+  await openWithTheme(page, "/login", "light");
+  await page.getByLabel("Email").fill("user@example.com");
+  await page.getByLabel("Password").fill("test-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+
+  await page.goto("/app/password");
+  await expect(page).toHaveTitle("Change password | Lamara");
+  await expect(page).toHaveScreenshot("change-password.png", screenshotOptions);
+
+  await page.getByLabel("Current password").fill("wrong-password");
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("new-password-10");
+  await page.getByLabel("Confirm new password").fill("new-password-10");
+  await page.getByRole("button", { name: "Change password" }).click();
+  await expect(page.locator("#change-password-error")).toBeVisible();
+  await expect(page).toHaveScreenshot(
+    "change-password-error.png",
+    screenshotOptions,
+  );
+});
+
 async function openWithTheme(
   page: Page,
   path: string,

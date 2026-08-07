@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  changePassword,
   getCurrentUser,
   confirmPasswordReset,
   loginWithPassword,
@@ -11,6 +12,7 @@ import {
   verifyEmail,
   type CurrentUserData,
   type EmailVerifyInput,
+  type PasswordChangeInput,
   type PasswordLoginData,
   type PasswordLoginInput,
   type PasswordResetConfirmInput,
@@ -30,6 +32,11 @@ const registerInput = {
   email: "new-user@example.com",
   password: "correct horse battery staple",
 } satisfies PasswordRegisterInput;
+
+const passwordChangeInput = {
+  currentPassword: "correct horse battery staple",
+  newPassword: "new-correct-password-10",
+} satisfies PasswordChangeInput;
 
 const emailVerifyInput = {
   token: "verification-token",
@@ -180,6 +187,38 @@ describe("auth API", () => {
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
     expect(await captured.json()).toEqual(emailVerifyInput);
+  });
+
+  it("changes the password with a bearer token and validates the empty response", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(
+        new Response(null, {
+          status: 204,
+          headers: { "X-Request-Id": "backend-request-id" },
+        }),
+      );
+    });
+
+    const result = await changePassword(passwordChangeInput, "access-token");
+
+    expect(result).toEqual({
+      ok: true,
+      data: undefined,
+      status: 204,
+      traceId: "backend-request-id",
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe("https://api.lamara.dev/v1/auth/password/change");
+    expect(captured.method).toBe("POST");
+    expect(captured.cache).toBe("no-store");
+    expect(captured.headers.get("authorization")).toBe("Bearer access-token");
+    expect(await captured.json()).toEqual(passwordChangeInput);
   });
 
   it("resends email verification with the server-owned access token", async () => {

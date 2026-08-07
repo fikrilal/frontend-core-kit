@@ -25,7 +25,9 @@ The auth/session foundation also includes:
   and family name through `PATCH /v1/me`;
 - `/app/sessions`: authenticated read-only list of the current user's sessions
   through `GET /v1/me/sessions`, with per-session revocation through
-  `POST /v1/me/sessions/{sessionId}/revoke`.
+  `POST /v1/me/sessions/{sessionId}/revoke`;
+- `/app/password`: authenticated change-password form through
+  `POST /v1/auth/password/change`.
 
 When the current user is not email-verified, `/app` also provides a
 server-owned resend-verification action with safe success and rate-limit
@@ -34,7 +36,8 @@ feedback. This remains authentication infrastructure, not a product workflow.
 `/app/profile` is an authenticated account-infrastructure surface: it edits the
 profile fields already exposed by the current-user API. `/app/sessions` lists
 the devices signed in to the account and lets the user revoke non-current
-sessions. Neither is a product dashboard or an account-management suite.
+sessions. `/app/password` changes the account password. None of these is a
+product dashboard or an account-management suite.
 
 These routes prove infrastructure only. `/app` is not a product dashboard and
 must not introduce navigation, reports, account management, or wedding

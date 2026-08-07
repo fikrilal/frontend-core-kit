@@ -69,8 +69,10 @@ Implementation is split into independently reviewable plans:
    [Patch current user profile](completed/2026-08-06_patch-current-user-profile.md)
 10. **Completed:**
     [List current user sessions](completed/2026-08-07_list-current-user-sessions.md)
-11. **Active:**
-    [Revoke current user session](active/2026-08-07_revoke-current-user-session.md)
+11. **Completed:**
+    [Revoke current user session](completed/2026-08-07_revoke-current-user-session.md)
+12. **Active:**
+    [Change current user password](active/2026-08-07_change-current-user-password.md)
 
 ## Agent Harness Sequence
 

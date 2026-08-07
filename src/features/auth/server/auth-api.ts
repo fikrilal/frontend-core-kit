@@ -15,6 +15,7 @@ import {
 
 const passwordLoginPath = "/v1/auth/password/login" as const;
 const passwordRegisterPath = "/v1/auth/password/register" as const;
+const passwordChangePath = "/v1/auth/password/change" as const;
 const emailVerifyPath = "/v1/auth/email/verify" as const;
 const passwordResetRequestPath = "/v1/auth/password/reset/request" as const;
 const passwordResetConfirmPath = "/v1/auth/password/reset/confirm" as const;
@@ -26,6 +27,7 @@ const authRequestTimeoutMs = 10_000;
 
 type PasswordLoginOperation = operations["auth.password.login"];
 type PasswordRegisterOperation = operations["auth.password.register"];
+type PasswordChangeOperation = operations["auth.password.change"];
 type EmailVerifyOperation = operations["auth.email.verify"];
 type PasswordResetRequestOperation = operations["auth.password.reset.request"];
 type PasswordResetConfirmOperation = operations["auth.password.reset.confirm"];
@@ -42,6 +44,8 @@ export type PasswordLoginInput =
 export type PasswordLoginData = PasswordLoginEnvelope["data"];
 export type PasswordRegisterInput =
   PasswordRegisterOperation["requestBody"]["content"]["application/json"];
+export type PasswordChangeInput =
+  PasswordChangeOperation["requestBody"]["content"]["application/json"];
 export type EmailVerifyInput =
   EmailVerifyOperation["requestBody"]["content"]["application/json"];
 export type PasswordResetRequestInput =
@@ -72,6 +76,24 @@ export async function verifyEmail(
   const request = client.POST(emailVerifyPath, {
     body: input,
     cache: "no-store",
+    parseAs: "text",
+    signal: AbortSignal.timeout(authRequestTimeoutMs),
+  });
+
+  return readEmptyApiResult(request);
+}
+
+export async function changePassword(
+  input: PasswordChangeInput,
+  accessToken: string,
+): Promise<ApiResult<undefined>> {
+  const client = createConfiguredLamaraApiClient();
+  const request = client.POST(passwordChangePath, {
+    body: input,
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
     parseAs: "text",
     signal: AbortSignal.timeout(authRequestTimeoutMs),
   });

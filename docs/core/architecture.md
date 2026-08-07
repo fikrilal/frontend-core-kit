@@ -24,7 +24,9 @@ Implemented routes:
 - `/app`: protected current-user proof, not a product dashboard;
 - `/app/profile`: authenticated profile editor through `PATCH /v1/me`;
 - `/app/sessions`: authenticated sessions list through `GET /v1/me/sessions`
-  with per-session revocation through `POST /v1/me/sessions/{sessionId}/revoke`.
+  with per-session revocation through `POST /v1/me/sessions/{sessionId}/revoke`;
+- `/app/password`: authenticated change-password form through
+  `POST /v1/auth/password/change`.
 
 Theme preference is the only client-owned application state and lives in
 `localStorage`. Authentication state is server-owned.
@@ -75,6 +77,7 @@ src/features/auth/
   login/                           sign-in flow
   register/                        account-creation flow
   password-reset/                  request and confirmation flows
+  password-change/                 authenticated change-password flow
   email-verification/              public verification-link flow
   session/                         session establishment, loading, logout
 ```

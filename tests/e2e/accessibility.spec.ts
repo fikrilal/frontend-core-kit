@@ -270,6 +270,42 @@ test("sessions list has landmarks, labelled statuses, and no detectable WCAG A/A
   await expectNoAccessibilityViolations(page);
 });
 
+test("change-password form exposes labels, password guidance, and no detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await signIn(page);
+  await page.goto("/app/password");
+  await expect(page).toHaveTitle("Change password | Lamara");
+  await expectNoAccessibilityViolations(page);
+
+  await expect(
+    page.getByLabel("New password", { exact: true }),
+  ).toHaveAttribute("minlength", "10");
+  await expect(page.getByLabel("Confirm new password")).toHaveAttribute(
+    "autocomplete",
+    "new-password",
+  );
+
+  await page.getByLabel("Current password").focus();
+  await expectKeyboardFocusIndicator(page.getByLabel("Current password"));
+  await page.keyboard.press("Tab");
+  await expect(page.getByLabel("New password", { exact: true })).toBeFocused();
+
+  await page.getByLabel("Current password").fill("wrong-password");
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("new-password-10");
+  await page.getByLabel("Confirm new password").fill("new-password-10");
+  await page.getByRole("button", { name: "Change password" }).click();
+  const error = page.locator("#change-password-error");
+  await expect(error).toBeVisible();
+  await expect(page.getByLabel("Current password")).toHaveAttribute(
+    "aria-describedby",
+    "change-password-error",
+  );
+  await expectNoAccessibilityViolations(page);
+});
+
 async function expectNoAccessibilityViolations(page: Page) {
   const results = await new AxePlaywrightBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

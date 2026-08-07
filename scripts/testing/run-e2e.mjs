@@ -46,6 +46,31 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  if (request.method === "POST" && request.url === "/v1/auth/password/change") {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.changePasswordRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 422, "VALIDATION_FAILED");
+    if (parsed.currentPassword === "wrong-password") {
+      return problem(response, 400, "AUTH_CURRENT_PASSWORD_INVALID");
+    }
+
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
   if (
     request.method === "POST" &&
     request.url === "/v1/auth/password/register"
