@@ -199,7 +199,7 @@ function createService(
     refresh,
     now: () => now,
     createSessionId: () => sessionId,
-    createLockOwner: () => crypto.randomUUID(),
+    createLockOwner: () => `${sessionId}-lock-${now}`,
   });
 }
 

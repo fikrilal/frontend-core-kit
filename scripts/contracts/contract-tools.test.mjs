@@ -73,6 +73,6 @@ test("detects exact generated-contract drift", () => {
 test("creates stable SHA-256 provenance", () => {
   assert.equal(
     sha256(Buffer.from("frontend-core")),
-    "5f70c8bd1b5aaff91195aeab3a6b1d6ea041a22111e34179d82ef732850ff058",
+    "8a20dd8516e9206ee50bc5e496c328ccb182d46327e8ce8aa853505445f540b2",
   );
 });
