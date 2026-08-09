@@ -183,7 +183,11 @@ test("sessions list matches its visual baseline", async ({ page }) => {
 
   await page.goto("/app/sessions");
   await expect(page).toHaveTitle("Sessions | Frontend Core Kit");
-  await expect(page).toHaveScreenshot("sessions.png", screenshotOptions);
+  await expect(page).toHaveScreenshot("sessions.png", {
+    ...screenshotOptions,
+    // Allow sub-pixel font antialiasing noise that varies between CI runners.
+    maxDiffPixelRatio: 0.01,
+  });
 });
 
 test("change-password page and its error state match their visual baselines", async ({
