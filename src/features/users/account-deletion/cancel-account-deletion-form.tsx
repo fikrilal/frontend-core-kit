@@ -39,7 +39,7 @@ export function CancelAccountDeletionForm() {
           id="cancel-account-deletion-error"
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             Canceling account deletion is temporarily unavailable. Please try
             again.
           </AlertDescription>

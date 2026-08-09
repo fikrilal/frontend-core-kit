@@ -62,7 +62,7 @@ export function RegisterForm() {
 
       {state.error ? (
         <Alert aria-live="polite" id="register-error" variant="destructive">
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForRegisterError(state.error)}
           </AlertDescription>
         </Alert>

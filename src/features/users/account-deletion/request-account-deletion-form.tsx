@@ -43,7 +43,7 @@ export function RequestAccountDeletionForm() {
           id="request-account-deletion-error"
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForRequestAccountDeletionError(state.error)}
           </AlertDescription>
         </Alert>

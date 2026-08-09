@@ -42,7 +42,7 @@ export function EmailVerificationResendForm() {
           id="email-verification-resend-error"
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForEmailVerificationResendError(state.error)}
           </AlertDescription>
         </Alert>

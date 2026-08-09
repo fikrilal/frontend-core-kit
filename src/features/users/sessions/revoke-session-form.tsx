@@ -46,7 +46,7 @@ export function RevokeSessionForm({ sessionId }: RevokeSessionFormProps) {
           id={`revoke-session-error-${sessionId}`}
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForRevokeSessionError(state.error)}
           </AlertDescription>
         </Alert>

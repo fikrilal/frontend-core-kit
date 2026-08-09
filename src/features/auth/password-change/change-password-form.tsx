@@ -108,7 +108,7 @@ export function ChangePasswordForm() {
           id="change-password-error"
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForChangePasswordError(state.error)}
           </AlertDescription>
         </Alert>

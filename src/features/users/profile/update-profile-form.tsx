@@ -193,7 +193,7 @@ export function UpdateProfileForm({
           id="update-profile-error"
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForUpdateProfileError(state.error)}
           </AlertDescription>
         </Alert>

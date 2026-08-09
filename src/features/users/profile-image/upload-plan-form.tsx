@@ -57,7 +57,7 @@ export function ProfileImageUploadPlanForm() {
                 id="profile-image-upload-error"
                 variant="destructive"
               >
-                <AlertDescription className="!text-destructive">
+                <AlertDescription className="text-destructive!">
                   {messageForProfileImageUploadError(state.error)}
                 </AlertDescription>
               </Alert>

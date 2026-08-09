@@ -47,7 +47,7 @@ export function CompleteProfileImageUploadForm({
           id="profile-image-complete-error"
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForCompleteProfileImageUploadError(state.error)}
           </AlertDescription>
         </Alert>

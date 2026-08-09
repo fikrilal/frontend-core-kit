@@ -57,7 +57,7 @@ function VerificationError({
 }>) {
   return error ? (
     <Alert aria-live="polite" id={id} variant="destructive">
-      <AlertDescription className="!text-destructive">
+      <AlertDescription className="text-destructive!">
         {messageForEmailVerificationError(error)}
       </AlertDescription>
     </Alert>

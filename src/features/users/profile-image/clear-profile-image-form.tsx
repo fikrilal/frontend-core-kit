@@ -37,7 +37,7 @@ export function ClearProfileImageForm() {
           id="clear-profile-image-error"
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             Removing your profile image is temporarily unavailable. Please try
             again.
           </AlertDescription>

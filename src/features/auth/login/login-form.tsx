@@ -45,7 +45,7 @@ export function LoginForm() {
 
       {state.error ? (
         <Alert aria-live="polite" id="login-error" variant="destructive">
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForLoginError(state.error)}
           </AlertDescription>
         </Alert>

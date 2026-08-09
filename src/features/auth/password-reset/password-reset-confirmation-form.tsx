@@ -87,7 +87,7 @@ function ConfirmationError({
 }>) {
   return error ? (
     <Alert aria-live="polite" id={id} variant="destructive">
-      <AlertDescription className="!text-destructive">
+      <AlertDescription className="text-destructive!">
         {messageForPasswordResetConfirmationError(error)}
       </AlertDescription>
     </Alert>

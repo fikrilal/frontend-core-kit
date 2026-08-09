@@ -61,7 +61,7 @@ export function PasswordResetRequestForm() {
           id="password-reset-error"
           variant="destructive"
         >
-          <AlertDescription className="!text-destructive">
+          <AlertDescription className="text-destructive!">
             {messageForPasswordResetError(state.error)}
           </AlertDescription>
         </Alert>
