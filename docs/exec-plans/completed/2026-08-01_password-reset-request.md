@@ -1,7 +1,7 @@
 # 2026-08-01 Password Reset Request
 
 **Plan version:** 2
-**Status:** queued
+**Status:** completed
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the public password-reset-request slice
@@ -113,7 +113,7 @@ copy, privacy invariants, and any later token-confirmation design.
 - [x] Extend the isolated fixture with contract-valid 204 and rate-limit cases.
 - [x] Add unit, accessibility, browser, and visual coverage without account enumeration.
 - [x] Run full and runtime verification and record the exact outcomes.
-- [ ] Move this plan to completed only after independent review and hosted CI.
+- [x] Move this plan to completed only after independent review and hosted CI.
 
 ## Rollout And Rollback
 

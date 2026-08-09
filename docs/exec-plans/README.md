@@ -52,47 +52,13 @@ Implementation is split into independently reviewable plans:
 1. **Completed:**
    [API contract foundation](completed/2026-07-28_api-contract-foundation.md)
 2. **Completed:**
-   [Password login API client slice](completed/2026-07-28_password-login-api-client.md)
-3. **Completed:**
-   [Generated runtime contracts and Node 24](completed/2026-07-29_generated-runtime-contracts-node24.md)
-4. **Completed:**
    [Generic auth and session foundation](completed/2026-07-30_generic-auth-session-foundation.md)
-5. **Completed:**
+3. **Completed:**
+   [Password reset request](completed/2026-08-01_password-reset-request.md)
+4. **Completed:**
    [Password reset confirmation](completed/2026-08-02_password-reset-confirmation.md)
-6. **Queued:**
-   [Password reset request](queued/2026-08-01_password-reset-request.md)
-7. **Completed:**
+5. **Completed:**
    [Email verification](completed/2026-08-02_email-verification.md)
-8. **Completed:**
-   [Email verification resend](completed/2026-08-02_email-verification-resend.md)
-9. **Completed:**
-   [Patch current user profile](completed/2026-08-06_patch-current-user-profile.md)
-10. **Completed:**
-    [List current user sessions](completed/2026-08-07_list-current-user-sessions.md)
-11. **Completed:**
-    [Revoke current user session](completed/2026-08-07_revoke-current-user-session.md)
-12. **Completed:**
-    [Change current user password](completed/2026-08-07_change-current-user-password.md)
-13. **Completed:**
-    [Request account deletion](completed/2026-08-07_request-account-deletion.md)
-14. **Completed:**
-    [Cancel account deletion](completed/2026-08-07_cancel-account-deletion.md)
-15. **Completed:**
-    [Profile image upload plan](completed/2026-08-07_profile-image-upload-plan.md)
-16. **Completed:**
-    [Profile image upload complete](completed/2026-08-07_profile-image-upload-complete.md)
-17. **Completed:**
-    [Profile image url](completed/2026-08-07_profile-image-url.md)
-18. **Completed:**
-    [Profile image clear](completed/2026-08-07_profile-image-clear.md)
-19. **Completed:**
-    [Shadcn default foundation](completed/2026-08-10_shadcn-default-foundation.md)
-20. **Completed:**
-    [Shadcn default auth migration](completed/2026-08-10_shadcn-default-auth-migration.md)
-21. **Completed:**
-    [Shadcn default users migration](completed/2026-08-10_shadcn-default-users-migration.md)
-22. **Completed:**
-    [Shadcn default marketing migration](completed/2026-08-10_shadcn-default-marketing-migration.md)
 
 ## Agent Harness Sequence
 
@@ -100,32 +66,8 @@ The accepted direction is documented in the
 [agent-first harness and loop engineering proposal](../planning/agent-harness-loop-engineering-proposal.md).
 
 1. **Completed:**
-   [Executable intent and knowledge](completed/2026-08-01_agent-harness-phase-1.md)
-2. **Completed:**
-   [Independent integration proof](completed/2026-08-01_agent-harness-phase-2.md)
-3. **Completed:**
-   [Maintainability fitness](completed/2026-08-01_agent-harness-phase-3-1.md)
-4. **Completed:**
-   [Contract fixtures and backend preflight](completed/2026-08-01_agent-harness-phase-3-2.md)
-5. **Completed:**
-   [Accessibility fitness](completed/2026-08-01_agent-harness-phase-3-3.md)
-6. **Completed:**
-   [Repository-owned visual evidence](completed/2026-08-01_agent-harness-phase-3-4.md)
-7. **Completed:**
-   [Task-oriented verification](completed/2026-08-01_agent-harness-phase-4-1-task-verification.md)
-8. **Completed:**
-   [Scope and repair bounds](completed/2026-08-01_agent-harness-phase-4-2-scope-repair-bounds.md)
-9. **Completed:**
-   [Authorized PR loop](completed/2026-08-01_agent-harness-phase-4-3-authorized-pr-loop.md)
-10. **Completed:**
-    [Password registration](completed/2026-08-01_auth-password-registration.md)
-11. **Completed:**
-    [Operating proof](completed/2026-08-01_agent-harness-phase-4-4-operating-proof.md)
-12. **Completed:**
-    [Harness evidence lifecycle reconciliation](completed/2026-08-03_harness-evidence-lifecycle.md)
-13. **Completed:**
-    [Repair boundary diagnostics](completed/2026-08-03_phase-5-repair-boundary-diagnostics.md)
-14. **Queued:**
-    [Controlled hill climbing](queued/2026-08-03_agent-harness-phase-5-controlled-hill-climbing.md)
+   [Password registration](completed/2026-08-01_auth-password-registration.md)
+2. **Queued:**
+   [Controlled hill climbing](queued/2026-08-03_agent-harness-phase-5-controlled-hill-climbing.md)
 
 Do not introduce product workflows until a real product decision exists.
