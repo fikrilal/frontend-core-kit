@@ -23,6 +23,7 @@ const accountDeletionCancelPath = "/v1/me/account-deletion/cancel" as const;
 const profileImageUploadPath = "/v1/me/profile-image/upload" as const;
 const profileImageCompletePath = "/v1/me/profile-image/complete" as const;
 const profileImageUrlPath = "/v1/me/profile-image/url" as const;
+const profileImagePath = "/v1/me/profile-image" as const;
 const usersRequestTimeoutMs = 10_000;
 
 type PatchMeOperation = operations["users.me.patch"];
@@ -191,4 +192,20 @@ export async function getProfileImageUrl(
   });
 
   return readOptionalApiResult(request, UsersMeProfileImageUrlResponse);
+}
+
+export async function clearProfileImage(
+  accessToken: string,
+): Promise<ApiResult<undefined>> {
+  const client = createConfiguredLamaraApiClient();
+  const request = client.DELETE(profileImagePath, {
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    parseAs: "text",
+    signal: AbortSignal.timeout(usersRequestTimeoutMs),
+  });
+
+  return readEmptyApiResult(request);
 }

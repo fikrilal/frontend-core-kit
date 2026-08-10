@@ -120,6 +120,27 @@ test("shows the profile image when one is set", async ({ page }) => {
     "src",
     "https://r2.example.com/e2e-render",
   );
+  await expect(
+    page.getByRole("button", { name: "Remove profile image" }),
+  ).toBeVisible();
+});
+
+test("clears the profile image and shows safe success feedback", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("with-image@example.com");
+  await page.getByLabel("Password").fill("test-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+
+  await page.goto("/app/profile");
+  await page.getByRole("button", { name: "Remove profile image" }).click();
+
+  await expect(
+    page.getByRole("status").getByText("Your profile image was removed."),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/app\/profile$/);
 });
 
 async function signIn(page: Page) {

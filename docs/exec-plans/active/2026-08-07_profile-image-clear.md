@@ -1,7 +1,7 @@
 # 2026-08-07 Clear Profile Image
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the authenticated `DELETE /v1/me/profile-image` slice against the committed generated contract; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -108,15 +108,15 @@ required for auth behavior, copy, and production rollout.
 
 ## Checklist
 
-- [ ] Add the generated-contract profile-image clear adapter and transport
+- [x] Add the generated-contract profile-image clear adapter and transport
       test.
-- [ ] Add safe failure mapping, authenticated Server Action, state, and
+- [x] Add safe failure mapping, authenticated Server Action, state, and
       `/app/profile` integration.
-- [ ] Extend the isolated fixture with authenticated clear behavior.
-- [ ] Add unit, accessibility, browser, and visual coverage.
-- [ ] Update truthful API, testing, product-foundation, architecture, and
+- [x] Extend the isolated fixture with authenticated clear behavior.
+- [x] Add unit, accessibility, browser, and visual coverage.
+- [x] Update truthful API, testing, product-foundation, architecture, and
       execution-plan docs.
-- [ ] Run full and runtime verification and record exact outcomes.
+- [x] Run full and runtime verification and record exact outcomes.
 
 ## Rollout And Rollback
 
@@ -131,14 +131,32 @@ integration together; the existing profile editor remains usable.
   profile-image slices, completing the profile-image lifecycle.
 - 2026-08-07: The endpoint is idempotent; clearing with no image set is a safe
   no-op success.
+- 2026-08-07: The clear action revalidates `/app/profile` on success; the e2e
+  fixture does not mutate the user on clear (matching the cancel precedent) so
+  the client success state survives the re-render.
 
 ## Verification
 
-- Not run yet.
+- Focused users tests passed: 107 Vitest tests across the profile-image clear
+  adapter transport (DELETE path, bearer header, empty 204), the clear Server
+  Action (redirect, one-401-retry, second-401 invalidation, unavailable
+  mapping, revalidation on success), the failure mapper, and the existing users
+  flows.
+- Static lanes passed under Node 24: `format:check`, `contracts:check`, `lint`,
+  `typecheck`, `harness:check` (knowledge, architecture, maintainability,
+  public-pages).
+- `pnpm build` passed.
+- Full unit suite: 236 passed, 1 failed — the single failure is the pre-existing
+  `theme-toggle` `React.act` test that also fails on the clean base in this
+  environment; unrelated to this change.
 
 ## Runtime Evidence
 
-- Not run yet.
+- `pnpm verify:runtime` passed with 69 Chromium tests, including the clear
+  success flow (avatar shown then removed with safe feedback), the
+  url-present/url-absent flows, and the stable profile visual baselines.
+- The profile visual baselines were unchanged by this slice (the default user
+  has no image); no regeneration was needed.
 
 ## Follow-Up Debt
 

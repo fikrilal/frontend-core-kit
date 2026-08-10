@@ -262,6 +262,28 @@ const api = createServer(async (request, response) => {
     );
   }
 
+  if (request.method === "DELETE" && request.url === "/v1/me/profile-image") {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    const user = tokenUsers.get(accessTokenValue);
+    if (!user) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    parseFixtureContract(
+      "profile image clear response",
+      fixtureContracts.profileImageClearResponse,
+      undefined,
+    );
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
   if (
     request.method === "POST" &&
     request.url === "/v1/auth/password/register"

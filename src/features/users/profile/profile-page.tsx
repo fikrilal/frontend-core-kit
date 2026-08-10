@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
 import { loadAuthenticatedUser } from "../../auth/session/load-authenticated-user";
+import { ClearProfileImageForm } from "../profile-image/clear-profile-image-form";
 import { loadProfileImageUrl } from "../profile-image/load-profile-image-url";
 import { ProfileImageUploadPlanForm } from "../profile-image/upload-plan-form";
 import { UpdateProfileForm } from "./update-profile-form";
@@ -42,12 +43,15 @@ export async function ProfilePage() {
         {result.ok ? (
           <>
             {imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                alt="Your profile"
-                className="border-border mb-6 size-20 rounded-full border object-cover"
-                src={imageUrl.url}
-              />
+              <div className="mb-6 grid justify-items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  alt="Your profile"
+                  className="border-border size-20 rounded-full border object-cover"
+                  src={imageUrl.url}
+                />
+                <ClearProfileImageForm />
+              </div>
             ) : null}
             <UpdateProfileForm
               displayName={result.user.profile.displayName}

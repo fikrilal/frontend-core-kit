@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   cancelAccountDeletion,
+  clearProfileImage,
   completeProfileImageUpload,
   createProfileImageUploadPlan,
   getProfileImageUrl,
@@ -418,6 +419,38 @@ describe("users API", () => {
       traceId: "backend-request-id",
     });
     expect(captured).toBeDefined();
+  });
+
+  it("clears the profile image through the empty-response contract", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(
+        new Response(null, {
+          status: 204,
+          headers: { "X-Request-Id": "backend-request-id" },
+        }),
+      );
+    });
+
+    const result = await clearProfileImage("access-token");
+
+    expect(result).toEqual({
+      ok: true,
+      data: undefined,
+      status: 204,
+      traceId: "backend-request-id",
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe("https://api.lamara.dev/v1/me/profile-image");
+    expect(captured.method).toBe("DELETE");
+    expect(captured.cache).toBe("no-store");
+    expect(captured.headers.get("authorization")).toBe("Bearer access-token");
+    expect(await captured.text()).toBe("");
   });
 });
 

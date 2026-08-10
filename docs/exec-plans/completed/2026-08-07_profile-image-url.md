@@ -1,7 +1,7 @@
 # 2026-08-07 Get Profile Image URL
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the authenticated `GET /v1/me/profile-image/url` slice against the committed generated contract; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
