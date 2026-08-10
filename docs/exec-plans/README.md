@@ -79,7 +79,7 @@ The accepted direction is documented in the
    [Verified handoff](completed/2026-08-11_frontendkit-verified-handoff.md)
 7. **Completed:**
    [Controlled improvement machinery](completed/2026-08-11_frontendkit-controlled-improvement.md)
-8. **Active:**
-   [Dogfood and completion audit](active/2026-08-11_frontendkit-dogfood-completion.md)
+8. **Completed:**
+   [Dogfood and completion audit](completed/2026-08-11_frontendkit-dogfood-completion.md)
 
 Do not introduce product workflows until a real product decision exists.

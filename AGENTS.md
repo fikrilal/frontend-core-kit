@@ -127,6 +127,18 @@ Use the harness docs for non-trivial work:
 - `docs/engineering/testing-strategy.md`
 - `docs/exec-plans/README.md`
 
+Use `pnpm frontendkit -- help` as the canonical operator surface. Before
+task-owned edits, run `pnpm frontendkit -- doctor`, activate one V2 plan, and
+create a clean baseline with `pnpm frontendkit -- task begin`. Use `task status`
+to inspect lifecycle and `task verify` to bind full evidence to the exact
+content-derived candidate. Compatibility pnpm scripts remain available, but
+they delegate to the same CLI registry.
+
+`handoff --dry-run` never grants publication authority. Push, draft-PR, update,
+merge, and deployment remain separate human-authorized actions. Improvement
+analysis is advisory and must stay disabled while the operating evidence report
+is insufficient.
+
 Risk expectations:
 
 - `low`: targeted checks are usually sufficient.

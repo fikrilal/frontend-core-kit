@@ -27,15 +27,18 @@ test("defines stable ordered verification profiles in one registry", () => {
       "typecheck",
       "frontendkit-typecheck",
       "test",
-      "harness",
+      "knowledge",
+      "architecture",
+      "maintainability",
+      "public-pages",
     ],
   );
   assert.deepEqual(
     verificationProfiles.full.map((step) => step.id),
     [
-      ...verificationProfiles.fast.slice(0, -1).map((step) => step.id),
+      ...verificationProfiles.fast.slice(0, 6).map((step) => step.id),
       "build",
-      "harness",
+      ...verificationProfiles.fast.slice(6).map((step) => step.id),
     ],
   );
   assert.equal(verificationProfiles.ci, verificationProfiles.full);
@@ -85,6 +88,10 @@ test("stops at the first failed owned boundary without raw output", () => {
     { name: "failed-step", value: "lint" },
   );
   assert.doesNotMatch(JSON.stringify(result), /private raw output/);
+  assert.deepEqual(
+    result.details.find((detail) => detail.name === "failure-code"),
+    { name: "failure-code", value: "maintainability.lint" },
+  );
 });
 
 test("keeps pnpm aliases and CI as delegates to canonical profiles", () => {

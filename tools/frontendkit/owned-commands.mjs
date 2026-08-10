@@ -23,12 +23,16 @@ const owners = Object.freeze({
     "scripts/harness/classify-risk.mjs",
     "Change risk was classified.",
     "Run pnpm risk:classify directly for native diagnostics.",
+    [],
+    true,
   ),
   evidence: owner(
     "evidence:report",
     "scripts/harness/operating-evidence-cli.mjs",
     "Operating evidence is valid and was summarized.",
     "Run pnpm harness:evidence directly for native diagnostics.",
+    ["--summary-json"],
+    true,
   ),
   "task-begin": owner(
     "task:begin",
@@ -102,6 +106,7 @@ export function runOwnedCommand(
         summary: `${definition.id} failed at its native owner.`,
         details: [
           ...details,
+          ...failureDetails(result.stderr),
           { name: "exit-code", value: result.status },
           { name: "remediation", value: definition.remediation },
         ],
@@ -164,24 +169,35 @@ function structuredDetails(source) {
   try {
     const value = JSON.parse(source);
     if (!value || typeof value !== "object" || Array.isArray(value)) return [];
-    return Object.entries(value).flatMap(([name, detail]) =>
-      /^[a-z][a-zA-Z0-9]*$/.test(name) &&
-      (typeof detail === "string" ||
+    return Object.entries(value).flatMap(([name, detail]) => {
+      if (!/^[a-z][a-zA-Z0-9]*$/.test(name)) return [];
+      if (Array.isArray(detail)) {
+        return [{ name: detailName(`${name}Count`), value: detail.length }];
+      }
+      return typeof detail === "string" ||
         typeof detail === "number" ||
         typeof detail === "boolean" ||
-        detail === null)
+        detail === null
         ? [
             {
-              name: name.replace(
-                /[A-Z]/g,
-                (letter) => `-${letter.toLowerCase()}`,
-              ),
+              name: detailName(name),
               value: detail,
             },
           ]
-        : [],
-    );
+        : [];
+    });
   } catch {
     return [];
   }
+}
+
+/** @param {string} source @returns {import("./result.mjs").CommandDetail[]} */
+function failureDetails(source) {
+  const code = source.match(/^Failure code: ([a-z0-9.-]+)$/m)?.[1];
+  return code ? [{ name: "failure-code", value: code }] : [];
+}
+
+/** @param {string} name */
+function detailName(name) {
+  return name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }

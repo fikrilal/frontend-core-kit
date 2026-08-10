@@ -20,6 +20,7 @@ try {
   if (error instanceof TaskHandoffFailure) {
     console.error(`Task handoff stopped: ${error.failure.invariant}`);
     console.error(`Remediation: ${error.failure.remediation}`);
+    console.error(`Failure code: ${error.failure.code}`);
     process.exit(1);
   }
   console.error("Task handoff stopped: unexpected local failure.");

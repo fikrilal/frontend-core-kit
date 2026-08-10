@@ -24,6 +24,7 @@ try {
   ) {
     console.error(`Task start failed: ${error.failure.invariant}`);
     console.error(`Remediation: ${error.failure.remediation}`);
+    console.error(`Failure code: ${error.failure.code}`);
     process.exit(1);
   }
   console.error("Task start failed: invalid local command arguments.");

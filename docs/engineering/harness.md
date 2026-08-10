@@ -37,7 +37,10 @@ lint
 typecheck
 typecheck:frontendkit
 test
-harness:check
+knowledge:check
+architecture:check
+maintainability:check
+public-pages:check
 ```
 
 `verify` adds the production build. `verify:runtime` runs Playwright separately

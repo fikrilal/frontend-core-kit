@@ -32,6 +32,7 @@ try {
   if (error instanceof ImprovementFailure || error?.failure) {
     console.error(`Improvement analysis failed: ${error.failure.invariant}`);
     console.error(`Remediation: ${error.failure.remediation}`);
+    console.error(`Failure code: ${error.failure.code}`);
     process.exit(1);
   }
   console.error(

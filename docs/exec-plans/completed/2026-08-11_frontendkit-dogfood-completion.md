@@ -1,7 +1,7 @@
 # 2026-08-11 Frontendkit Dogfood And Completion Audit
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** exercise the implemented local loop, refine usability, update durable docs, verify, and commit; do not push, create a PR, deploy, mutate production, fabricate operating evidence, or enable unsupported autonomy
@@ -80,12 +80,12 @@ documentation. Local commits are authorized; external publication is not.
 
 ## Checklist
 
-- [ ] Activate and begin the dogfood plan through `frontendkit`.
-- [ ] Exercise help, doctor, read-only controls, task state, and dry-run handoff.
-- [ ] Repair only observed usability defects and add regressions.
-- [ ] Update durable docs and proposal status/evidence.
-- [ ] Run full and runtime verification on Node 24.18.0/pnpm 11.15.0.
-- [ ] Complete the proposal acceptance audit and commit.
+- [x] Activate and begin the dogfood plan through `frontendkit`.
+- [x] Exercise help, doctor, read-only controls, task state, and dry-run handoff.
+- [x] Repair only observed usability defects and add regressions.
+- [x] Update durable docs and proposal status/evidence.
+- [x] Run full and runtime verification on Node 24.18.0/pnpm 11.15.0.
+- [x] Complete the proposal acceptance audit and commit.
 
 ## Rollout And Rollback
 
@@ -97,14 +97,43 @@ implementation commits.
 
 - 2026-08-11: Local dogfooding is required, but it is not a substitute for
   clean hosted CI or independently reviewed operating evidence.
+- 2026-08-11: A clean baseline was created at `3855a97`; subsequent AGENTS,
+  CLI-output, attribution, audit, and documentation changes are candidate-owned
+  rather than inherited as pre-existing paths.
+- 2026-08-11: Dogfooding exposed hidden risk/evidence aggregates, awkward help
+  rendering, composite harness attribution, and generic native failure output.
+  The repair keeps the same checks while returning bounded aggregates, stable
+  failure codes, and individually owned harness steps.
+- 2026-08-11: The dogfood candidate had 18 owned paths, no pre-existing paths,
+  a non-empty content fingerprint, and passed on its first attempt. It was not
+  promoted into the independently reviewed operating ledger.
 
 ## Verification
 
-- Not run yet.
+- `pnpm test:frontendkit` passed: 25 tests.
+- Focused lifecycle, handoff, evidence, and improvement suites passed: 33
+  tests.
+- `pnpm typecheck:frontendkit`, `pnpm format:check`, and
+  `pnpm knowledge:check` passed before stateful verification.
+- Doctor reported 0 blockers and 0 warnings with active schema-2 state.
+- Clean-baseline `task verify` passed the 11-step full profile in 46.8 seconds
+  and reached `ready_for_review` with candidate fingerprint
+  `f8cf34d8c1a26dcca101ace6daed6d70832d2633f384b6926ef2c98d91764196`.
+- Unauthorized handoff stopped with `action-not-authorized` and left lifecycle
+  state unchanged; `task complete` then archived exact `handed_off` state.
+- Recovery after completion stopped with `task-state-missing`, proving it did
+  not erase or recreate state.
 
 ## Runtime Evidence
 
-- Not run yet.
+- The stateful runtime lane passed in 28.2 seconds with no snapshot update.
+- Real risk output reported effective/path/declared high risk and bounded path
+  counts. Real evidence output reported 3 reviewed records, 1 risk class, 1
+  repair, 0 false positives, and 1 eligibility gap.
+- Real improvement shadow output remained
+  `disabled / operating-evidence-insufficient` with zero hypotheses.
+- No push, PR, merge, deployment, production mutation, external call, or
+  operating-ledger promotion occurred.
 
 ## Follow-Up Debt
 

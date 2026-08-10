@@ -34,12 +34,48 @@ test("delegates read-only controls to their native owners", () => {
 test("reports native-owner failure without returning raw output", () => {
   const result = runOwnedCommand("contracts", [], {
     root: "/fixture",
-    runProcess: () => processResult(7, "secret response body"),
+    runProcess: () =>
+      processResult(
+        7,
+        "",
+        "secret response body\nFailure code: scope.blocked\n",
+      ),
   });
 
   assert.equal(result.status, "failed");
   assert.match(result.summary, /native owner/);
+  assert.deepEqual(
+    result.details.find((detail) => detail.name === "failure-code"),
+    { name: "failure-code", value: "scope.blocked" },
+  );
   assert.doesNotMatch(JSON.stringify(result), /secret response body/);
+});
+
+test("returns bounded structured aggregates instead of raw owner output", () => {
+  const result = runOwnedCommand("risk", [], {
+    root: "/fixture",
+    runProcess: () =>
+      processResult(
+        0,
+        JSON.stringify({
+          risk: "high",
+          pathRisk: "medium",
+          declaredRisk: "high",
+          changedPaths: ["private/path.ts"],
+          reasons: [{ private: "detail" }],
+        }),
+      ),
+  });
+
+  assert.equal(
+    result.details.find((detail) => detail.name === "risk").value,
+    "high",
+  );
+  assert.deepEqual(
+    result.details.find((detail) => detail.name === "changed-paths-count"),
+    { name: "changed-paths-count", value: 1 },
+  );
+  assert.doesNotMatch(JSON.stringify(result), /private\/path/);
 });
 
 test("keeps read-only compatibility aliases as frontendkit delegates", () => {
@@ -71,12 +107,12 @@ test("keeps read-only compatibility aliases as frontendkit delegates", () => {
   assert.equal(scripts["improve:shadow"], "pnpm frontendkit -- improve shadow");
 });
 
-function processResult(status, stderr = "") {
+function processResult(status, stdout = "", stderr = "") {
   return {
     status,
     signal: null,
     durationMs: 3,
-    stdout: "",
+    stdout,
     stderr,
     outputTruncated: false,
     errorCode: null,

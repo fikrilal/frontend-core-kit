@@ -1,7 +1,7 @@
 # Engineering Proposal: Controlled Frontend Loop Improvement
 
 **Date:** 2026-08-10  
-**Status:** Accepted for implementation on 2026-08-11  
+**Status:** Implemented locally on 2026-08-11; hosted CI and real handoff evidence require an authorized push
 **Scope:** The canonical harness CLI, outer steering loop, and task-operability gaps in `frontend-core-kit`  
 **Research:** [Frontend Harness And Loop Engineering Research](2026-08-10_frontend-harness-loop-engineering-research.md)
 
@@ -25,10 +25,10 @@ deployment, event-driven code changes, or blanket agent-to-agent review.
 This proposal is a delta to the accepted
 [Agent-First Harness And Loop Engineering Proposal](../docs/planning/agent-harness-loop-engineering-proposal.md).
 It does not reopen its settled architecture, risk, authority, CI, or behavioral
-oracle decisions. It refines the queued
-[Phase 5 plan](../docs/exec-plans/queued/2026-08-03_agent-harness-phase-5-controlled-hill-climbing.md)
-using current operating evidence and the more mature backend implementation as
-a comparison.
+oracle decisions. It refines the earlier Phase 5 direction using current
+operating evidence and the more mature backend implementation as a comparison.
+The implemented sequence is indexed in the
+[execution plans](../docs/exec-plans/README.md#agent-harness-sequence).
 
 ## Context
 
@@ -477,6 +477,26 @@ This proposal is implemented successfully when:
     broaden authority, exceed its paths, publish, or store prohibited data;
 14. existing `verify`, runtime, CI, architecture, contract, and behavioral
     guarantees remain unchanged unless separately approved.
+
+## Implementation Audit — 2026-08-11
+
+| Condition | Local evidence                                                                                                               | Status                                                                   |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| 1–2       | `tools/frontendkit/`, canonical profile registry, package parity tests, and CI profile calls                                 | Implemented                                                              |
+| 3         | Safe native-owner adapters, bounded aggregates, profile failure codes, and parsed native failure identifiers                 | Implemented                                                              |
+| 4         | Read-only doctor tests plus real Node 24 and Node 22 invocations                                                             | Implemented                                                              |
+| 5         | Ignored schema-2 state records lifecycle, transitions, plan identity, and candidate identity                                 | Implemented                                                              |
+| 6         | Failure taxonomy and profile step codes name owner, repairability, and direct remediation                                    | Implemented                                                              |
+| 7         | Content hashing, repair-limit tests, fail-closed completion, and unchanged-escalation recovery rejection                     | Implemented                                                              |
+| 8         | Operating-evidence schema 3 binds reviewed records to exact Git revisions and fixed categorical outcomes                     | Implemented                                                              |
+| 9         | Real `improve analyze` and `improve shadow` remain disabled with zero hypotheses                                             | Implemented                                                              |
+| 10–12     | One-evaluating-hypothesis validator and deterministic fixture-only keep/revert analysis; status remains human-edited history | Implemented but intentionally inactive on current evidence               |
+| 13        | Privacy, path escape, lane/risk weakening, authority, stale candidate, dry-run, and no-retry publication tests               | Implemented                                                              |
+| 14        | Local full and browser profiles pass; CI consumes the same registry                                                          | Implemented locally; clean hosted reproduction awaits an authorized push |
+
+No operating record or improvement hypothesis was fabricated from local
+dogfooding. Auto-merge, deployment, worktree orchestration, event intake, and
+self-modification remain disabled and out of scope.
 
 ## Open Questions And Recommended Defaults
 

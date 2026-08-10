@@ -5,25 +5,70 @@ import process from "node:process";
 import { createProcessRunner } from "./process-runner.mjs";
 import { failed, passed } from "./result.mjs";
 
-const format = step("format", "formatting", "pnpm", ["format:check"]);
-const contracts = step("contracts", "API contracts", "pnpm", [
-  "contracts:check",
+const format = step("format", "code owner", "maintainability.format", "pnpm", [
+  "format:check",
 ]);
-const lint = step("lint", "linting", "pnpm", ["lint"]);
-const typecheck = step("typecheck", "application types", "pnpm", ["typecheck"]);
+const contracts = step(
+  "contracts",
+  "API boundary owner",
+  "contract.generated",
+  "pnpm",
+  ["contracts:check"],
+);
+const lint = step("lint", "code owner", "maintainability.lint", "pnpm", [
+  "lint",
+]);
+const typecheck = step(
+  "typecheck",
+  "application owner",
+  "build.typecheck",
+  "pnpm",
+  ["typecheck"],
+);
 const frontendkitTypecheck = step(
   "frontendkit-typecheck",
-  "frontendkit types",
+  "harness maintainer",
+  "build.frontendkit-types",
   "pnpm",
   ["typecheck:frontendkit"],
 );
-const tests = step("test", "automated tests", "pnpm", ["test"]);
-const build = step("build", "production build", "pnpm", ["build"]);
-const harness = step("harness", "repository harness", "pnpm", [
-  "harness:check",
+const tests = step("test", "feature owner", "behavior.tests", "pnpm", ["test"]);
+const build = step("build", "application owner", "build.production", "pnpm", [
+  "build",
 ]);
-const runtime = step("runtime", "browser runtime", "pnpm", ["test:e2e"]);
+const knowledge = step(
+  "knowledge",
+  "plan owner",
+  "knowledge.repository",
+  "pnpm",
+  ["knowledge:check"],
+);
+const architecture = step(
+  "architecture",
+  "architecture owner",
+  "architecture.boundary",
+  "pnpm",
+  ["architecture:check"],
+);
+const maintainability = step(
+  "maintainability",
+  "code owner",
+  "maintainability.dead-code",
+  "pnpm",
+  ["maintainability:check"],
+);
+const publicPages = step(
+  "public-pages",
+  "feature owner",
+  "behavior.public-pages",
+  "pnpm",
+  ["public-pages:check"],
+);
+const runtime = step("runtime", "feature/UX owner", "runtime.browser", "pnpm", [
+  "test:e2e",
+]);
 
+const harnessSteps = [knowledge, architecture, maintainability, publicPages];
 const fastSteps = freezeSteps([
   format,
   contracts,
@@ -31,7 +76,7 @@ const fastSteps = freezeSteps([
   typecheck,
   frontendkitTypecheck,
   tests,
-  harness,
+  ...harnessSteps,
 ]);
 const fullSteps = freezeSteps([
   format,
@@ -41,7 +86,7 @@ const fullSteps = freezeSteps([
   frontendkitTypecheck,
   tests,
   build,
-  harness,
+  ...harnessSteps,
 ]);
 
 export const verificationProfiles = Object.freeze({
@@ -52,14 +97,7 @@ export const verificationProfiles = Object.freeze({
 });
 
 /** @typedef {keyof typeof verificationProfiles} VerificationProfile */
-
-/**
- * @typedef {object} VerificationStep
- * @property {string} id
- * @property {string} owner
- * @property {string} command
- * @property {readonly string[]} args
- */
+/** @typedef {{ id: string, owner: string, failureCode: string, command: string, args: readonly string[] }} VerificationStep */
 
 /**
  * @param {VerificationProfile} profile
@@ -71,7 +109,6 @@ export function runVerificationProfile(
 ) {
   const steps = verificationProfiles[profile];
   let durationMs = 0;
-
   for (const current of steps) {
     const result = runProcess(current.command, current.args, { cwd: root });
     durationMs += result.durationMs;
@@ -82,7 +119,9 @@ export function runVerificationProfile(
         details: [
           { name: "profile", value: profile },
           { name: "failed-step", value: current.id },
+          { name: "failure-code", value: current.failureCode },
           { name: "owner", value: current.owner },
+          { name: "repairable", value: true },
           { name: "command-line", value: commandLine(current) },
           { name: "exit-code", value: result.status },
           { name: "duration-ms", value: durationMs },
@@ -94,7 +133,6 @@ export function runVerificationProfile(
       });
     }
   }
-
   return passed({
     command: `verify:${profile}`,
     summary: `Verification profile ${profile} passed.`,
@@ -106,15 +144,15 @@ export function runVerificationProfile(
   });
 }
 
-/**
- * @param {string} id
- * @param {string} owner
- * @param {string} command
- * @param {readonly string[]} args
- * @returns {Readonly<VerificationStep>}
- */
-function step(id, owner, command, args) {
-  return Object.freeze({ id, owner, command, args: Object.freeze([...args]) });
+/** @param {string} id @param {string} owner @param {string} failureCode @param {string} command @param {readonly string[]} args @returns {Readonly<VerificationStep>} */
+function step(id, owner, failureCode, command, args) {
+  return Object.freeze({
+    id,
+    owner,
+    failureCode,
+    command,
+    args: Object.freeze([...args]),
+  });
 }
 
 /** @param {readonly Readonly<VerificationStep>[]} steps */

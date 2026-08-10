@@ -92,6 +92,38 @@ test("fails closed for privacy fields and multiple evaluating hypotheses", () =>
   }
 });
 
+test("cannot weaken risk or lanes and rejects escaping target paths", () => {
+  const fixture = createFixture();
+  try {
+    const evidence = eligibleEvidence();
+    const weakened = {
+      ...hypothesis(),
+      requiredRisk: "low",
+      requiredLanes: ["fast"],
+    };
+    writeJson(fixture.ledgerPath, {
+      schemaVersion: 1,
+      hypotheses: [weakened],
+    });
+    const ledger = readImprovementLedger(fixture.root, evidence);
+    assert.equal(
+      analyzeImprovement({ evidence, ledger, shadow: true }).decision,
+      "revert",
+    );
+
+    writeJson(fixture.ledgerPath, {
+      schemaVersion: 1,
+      hypotheses: [{ ...hypothesis(), targetPaths: ["../outside"] }],
+    });
+    assert.throws(
+      () => readImprovementLedger(fixture.root, evidence),
+      failureWithCode("improvement-hypothesis"),
+    );
+  } finally {
+    fs.rmSync(fixture.root, { recursive: true, force: true });
+  }
+});
+
 function eligibleEvidence() {
   return {
     schemaVersion: 3,

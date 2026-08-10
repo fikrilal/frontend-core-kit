@@ -32,6 +32,7 @@ try {
   if (error instanceof TaskStateFailure) {
     console.error(`Task control failed: ${error.failure.invariant}`);
     console.error(`Remediation: ${error.failure.remediation}`);
+    console.error(`Failure code: ${error.failure.code}`);
     process.exit(1);
   }
   console.error("Task control failed: invalid local command arguments.");
