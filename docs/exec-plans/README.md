@@ -77,10 +77,10 @@ Implementation is split into independently reviewable plans:
     [Request account deletion](completed/2026-08-07_request-account-deletion.md)
 14. **Completed:**
     [Cancel account deletion](completed/2026-08-07_cancel-account-deletion.md)
-15. **Active:**
-    [Profile image upload plan](active/2026-08-07_profile-image-upload-plan.md)
-16. **Queued:**
-    [Profile image upload complete](queued/2026-08-07_profile-image-upload-complete.md)
+15. **Completed:**
+    [Profile image upload plan](completed/2026-08-07_profile-image-upload-plan.md)
+16. **Active:**
+    [Profile image upload complete](active/2026-08-07_profile-image-upload-complete.md)
 17. **Queued:**
     [Profile image url](queued/2026-08-07_profile-image-url.md)
 18. **Queued:**

@@ -23,6 +23,60 @@ test("creates a profile image upload plan", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("confirms a profile image upload", async ({ page }) => {
+  await signIn(page);
+
+  await page.goto("/app/profile");
+  await page.locator("input[type='file']").setInputFiles({
+    name: "avatar.webp",
+    mimeType: "image/webp",
+    buffer: Buffer.from("fake-webp-bytes"),
+  });
+
+  const prepareButton = page.getByRole("button", { name: "Prepare upload" });
+  await expect(prepareButton).toBeEnabled();
+  await prepareButton.click();
+  await expect(
+    page.getByRole("button", { name: "Confirm upload" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Confirm upload" }).click();
+
+  await expect(
+    page.getByRole("status").getByText("Your profile image was updated."),
+  ).toBeVisible();
+});
+
+test("maps a missing upload to safe feedback", async ({ page }) => {
+  await signIn(page);
+
+  await page.goto("/app/profile");
+  await page.locator("input[type='file']").setInputFiles({
+    name: "avatar.webp",
+    mimeType: "image/webp",
+    buffer: Buffer.from("fake-webp-bytes"),
+  });
+
+  const prepareButton = page.getByRole("button", { name: "Prepare upload" });
+  await expect(prepareButton).toBeEnabled();
+  await prepareButton.click();
+  await expect(
+    page.getByRole("button", { name: "Confirm upload" }),
+  ).toBeVisible();
+
+  // Swap the file id to the fixture's missing sentinel before confirming.
+  await page.locator("input[name='fileId']").evaluate((input) => {
+    (input as HTMLInputElement).value = "missing-file-id";
+  });
+  await page.getByRole("button", { name: "Confirm upload" }).click();
+
+  await expect(
+    page
+      .locator("#profile-image-complete-error")
+      .getByText("This upload no longer exists. Start again."),
+  ).toBeVisible();
+});
+
 test("maps upload rate limiting to safe feedback", async ({ page }) => {
   await signIn(page);
 

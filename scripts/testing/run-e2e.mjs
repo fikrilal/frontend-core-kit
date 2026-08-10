@@ -181,6 +181,39 @@ const api = createServer(async (request, response) => {
 
   if (
     request.method === "POST" &&
+    request.url === "/v1/me/profile-image/complete"
+  ) {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    if (!tokenUsers.has(accessTokenValue)) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    const parsed = tryParseFixtureContract(
+      fixtureContracts.profileImageCompleteRequest,
+      await readJson(request),
+    );
+    if (!parsed) return problem(response, 422, "VALIDATION_FAILED");
+    if (parsed.fileId === "missing-file-id") {
+      return problem(response, 404, "NOT_FOUND");
+    }
+
+    parseFixtureContract(
+      "profile image complete response",
+      fixtureContracts.profileImageCompleteResponse,
+      undefined,
+    );
+    response.statusCode = 204;
+    response.removeHeader("Content-Type");
+    return response.end();
+  }
+
+  if (
+    request.method === "POST" &&
     request.url === "/v1/auth/password/register"
   ) {
     const body = await readJson(request);

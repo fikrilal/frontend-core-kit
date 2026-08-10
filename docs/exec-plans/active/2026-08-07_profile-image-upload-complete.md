@@ -1,7 +1,7 @@
 # 2026-08-07 Complete Profile Image Upload
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the authenticated `POST /v1/me/profile-image/complete` slice against the committed generated contract; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -117,15 +117,15 @@ required for auth behavior, copy, and production rollout.
 
 ## Checklist
 
-- [ ] Add the generated-contract profile-image complete adapter and transport
+- [x] Add the generated-contract profile-image complete adapter and transport
       test.
-- [ ] Add safe failure mapping, authenticated Server Action, state, and
+- [x] Add safe failure mapping, authenticated Server Action, state, and
       `/app/profile` integration.
-- [ ] Extend the isolated fixture with authenticated complete behavior.
-- [ ] Add unit, accessibility, browser, and visual coverage.
-- [ ] Update truthful API, testing, product-foundation, architecture, and
+- [x] Extend the isolated fixture with authenticated complete behavior.
+- [x] Add unit, accessibility, browser, and visual coverage.
+- [x] Update truthful API, testing, product-foundation, architecture, and
       execution-plan docs.
-- [ ] Run full and runtime verification and record exact outcomes.
+- [x] Run full and runtime verification and record exact outcomes.
 
 ## Rollout And Rollback
 
@@ -142,14 +142,36 @@ remains usable.
   upload-plan slice.
 - 2026-08-07: The action takes the `fileId` from the upload plan; the browser
   never handles tokens.
+- 2026-08-07: The complete form renders as a sibling of the upload-plan form
+  (not nested) — nested forms are invalid HTML and the browser drops the inner
+  submit, which the e2e gate caught.
+- 2026-08-07: Review fix applied — the complete action now calls
+  `revalidatePath("/app/profile")` on success so the profile route refetches
+  the updated profile image once the URL slice renders it.
 
 ## Verification
 
-- Not run yet.
+- Focused users tests passed: 89 Vitest tests across the profile-image complete
+  adapter transport (path, body, bearer header, empty 204), the complete Server
+  Action (redirect, missing-file-id rejection, one-401-retry, second-401
+  invalidation, not-found/mismatch/unavailable mapping), the failure mapper,
+  and the existing users flows.
+- Static lanes passed under Node 24: `format:check`, `contracts:check`, `lint`,
+  `typecheck`, `harness:check` (knowledge, architecture, maintainability,
+  public-pages).
+- `pnpm build` passed.
+- Full unit suite: 218 passed, 1 failed — the single failure is the pre-existing
+  `theme-toggle` `React.act` test that also fails on the clean base in this
+  environment; unrelated to this change.
 
 ## Runtime Evidence
 
-- Not run yet.
+- `pnpm verify:runtime` passed with 66 Chromium tests, including the complete
+  success flow (plan then confirm), the not-found browser scenario, the
+  upload-plan success and rate-limit flows, and the stable profile visual
+  baselines.
+- The profile visual baselines were unchanged by this slice (the initial form
+  state is identical); no regeneration was needed.
 
 ## Follow-Up Debt
 

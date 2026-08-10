@@ -19,6 +19,7 @@ const revokeSessionPath = "/v1/me/sessions/{sessionId}/revoke" as const;
 const accountDeletionRequestPath = "/v1/me/account-deletion/request" as const;
 const accountDeletionCancelPath = "/v1/me/account-deletion/cancel" as const;
 const profileImageUploadPath = "/v1/me/profile-image/upload" as const;
+const profileImageCompletePath = "/v1/me/profile-image/complete" as const;
 const usersRequestTimeoutMs = 10_000;
 
 type PatchMeOperation = operations["users.me.patch"];
@@ -32,6 +33,8 @@ type RevokeSessionPath = RevokeSessionOperation["parameters"]["path"];
 type ProfileImageUploadOperation = operations["users.me.profileImage.upload"];
 type ProfileImageUploadEnvelope =
   ProfileImageUploadOperation["responses"][200]["content"]["application/json"];
+type ProfileImageCompleteOperation =
+  operations["users.me.profileImage.complete"];
 
 export type PatchMeInput =
   PatchMeOperation["requestBody"]["content"]["application/json"];
@@ -42,6 +45,8 @@ export type RevokeSessionInput = RevokeSessionPath["sessionId"];
 export type ProfileImageUploadInput =
   ProfileImageUploadOperation["requestBody"]["content"]["application/json"];
 export type ProfileImageUploadData = ProfileImageUploadEnvelope["data"];
+export type ProfileImageCompleteInput =
+  ProfileImageCompleteOperation["requestBody"]["content"]["application/json"];
 
 export async function patchCurrentUser(
   input: PatchMeInput,
@@ -145,4 +150,22 @@ export async function createProfileImageUploadPlan(
   });
 
   return readApiResult(request, UsersMeProfileImageUploadResponse);
+}
+
+export async function completeProfileImageUpload(
+  input: ProfileImageCompleteInput,
+  accessToken: string,
+): Promise<ApiResult<undefined>> {
+  const client = createConfiguredLamaraApiClient();
+  const request = client.POST(profileImageCompletePath, {
+    body: input,
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    parseAs: "text",
+    signal: AbortSignal.timeout(usersRequestTimeoutMs),
+  });
+
+  return readEmptyApiResult(request);
 }
