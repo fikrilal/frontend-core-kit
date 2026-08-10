@@ -67,7 +67,19 @@ The accepted direction is documented in the
 
 1. **Completed:**
    [Password registration](completed/2026-08-01_auth-password-registration.md)
-2. **Queued:**
-   [Controlled hill climbing](queued/2026-08-03_agent-harness-phase-5-controlled-hill-climbing.md)
+2. **Active:**
+   [Frontendkit CLI foundation](active/2026-08-11_frontendkit-cli-foundation.md)
+3. **Queued:**
+   [Canonical verification profiles](queued/2026-08-11_frontendkit-canonical-profiles.md)
+4. **Queued:**
+   [Read-only controls and doctor](queued/2026-08-11_frontendkit-doctor-controls.md)
+5. **Queued:**
+   [Task lifecycle and failure taxonomy](queued/2026-08-11_frontendkit-task-lifecycle.md)
+6. **Queued:**
+   [Verified handoff](queued/2026-08-11_frontendkit-verified-handoff.md)
+7. **Queued:**
+   [Controlled improvement machinery](queued/2026-08-11_frontendkit-controlled-improvement.md)
+8. **Queued:**
+   [Dogfood and completion audit](queued/2026-08-11_frontendkit-dogfood-completion.md)
 
 Do not introduce product workflows until a real product decision exists.
