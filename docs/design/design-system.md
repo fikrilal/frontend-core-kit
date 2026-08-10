@@ -12,10 +12,10 @@ shadcn new-york components and token set as shipped:
 - light and dark themes via the shadcn default contract;
 - `cn()` (`clsx` + `tailwind-merge`) from `src/lib/utils.ts`.
 
-A small transitional block of the old custom tokens (`--line`, `--ember`,
-`--surface`, `--success`) and their utilities remains in `globals.css` only
-until the marketing layout migration removes them; do not use them in new
-code.
+The migration to pure shadcn defaults is complete: no custom tokens,
+utilities, or layout primitives remain in `src/`. The previous custom
+`--line`/`--ember` tokens and `Rail`/`SectionDivider` chrome were removed in
+the marketing layout migration.
 
 There is no custom token layer, no hand-rolled primitive set, and no bespoke
 styling vocabulary. The previous chanhdai/code-alchemy visual references are

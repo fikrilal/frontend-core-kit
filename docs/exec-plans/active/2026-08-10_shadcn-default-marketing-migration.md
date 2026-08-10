@@ -1,7 +1,7 @@
 # 2026-08-10 Shadcn Default Marketing And Layout Migration
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary agent with independent reviewer for UI behavior
 **Risk:** medium
 **Authority:** implement and verify the shadcn-default migration of the marketing and shared layout chrome against the accepted pure-shadcn-default design-system proposal; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -91,12 +91,12 @@ Human review remains required for visual behavior.
 
 ## Checklist
 
-- [ ] Recompose the landing page with shadcn primitives.
-- [ ] Remove or recompose the custom layout primitives.
-- [ ] Reconcile the theme behavior to the shadcn default contract.
-- [ ] Regenerate and inspect the marketing visual baselines.
-- [ ] Update design and architecture docs for the completed migration.
-- [ ] Run full and runtime verification and record exact outcomes.
+- [x] Recompose the landing page with shadcn primitives.
+- [x] Remove or recompose the custom layout primitives.
+- [x] Reconcile the theme behavior to the shadcn default contract.
+- [x] Regenerate and inspect the marketing visual baselines.
+- [x] Update design and architecture docs for the completed migration.
+- [x] Run full and runtime verification and record exact outcomes.
 
 ## Rollout And Rollback
 
@@ -108,14 +108,31 @@ migration. Roll back by reverting `src/features/marketing/**` and
 
 - 2026-08-10: Marketing/layout migrates last because it removes the final
   custom layer and depends on the feature migrations settling the patterns.
+- 2026-08-10: The landing hero recomposes with a `Button` CTA and a plain
+  centered max-width container; the custom `Rail`/`SectionDivider`/`SiteTopbar`
+  hairlines are replaced with the default chrome and a `Separator` footer
+  divider.
+- 2026-08-10: The transitional custom tokens (`--line`, `--ember`, `--surface`,
+  `--success`) and utilities are fully removed; `globals.css` is pure shadcn
+  default.
 
 ## Verification
 
-- Not run yet.
+- Static lanes passed under Node 24: `format:check`, `contracts:check`,
+  `lint`, `typecheck`, `harness:check`, and `pnpm build`.
+- Unit suite: 236 passed, 1 failed — the pre-existing `theme-toggle`
+  `React.act` failure, unrelated to this change.
+- `pnpm verify:runtime`: 69 Chromium tests passed, including the landing
+  light/dark accessibility checks.
 
 ## Runtime Evidence
 
-- Not run yet.
+- The landing light and dark visual baselines were regenerated and inspected
+  before recording; they show the shadcn default topbar, hero with Button CTA,
+  and Separator-divided footer.
+- No custom tokens, utilities, or layout primitives remain in `src/`; grep for
+  `--line`, `--ember`, `screen-line-*`, `Rail`, and `SectionDivider` returns no
+  matches.
 
 ## Follow-Up Debt
 

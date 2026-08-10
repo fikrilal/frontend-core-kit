@@ -1,17 +1,12 @@
-import { Rail, RailViewport } from "@/components/layout/rail";
-import { SectionDivider } from "@/components/layout/section-divider";
+import { Separator } from "@/components/ui/separator";
 
 export function SiteFooter() {
   return (
-    <footer>
-      <SectionDivider topLine />
-      <RailViewport>
-        <Rail className="px-5 py-8 text-sm">
-          <p className="text-muted-foreground">
-            Lamara is currently under development.
-          </p>
-        </Rail>
-      </RailViewport>
+    <footer className="mx-auto w-full max-w-2xl px-6 py-8">
+      <Separator className="mb-6" />
+      <p className="text-muted-foreground text-sm">
+        Lamara is currently under development.
+      </p>
     </footer>
   );
 }

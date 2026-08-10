@@ -1,13 +1,12 @@
 import Link from "next/link";
 
 import { LamaraMark } from "@/components/brand/lamara-mark";
-import { Rail } from "@/components/layout/rail";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export function SiteTopbar() {
   return (
-    <header className="bg-background/92 sticky top-0 z-50 w-full overflow-x-clip px-2 backdrop-blur-md">
-      <Rail className="screen-line-bottom flex h-14 items-center gap-4 px-3">
+    <header className="bg-background sticky top-0 z-50 w-full">
+      <div className="mx-auto flex h-14 w-full max-w-2xl items-center gap-4 px-6">
         <Link
           aria-label="Lamara home"
           className="text-foreground flex items-center gap-2 font-medium transition-opacity hover:opacity-75"
@@ -26,7 +25,7 @@ export function SiteTopbar() {
           Sign in
         </Link>
         <ThemeToggle />
-      </Rail>
+      </div>
     </header>
   );
 }

@@ -89,10 +89,10 @@ Implementation is split into independently reviewable plans:
     [Shadcn default foundation](completed/2026-08-10_shadcn-default-foundation.md)
 20. **Completed:**
     [Shadcn default auth migration](completed/2026-08-10_shadcn-default-auth-migration.md)
-21. **Active:**
-    [Shadcn default users migration](active/2026-08-10_shadcn-default-users-migration.md)
-22. **Queued:**
-    [Shadcn default marketing migration](queued/2026-08-10_shadcn-default-marketing-migration.md)
+21. **Completed:**
+    [Shadcn default users migration](completed/2026-08-10_shadcn-default-users-migration.md)
+22. **Active:**
+    [Shadcn default marketing migration](active/2026-08-10_shadcn-default-marketing-migration.md)
 
 ## Agent Harness Sequence
 

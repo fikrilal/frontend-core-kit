@@ -1,7 +1,7 @@
 # 2026-08-10 Shadcn Default Users Migration
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for UI behavior
 **Risk:** high
 **Authority:** implement and verify the shadcn-default migration of the users feature against the accepted pure-shadcn-default design-system proposal; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -128,7 +128,7 @@ The users migration lands flow by flow. Roll back by reverting the affected
 ## Runtime Evidence
 
 - The users visual baselines (profile, profile-saved, sessions,
-  account-deletion request, account-deletion pending) were regenerated and
+  account-deletion request, account-deletion in-progress) were regenerated and
   inspected before recording; they show the shadcn default card/input/button/
   badge/alert look.
 - All users accessibility tests pass; no contrast regressions after the
