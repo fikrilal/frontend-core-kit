@@ -93,13 +93,17 @@ user-owned and request a boundary change before editing them.
 
 ## Draft handoff
 
-`pnpm task:handoff -- --title "type(scope): summary" --dry-run` exercises the
-same preflight without mutating Git or GitHub. The non-dry path re-runs task
-verification, requires a clean task baseline, validates the current named branch
-and `origin`, and requires separate `commit`, `push`, and `draft-pr` action
-authority in the active V2 plan before it can stage only verified task paths,
-create one normal commit, push normally, and create a draft PR. It never
-force-pushes, merges, deploys, comments, or changes review state.
+`pnpm frontendkit -- handoff --title "type(scope): summary" --dry-run`
+exercises the same verification and publication preflight without changing task
+state or mutating Git or GitHub. `pnpm task:handoff` remains a compatibility
+delegate. The non-dry path re-runs task verification, requires schema-2
+`ready_for_review` state for the exact candidate fingerprint and paths, validates
+the current named branch and `origin`, and requires separate `commit`, `push`,
+and `draft-pr` action authority in the active V2 plan before it can stage only
+verified task paths, create one normal commit, push normally, and create a draft
+PR. It never force-pushes, merges, deploys, comments, or changes review state.
+An uncertain push or GitHub response stops with no automatic retry; a human must
+inspect remote state.
 
 `pnpm task:handoff -- --pr <number> --title "type(scope): repair"` is the
 separate repair-handoff form. It requires `commit`, `push`, and `update-pr`

@@ -148,14 +148,42 @@ export function markReadyForReview({ root, state, scope, now }) {
   });
 }
 
-export function assertRepairBudget({ root, state, scope, now }) {
+export function markTaskHandedOff({
+  root,
+  state,
+  now = () => new Date().toISOString(),
+}) {
+  if (state.lifecycle !== "ready_for_review") {
+    throw stateError(
+      "task-not-ready",
+      "Only ready_for_review state can be marked handed off.",
+      "Run fresh task verification before publication handoff.",
+    );
+  }
+  return transitionTaskState({
+    root,
+    state,
+    to: "handed_off",
+    reason: "publication-complete",
+    candidateFingerprint: state.candidateFingerprint,
+    now,
+  });
+}
+
+export function assertRepairBudget({
+  root,
+  state,
+  scope,
+  now,
+  recordEscalation = true,
+}) {
   const previous = state.failures.at(-1);
   if (
     previous &&
     previous.candidateFingerprint === scope.taskFingerprint &&
     previous.repeatCount >= state.boundaries.repairLimit
   ) {
-    if (state.lifecycle !== "escalated") {
+    if (recordEscalation && state.lifecycle !== "escalated") {
       transitionTaskState({
         root,
         state,

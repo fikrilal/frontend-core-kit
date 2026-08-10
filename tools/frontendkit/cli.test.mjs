@@ -92,6 +92,22 @@ test("parses bounded task lifecycle commands", () => {
   );
 });
 
+test("parses handoff without shell-like passthrough", () => {
+  assert.deepEqual(
+    parseCommand(["handoff", "--title", "feat(harness): test", "--dry-run"]),
+    {
+      kind: "owned",
+      format: "human",
+      owner: "handoff",
+      args: ["--title", "feat(harness): test", "--dry-run"],
+    },
+  );
+  assert.throws(
+    () => parseCommand(["handoff", "--command", "git push"]),
+    CliUsageError,
+  );
+});
+
 test("rejects unknown commands and malformed global options", () => {
   assert.throws(() => parseCommand(["unknown"]), CliUsageError);
   assert.throws(

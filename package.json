@@ -35,7 +35,7 @@
     "task:verify": "pnpm frontendkit -- task verify",
     "task:complete": "pnpm frontendkit -- task complete",
     "task:recover": "pnpm frontendkit -- task recover",
-    "task:handoff": "node scripts/harness/task-handoff-cli.mjs",
+    "task:handoff": "pnpm frontendkit -- handoff",
     "harness:evidence": "pnpm frontendkit -- evidence report",
     "knowledge:check": "pnpm frontendkit -- knowledge check",
     "architecture:check": "node scripts/harness/check-architecture.mjs",

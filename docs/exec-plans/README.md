@@ -75,10 +75,10 @@ The accepted direction is documented in the
    [Read-only controls and doctor](completed/2026-08-11_frontendkit-doctor-controls.md)
 5. **Completed:**
    [Task lifecycle and failure taxonomy](completed/2026-08-11_frontendkit-task-lifecycle.md)
-6. **Active:**
-   [Verified handoff](active/2026-08-11_frontendkit-verified-handoff.md)
-7. **Queued:**
-   [Controlled improvement machinery](queued/2026-08-11_frontendkit-controlled-improvement.md)
+6. **Completed:**
+   [Verified handoff](completed/2026-08-11_frontendkit-verified-handoff.md)
+7. **Active:**
+   [Controlled improvement machinery](active/2026-08-11_frontendkit-controlled-improvement.md)
 8. **Queued:**
    [Dogfood and completion audit](queued/2026-08-11_frontendkit-dogfood-completion.md)
 

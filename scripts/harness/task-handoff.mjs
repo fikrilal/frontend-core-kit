@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 
 import { assertActionAllowed } from "./task-boundaries.mjs";
-import { readTaskState } from "./task-state.mjs";
+import { markTaskHandedOff, readTaskState } from "./task-state.mjs";
 import {
   discoverTaskChanges,
   loadActivePlan,
@@ -65,6 +65,7 @@ export function runTaskHandoff({
   discoverChanges = discoverTaskChanges,
   readState = readTaskState,
   loadPlan = loadActivePlan,
+  finishHandoff = markTaskHandedOff,
 }) {
   try {
     validateArguments({ base, head, title, pullRequest, dryRun });
@@ -76,10 +77,11 @@ export function runTaskHandoff({
       assertActionAllowed(activePlan.boundaries, action);
     }
 
-    const verification = verifyTask({ root });
+    const verification = verifyTask({ root, recordState: !dryRun });
     assertFreshSuccessfulVerification(verification, activePlan.path);
     const changes = discoverChanges({ root, base: "HEAD" });
     const state = readState(root);
+    assertReadyCandidate({ state, verification });
     const taskPaths = assertOwnedTaskChanges({ changes, state, verification });
     const branch = resolveBranch({ root, head, execute });
     assertRemote({ root, execute });
@@ -154,6 +156,8 @@ export function runTaskHandoff({
       });
     }
 
+    finishHandoff({ root, state });
+
     return {
       status: "published",
       dryRun: false,
@@ -173,6 +177,24 @@ export function runTaskHandoff({
       "unexpected",
       "Task handoff encountered an unexpected local failure.",
       "Inspect the local handoff adapter and rerun its deterministic tests.",
+    );
+  }
+}
+
+function assertReadyCandidate({ state, verification }) {
+  if (
+    state.lifecycle !== "ready_for_review" ||
+    typeof state.candidateFingerprint !== "string" ||
+    state.candidateFingerprint !== verification.scope?.taskFingerprint ||
+    !Array.isArray(state.candidatePaths) ||
+    !Array.isArray(verification.scope?.taskPaths) ||
+    JSON.stringify([...state.candidatePaths].toSorted()) !==
+      JSON.stringify([...verification.scope.taskPaths].toSorted())
+  ) {
+    throw handoffError(
+      "handoff-candidate-stale",
+      "Task lifecycle readiness does not match the freshly verified candidate.",
+      "Rerun task verification for the exact current candidate before handoff.",
     );
   }
 }
@@ -390,6 +412,13 @@ function assertExistingDraft({ root, execute, pullRequest, base, branch }) {
 function runCommand({ root, execute, command, args, acceptedStatuses = [0] }) {
   const result = commandResult({ root, execute, command, args });
   if (!acceptedStatuses.includes(result.status)) {
+    if (command === "gh" || (command === "git" && args[0] === "push")) {
+      throw handoffError(
+        "publication-outcome-uncertain",
+        "The external publication outcome could not be proven.",
+        "Do not retry automatically; inspect the remote state and request human direction.",
+      );
+    }
     throw handoffError(
       "publication-command-failed",
       "A Git or GitHub publication command failed.",

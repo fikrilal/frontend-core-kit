@@ -18,6 +18,7 @@ const helpLines = Object.freeze([
   "  evidence check|report               Inspect operating evidence.",
   "  task begin|status|verify|complete|recover",
   "                                      Control the bounded task lifecycle.",
+  "  handoff [options]                   Run verified handoff preflight.",
   "  --json                              Emit bounded structured output.",
 ]);
 
@@ -110,6 +111,14 @@ export function parseCommand(args) {
       ),
     };
   }
+  if (values[0] === "handoff") {
+    return {
+      kind: "owned",
+      format,
+      owner: "handoff",
+      args: parseHandoffArguments(values.slice(1)),
+    };
+  }
 
   throw new CliUsageError(`Unknown frontendkit command: ${values[0]}.`);
 }
@@ -139,7 +148,8 @@ export function executeCommand(command, options) {
           { name: "command-risk", value: helpLines[7] },
           { name: "command-evidence", value: helpLines[9] },
           { name: "command-task", value: helpLines[10] },
-          { name: "option-json", value: helpLines[12] },
+          { name: "command-handoff", value: helpLines[12] },
+          { name: "option-json", value: helpLines[13] },
         ],
       });
     case "doctor":
@@ -206,4 +216,34 @@ function parseOptionPairs(values, allowed, command) {
     seen.add(option);
   }
   return values;
+}
+
+/** @param {readonly string[]} values */
+function parseHandoffArguments(values) {
+  const output = [];
+  const seen = new Set();
+  for (let index = 0; index < values.length; index += 1) {
+    const option = values[index];
+    if (option === "--dry-run") {
+      if (seen.has(option))
+        throw new CliUsageError("handoff received duplicate options.");
+      seen.add(option);
+      output.push(option);
+      continue;
+    }
+    if (
+      !["--base", "--head", "--title", "--pr"].includes(option) ||
+      seen.has(option)
+    ) {
+      throw new CliUsageError("handoff received invalid options.");
+    }
+    const value = values[index + 1];
+    if (!value || value.startsWith("--")) {
+      throw new CliUsageError("handoff received incomplete options.");
+    }
+    seen.add(option);
+    output.push(option, value);
+    index += 1;
+  }
+  return output;
 }

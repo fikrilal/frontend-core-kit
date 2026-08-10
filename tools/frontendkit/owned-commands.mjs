@@ -51,6 +51,12 @@ const owners = Object.freeze({
     "recover",
     "Terminal task state was recovered and archived.",
   ),
+  handoff: owner(
+    "handoff",
+    "scripts/harness/task-handoff-cli.mjs",
+    "Task handoff preflight or publication completed.",
+    "Run the native task-handoff script for focused diagnostics.",
+  ),
 });
 
 /** @typedef {keyof typeof owners} CommandOwner */

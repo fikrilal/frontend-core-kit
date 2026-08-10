@@ -1,11 +1,11 @@
 # 2026-08-11 Frontendkit Verified Handoff
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit the CLI handoff boundary and tests; do not perform a real push, create a real pull request, merge, deploy, or infer publication authority
-**Allowed paths:** tools/frontendkit/, scripts/harness/, package.json, docs/engineering/, docs/exec-plans/
+**Allowed paths:** tools/frontendkit/, scripts/harness/, package.json, knip.json, docs/engineering/, docs/exec-plans/
 **Allowed actions:** plan, edit, verify, commit
 **Maximum risk:** high
 **Repair limit:** 2
@@ -73,12 +73,12 @@ dry-run, and commit of the harness change itself.
 
 ## Checklist
 
-- [ ] Register handoff commands and structured results.
-- [ ] Bind handoff readiness to lifecycle candidate identity.
-- [ ] Preserve native adapter tests and compatibility alias.
-- [ ] Add dry-run, stale, unauthorized, and uncertain-outcome tests.
-- [ ] Update harness documentation.
-- [ ] Run verification and record evidence.
+- [x] Register handoff commands and structured results.
+- [x] Bind handoff readiness to lifecycle candidate identity.
+- [x] Preserve native adapter tests and compatibility alias.
+- [x] Add dry-run, stale, unauthorized, and uncertain-outcome tests.
+- [x] Update harness documentation.
+- [x] Run verification and record evidence.
 
 ## Rollout And Rollback
 
@@ -89,14 +89,31 @@ entry point; no external operation is performed by rollout.
 
 - 2026-08-11: Keep external actions separate in authority even if one operator
   command sequences them.
+- 2026-08-11: Retain the native handoff adapter as an explicit Knip entry after
+  moving its compatibility alias behind `frontendkit`.
+- 2026-08-11: Dry-run verification uses `recordState: false`; it executes the
+  same gates but does not add lifecycle transitions or failure records.
+- 2026-08-11: Remote push and GitHub failures use the conservative
+  `publication-outcome-uncertain` stop and are never retried automatically.
 
 ## Verification
 
-- Not run yet.
+- `pnpm test:frontendkit` passed: 23 tests.
+- `pnpm test:harness` passed: 68 tests, including exact candidate readiness,
+  authorization, stale evidence, dry-run no-state-mutation, and uncertain
+  external outcome fixtures.
+- `pnpm typecheck:frontendkit`, `pnpm maintainability:check`,
+  `pnpm format:check`, and `pnpm knowledge:check` passed.
+- `pnpm verify` passed: 8 canonical steps in 46.6 seconds.
 
 ## Runtime Evidence
 
-- Only dry-run and local fake-adapter evidence are authorized.
+- Dry-run exercised full preflight through injected adapters and produced no
+  Git, GitHub, or lifecycle mutation.
+- Fake adapters proved one normal push attempt and no retry or later GitHub
+  call after an uncertain response.
+- `pnpm verify:runtime` passed: 1 browser step in 27.1 seconds; snapshots were
+  not updated. No real push or pull request was attempted.
 
 ## Follow-Up Debt
 

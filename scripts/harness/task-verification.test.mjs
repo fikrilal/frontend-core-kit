@@ -329,6 +329,28 @@ test("leaves the Git-visible task state unchanged", () => {
   }
 });
 
+test("supports read-only verification evidence for handoff dry-run", () => {
+  const root = createRepository({ activePlanRisk: "low" });
+  try {
+    begin(root);
+    write(root, "docs/change.md", "change\n");
+    const statePath = path.join(root, "test-results/task-state.json");
+    const before = fs.readFileSync(statePath, "utf8");
+    const summary = runTaskVerification({
+      root,
+      nodeVersion: "24.18.0",
+      pnpmVersion: () => "11.15.0",
+      execute: taskExecutor(root, []),
+      recordState: false,
+    });
+
+    assert.equal(summary.status, "passed");
+    assert.equal(fs.readFileSync(statePath, "utf8"), before);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 function createRepository({ activePlanRisk = null } = {}) {
   const root = fs.mkdtempSync(
     path.join(os.tmpdir(), "frontend-core-task-verify-"),

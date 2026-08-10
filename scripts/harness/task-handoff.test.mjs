@@ -23,7 +23,9 @@ test("stops before verification or mutation without every publication authority"
 
 test("dry run verifies scope and renders a sanitized handoff without mutation", () => {
   const calls = [];
-  const result = handoff({ calls, dryRun: true });
+  const finished = [];
+  const verificationCalls = [];
+  const result = handoff({ calls, dryRun: true, finished, verificationCalls });
 
   assert.equal(result.status, "ready");
   assert.equal(result.dryRun, true);
@@ -33,11 +35,16 @@ test("dry run verifies scope and renders a sanitized handoff without mutation", 
     calls.map((call) => call.join(" ")),
     ["git branch --show-current", "git remote get-url origin"],
   );
+  assert.deepEqual(finished, []);
+  assert.deepEqual(verificationCalls, [
+    { root: "/fixture", recordState: false },
+  ]);
 });
 
 test("publishes only the authorized commit, normal push, and draft PR sequence", () => {
   const calls = [];
-  const result = handoff({ calls });
+  const finished = [];
+  const result = handoff({ calls, finished });
 
   assert.equal(result.status, "published");
   assert.deepEqual(
@@ -53,6 +60,7 @@ test("publishes only the authorized commit, normal push, and draft PR sequence",
     ],
   );
   assert.equal(calls.flat().includes("--force"), false);
+  assert.deepEqual(finished, ["ready_for_review"]);
 });
 
 test("repairs only the matching open draft PR with separate update authority", () => {
@@ -82,7 +90,7 @@ test("stops before mutation when verification evidence is stale or unowned", () 
         calls,
         verification: verification({ taskPaths: ["docs/old.md"] }),
       }),
-    failureWithCode("verification-stale"),
+    failureWithCode("handoff-candidate-stale"),
   );
   assert.deepEqual(calls, []);
 
@@ -93,6 +101,30 @@ test("stops before mutation when verification evidence is stale or unowned", () 
         state: { preexistingChanges: { changedPaths: ["docs/user.md"] } },
       }),
     failureWithCode("unowned-changes"),
+  );
+});
+
+test("does not retry an uncertain external publication outcome", () => {
+  const calls = [];
+  const native = executor(calls);
+  assert.throws(
+    () =>
+      handoff({
+        calls,
+        execute: (command, args) =>
+          command === "git" && args[0] === "push"
+            ? (calls.push([command, ...args]), { status: null, stdout: "" })
+            : native(command, args),
+      }),
+    failureWithCode("publication-outcome-uncertain"),
+  );
+  assert.equal(
+    calls.filter((call) => call.join(" ").startsWith("git push")).length,
+    1,
+  );
+  assert.equal(
+    calls.some((call) => call[0] === "gh"),
+    false,
   );
 });
 
@@ -132,22 +164,31 @@ function handoff({
   boundaries: taskBoundaries = boundaries(),
   state = { preexistingChanges: { changedPaths: [] } },
   verification: taskVerification = verification(),
+  execute = executor(calls),
+  finished = [],
+  verificationCalls = [],
 } = {}) {
+  const taskState = { ...stateFixture(), ...state };
   return runTaskHandoff({
     root: "/fixture",
     base: "main",
     title: "feat(harness): add task handoff",
     dryRun,
     pullRequest,
-    execute: executor(calls),
+    execute,
     loadPlan: () => ({
       path: "docs/exec-plans/active/task.md",
       source: planSource(),
       boundaries: taskBoundaries,
     }),
-    verifyTask: () => taskVerification,
+    verifyTask: (options) => {
+      verificationCalls.push(options);
+      return taskVerification;
+    },
     discoverChanges: () => changes(),
-    readState: () => state,
+    readState: () => taskState,
+    finishHandoff: ({ state: readyState }) =>
+      finished.push(readyState.lifecycle),
   });
 }
 
@@ -162,11 +203,20 @@ function verification({
     status: "passed",
     activePlan: "docs/exec-plans/active/task.md",
     risk: { risk: "high" },
-    scope: { taskPaths },
+    scope: { taskPaths, taskFingerprint: "candidate" },
     lanes: [
       { id: "full", command: "pnpm verify", status: "passed" },
       { id: "runtime", command: "pnpm verify:runtime", status: "passed" },
     ],
+  };
+}
+
+function stateFixture() {
+  return {
+    lifecycle: "ready_for_review",
+    candidateFingerprint: "candidate",
+    candidatePaths: ["scripts/harness/task-handoff.mjs"],
+    preexistingChanges: { changedPaths: [] },
   };
 }
 

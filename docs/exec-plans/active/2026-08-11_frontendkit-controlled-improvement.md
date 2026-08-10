@@ -1,7 +1,7 @@
 # 2026-08-11 Frontendkit Controlled Improvement Machinery
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit sanitized evidence and read-only improvement machinery; do not create an unsupported hypothesis, mutate policy, lower risk or gates, push, deploy, or contact external systems

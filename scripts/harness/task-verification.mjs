@@ -63,6 +63,7 @@ export function runTaskVerification({
   browserPath = defaultBrowserPath,
   execute = executeCommand,
   now = () => Date.now(),
+  recordState = true,
 }) {
   const startedAt = now();
   const summary = createSummary({ base });
@@ -82,10 +83,10 @@ export function runTaskVerification({
     const lanes = selectVerificationLanes(classification.risk);
     const state = readTaskState(root);
     const scope = evaluateTaskScope({ root, state, activePlan, changes });
-    assertRepairBudget({ root, state, scope });
+    assertRepairBudget({ root, state, scope, recordEscalation: recordState });
 
     validateBrowserIfRequired({ risk: classification.risk, browserPath });
-    beginVerification({ root, state, scope });
+    if (recordState) beginVerification({ root, state, scope });
 
     summary.status = "running";
     summary.risk = classification;
@@ -111,17 +112,19 @@ export function runTaskVerification({
           `${lane.label} failed.`,
           `Run ${laneSummary.command} directly, repair the reported invariant, then rerun task verification.`,
         );
-        summary.repair = recordTaskFailure({
-          root,
-          state,
-          failureCode: failure.failure.code,
-          scope,
-        });
+        if (recordState) {
+          summary.repair = recordTaskFailure({
+            root,
+            state,
+            failureCode: failure.failure.code,
+            scope,
+          });
+        }
         throw failure;
       }
     }
 
-    markReadyForReview({ root, state, scope });
+    if (recordState) markReadyForReview({ root, state, scope });
     summary.status = "passed";
     summary.durationMs = Math.max(0, now() - startedAt);
     writeSummaryIfRequested(root, summaryPath, summary);
