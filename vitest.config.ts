@@ -20,6 +20,7 @@ export default defineConfig({
       "scripts/contracts/**",
       "scripts/harness/**",
       "scripts/testing/**",
+      "tools/frontendkit/**",
       "tests/e2e/**",
       "node_modules/**",
       ".next/**",

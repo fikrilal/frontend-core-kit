@@ -1,11 +1,11 @@
 # 2026-08-11 Frontendkit CLI Foundation
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit the repository-local CLI foundation; do not push, publish, deploy, contact external systems, or change product behavior
-**Allowed paths:** tools/frontendkit/, package.json, docs/exec-plans/
+**Allowed paths:** tools/frontendkit/, package.json, vitest.config.ts, docs/exec-plans/
 **Allowed actions:** plan, edit, verify, commit
 **Maximum risk:** high
 **Repair limit:** 2
@@ -78,12 +78,12 @@ state.
 
 ## Checklist
 
-- [ ] Add command/result contracts and parser.
-- [ ] Add safe process runner and bounded result normalization.
-- [ ] Add CLI entry point, help, human output, and JSON output.
-- [ ] Add focused positive and negative tests.
-- [ ] Add package scripts without changing existing command behavior.
-- [ ] Run verification and record evidence.
+- [x] Add command/result contracts and parser.
+- [x] Add safe process runner and bounded result normalization.
+- [x] Add CLI entry point, help, human output, and JSON output.
+- [x] Add focused positive and negative tests.
+- [x] Add package scripts without changing existing command behavior.
+- [x] Run verification and record evidence.
 
 ## Rollout And Rollback
 
@@ -94,15 +94,29 @@ the existing harness.
 ## Decision And Deviation Log
 
 - 2026-08-11: Keep the kernel dependency-free and use direct process spawning.
+- 2026-08-11: Add `vitest.config.ts` to scope after the full test command showed
+  Vitest collecting Node test-runner files; exclude the dedicated CLI test tree
+  so each suite has one owner.
 
 ## Verification
 
-- Not run yet.
+- Node `24.18.0`, pnpm `11.15.0`.
+- `pnpm test:frontendkit` — passed, 8 tests.
+- `pnpm typecheck:frontendkit` — passed.
+- `pnpm format:check` — passed.
+- `pnpm typecheck` — passed.
+- `pnpm test` — passed, including 244 Vitest tests, 6 contract tests,
+  63 harness/testing tests, and 8 frontendkit tests.
+- `pnpm knowledge:check` — passed.
 
 ## Runtime Evidence
 
-- CLI invocation evidence will be recorded after implementation.
+- `pnpm frontendkit -- help` produced bounded human help and exited 0.
+- `pnpm frontendkit -- help --json` produced parseable schema-versioned JSON
+  with status `passed`.
+- `pnpm frontendkit -- unknown` exited 2 without a stack trace.
 
 ## Follow-Up Debt
 
-- Command migrations are intentionally assigned to the following plans.
+- Command migrations are assigned to the following plans; no foundation debt
+  remains.
