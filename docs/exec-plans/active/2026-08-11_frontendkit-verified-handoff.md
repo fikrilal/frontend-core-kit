@@ -1,7 +1,7 @@
 # 2026-08-11 Frontendkit Verified Handoff
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit the CLI handoff boundary and tests; do not perform a real push, create a real pull request, merge, deploy, or infer publication authority

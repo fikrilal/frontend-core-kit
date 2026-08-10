@@ -1,11 +1,11 @@
 # 2026-08-11 Frontendkit Task Lifecycle And Failure Taxonomy
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit task lifecycle, recovery, candidate identity, and failure classification; do not push, publish, deploy, broaden task authority, or erase active evidence
-**Allowed paths:** tools/frontendkit/, scripts/harness/, package.json, docs/engineering/, docs/exec-plans/
+**Allowed paths:** tools/frontendkit/, scripts/harness/, package.json, knip.json, docs/engineering/, docs/exec-plans/
 **Allowed actions:** plan, edit, verify, commit
 **Maximum risk:** high
 **Repair limit:** 2
@@ -78,12 +78,12 @@ systems or publish.
 
 ## Checklist
 
-- [ ] Define lifecycle states, transitions, and schema migration policy.
-- [ ] Replace metadata fingerprints with content-derived candidate identity.
-- [ ] Add stable failure descriptors and task command routes.
-- [ ] Add complete/recover behavior with fail-closed archive rules.
-- [ ] Add cross-component task tests and docs.
-- [ ] Run verification and record evidence.
+- [x] Define lifecycle states, transitions, and schema migration policy.
+- [x] Replace metadata fingerprints with content-derived candidate identity.
+- [x] Add stable failure descriptors and task command routes.
+- [x] Add complete/recover behavior with fail-closed archive rules.
+- [x] Add cross-component task tests and docs.
+- [x] Run verification and record evidence.
 
 ## Rollout And Rollback
 
@@ -94,14 +94,40 @@ controller and leaves archived evidence untouched.
 ## Decision And Deviation Log
 
 - 2026-08-11: Separate plan-boundary identity from editable plan progress.
+- 2026-08-11: Retained native task scripts are explicit Knip entries because
+  compatibility aliases now delegate to `frontendkit`; this keeps direct
+  diagnostics visible without duplicating command ownership.
+- 2026-08-11: Began a real repository task baseline after implementation, then
+  used this progress-only plan edit as the bounded candidate for lifecycle
+  dogfooding; structured authority remained unchanged.
+- 2026-08-11: Added an exact-candidate check to `task complete` before
+  dogfooding. Ready state is rejected if any candidate content changes after
+  verification.
+- 2026-08-11: The real run inherited this already-modified plan path as
+  pre-existing, so its candidate path set was empty. It still proves state
+  transitions and selected gates, but clean candidate attribution is deferred
+  to the dedicated dogfood plan after a clean commit.
 
 ## Verification
 
-- Not run yet.
+- `pnpm test:frontendkit` passed: 22 tests.
+- `pnpm test:harness` passed: 66 tests, including real temporary Git worktrees,
+  content-versus-mtime identity, boundary stability, stale completion, bounded
+  repair, and terminal recovery.
+- `pnpm typecheck:frontendkit`, `pnpm maintainability:check`,
+  `pnpm format:check`, and `pnpm knowledge:check` passed.
+- Real repository commands passed for `task begin`, `task status`, `task
+verify`, and `task complete`; status after completion failed as expected
+  because active state had been archived.
 
 ## Runtime Evidence
 
-- A temporary real Git repository will exercise the lifecycle.
+- Temporary real Git repositories exercised low/high verification, failure,
+  repair exhaustion, recovery, scope rejection, and ready-state transitions.
+- Real repository `task verify` selected and passed `pnpm verify` in 52.6
+  seconds and `pnpm verify:runtime` in 29.6 seconds. The lifecycle then reached
+  `ready_for_review`, transitioned to `handed_off`, archived exact schema-2
+  state, and removed active private state.
 
 ## Follow-Up Debt
 

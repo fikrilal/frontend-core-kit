@@ -5,6 +5,7 @@ import process from "node:process";
 
 import { chromium } from "@playwright/test";
 
+import { describeFailure } from "./failure-taxonomy.mjs";
 import { collectKnowledgeViolations } from "./knowledge-tools.mjs";
 import { classifyRisk, loadChangedPlanDocuments } from "./risk-classifier.mjs";
 import {
@@ -14,8 +15,10 @@ import {
 } from "./task-boundaries.mjs";
 import {
   assertRepairBudget,
+  beginVerification,
   evaluateTaskScope,
   initializeTaskState,
+  markReadyForReview,
   readTaskState,
   recordTaskFailure,
 } from "./task-state.mjs";
@@ -79,7 +82,10 @@ export function runTaskVerification({
     const lanes = selectVerificationLanes(classification.risk);
     const state = readTaskState(root);
     const scope = evaluateTaskScope({ root, state, activePlan, changes });
-    assertRepairBudget(state, scope);
+    assertRepairBudget({ root, state, scope });
+
+    validateBrowserIfRequired({ risk: classification.risk, browserPath });
+    beginVerification({ root, state, scope });
 
     summary.status = "running";
     summary.risk = classification;
@@ -87,8 +93,6 @@ export function runTaskVerification({
     summary.changes = changes;
     summary.scope = scope;
     summary.lanes = [];
-
-    validateBrowserIfRequired({ risk: classification.risk, browserPath });
 
     for (const lane of lanes) {
       const laneStartedAt = now();
@@ -117,6 +121,7 @@ export function runTaskVerification({
       }
     }
 
+    markReadyForReview({ root, state, scope });
     summary.status = "passed";
     summary.durationMs = Math.max(0, now() - startedAt);
     writeSummaryIfRequested(root, summaryPath, summary);
@@ -465,7 +470,7 @@ function resolveSummaryPath(root, summaryPath) {
 
 function createSummary({ base }) {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     status: "preflight",
     base,
     activePlan: null,
@@ -563,12 +568,15 @@ function formatCommand(command, args) {
 }
 
 function normalizeTaskError(error) {
-  if (error instanceof TaskVerificationFailure) return error.failure;
+  if (error instanceof TaskVerificationFailure) {
+    return { ...error.failure, ...describeFailure(error.failure.code) };
+  }
   if (error && typeof error === "object" && "failure" in error) {
-    return error.failure;
+    return { ...error.failure, ...describeFailure(error.failure.code) };
   }
   return {
     code: "unexpected",
+    ...describeFailure("unexpected"),
     invariant: "Task verification encountered an unexpected local failure.",
     remediation:
       "Inspect the task verifier implementation and rerun the relevant gate directly.",

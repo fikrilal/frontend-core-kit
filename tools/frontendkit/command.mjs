@@ -16,13 +16,15 @@ const helpLines = Object.freeze([
   "  risk classify --base <rev> --head <rev>",
   "                                      Classify changed-path risk.",
   "  evidence check|report               Inspect operating evidence.",
+  "  task begin|status|verify|complete|recover",
+  "                                      Control the bounded task lifecycle.",
   "  --json                              Emit bounded structured output.",
 ]);
 
 /** @typedef {"human" | "json"} OutputFormat */
 
 /**
- * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").ReadOnlyOwner, args: readonly string[] }} ParsedCommand
+ * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").CommandOwner, args: readonly string[] }} ParsedCommand
  */
 
 /**
@@ -86,8 +88,35 @@ export function parseCommand(args) {
     requireLength(values, 2, "Evidence inspection accepts no arguments.");
     return { kind: "owned", format, owner: "evidence", args: [] };
   }
+  if (values[0] === "task") {
+    const taskCommand = values[1];
+    if (!taskCommand || !isTaskCommand(taskCommand)) {
+      throw new CliUsageError("Use task begin|status|verify|complete|recover.");
+    }
+    const allowedOptions =
+      taskCommand === "begin"
+        ? ["--base"]
+        : taskCommand === "verify"
+          ? ["--base", "--summary"]
+          : [];
+    return {
+      kind: "owned",
+      format,
+      owner: `task-${taskCommand}`,
+      args: parseOptionPairs(
+        values.slice(2),
+        allowedOptions,
+        `task ${taskCommand}`,
+      ),
+    };
+  }
 
   throw new CliUsageError(`Unknown frontendkit command: ${values[0]}.`);
+}
+
+/** @param {string} value @returns {value is "begin" | "status" | "verify" | "complete" | "recover"} */
+function isTaskCommand(value) {
+  return ["begin", "status", "verify", "complete", "recover"].includes(value);
 }
 
 /**
@@ -109,7 +138,8 @@ export function executeCommand(command, options) {
           { name: "command-contracts", value: helpLines[6] },
           { name: "command-risk", value: helpLines[7] },
           { name: "command-evidence", value: helpLines[9] },
-          { name: "option-json", value: helpLines[10] },
+          { name: "command-task", value: helpLines[10] },
+          { name: "option-json", value: helpLines[12] },
         ],
       });
     case "doctor":
@@ -154,4 +184,26 @@ function parseRiskArguments(values) {
 /** @param {readonly string[]} values @param {number} expected @param {string} message */
 function requireLength(values, expected, message) {
   if (values.length !== expected) throw new CliUsageError(message);
+}
+
+/** @param {readonly string[]} values @param {readonly string[]} allowed @param {string} command */
+function parseOptionPairs(values, allowed, command) {
+  if (values.length % 2 !== 0) {
+    throw new CliUsageError(`${command} received incomplete options.`);
+  }
+  const seen = new Set();
+  for (let index = 0; index < values.length; index += 2) {
+    const option = values[index];
+    const value = values[index + 1];
+    if (
+      !allowed.includes(option) ||
+      seen.has(option) ||
+      !value ||
+      value.startsWith("--")
+    ) {
+      throw new CliUsageError(`${command} received invalid options.`);
+    }
+    seen.add(option);
+  }
+  return values;
 }

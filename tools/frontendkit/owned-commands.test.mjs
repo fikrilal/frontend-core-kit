@@ -59,6 +59,9 @@ test("keeps read-only compatibility aliases as frontendkit delegates", () => {
     scripts["harness:evidence"],
     "pnpm frontendkit -- evidence report",
   );
+  assert.equal(scripts["task:begin"], "pnpm frontendkit -- task begin");
+  assert.equal(scripts["task:verify"], "pnpm frontendkit -- task verify");
+  assert.equal(scripts["task:complete"], "pnpm frontendkit -- task complete");
 });
 
 function processResult(status, stderr = "") {

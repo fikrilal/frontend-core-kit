@@ -151,7 +151,7 @@ function inspectTaskState({ root, activePlan, findings }) {
   const state = readJson(absolutePath);
   if (
     !state ||
-    state.schemaVersion !== 1 ||
+    (state.schemaVersion !== 1 && state.schemaVersion !== 2) ||
     typeof state.activePlan !== "string" ||
     typeof state.planFingerprint !== "string"
   ) {
@@ -161,6 +161,17 @@ function inspectTaskState({ root, activePlan, findings }) {
         "task-state.invalid",
         "Private task state is malformed.",
         "Use task recovery after confirming the state is stale.",
+      ),
+    );
+    return;
+  }
+  if (state.schemaVersion === 1) {
+    findings.push(
+      finding(
+        "warning",
+        "task-state.legacy",
+        "Private task state uses the diagnostic-only legacy schema.",
+        "Preserve it for diagnosis, then begin a new schema-v2 task baseline.",
       ),
     );
     return;
@@ -176,7 +187,11 @@ function inspectTaskState({ root, activePlan, findings }) {
     );
     return;
   }
-  if (state.planFingerprint !== fingerprint(activePlan.source)) {
+  const boundaries = planBoundaries(activePlan.source);
+  if (
+    !boundaries ||
+    state.planFingerprint !== fingerprint(JSON.stringify(boundaries))
+  ) {
     findings.push(
       finding(
         "warning",
@@ -186,6 +201,40 @@ function inspectTaskState({ root, activePlan, findings }) {
       ),
     );
   }
+}
+
+/** @param {string} source */
+function planBoundaries(source) {
+  const allowedPaths = metadata(source, "Allowed paths");
+  const allowedActions = metadata(source, "Allowed actions");
+  const maximumRisk = metadata(source, "Maximum risk")?.toLowerCase();
+  const repairLimit = Number(metadata(source, "Repair limit"));
+  if (
+    !allowedPaths ||
+    !allowedActions ||
+    !maximumRisk ||
+    !Number.isInteger(repairLimit)
+  ) {
+    return null;
+  }
+  return {
+    allowedPaths: allowedPaths
+      .split(",")
+      .map((value) => value.trim().replaceAll("\\", "/")),
+    allowedActions: allowedActions.split(",").map((value) => value.trim()),
+    maximumRisk,
+    repairLimit,
+  };
+}
+
+/** @param {string} source @param {string} name */
+function metadata(source, name) {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return (
+    source
+      .match(new RegExp(`^\\*\\*${escaped}:\\*\\*\\s*(.+)$`, "m"))?.[1]
+      ?.trim() ?? null
+  );
 }
 
 /** @param {{ root: string, runProcess: ReturnType<typeof createProcessRunner>, findings: DoctorFinding[] }} input */

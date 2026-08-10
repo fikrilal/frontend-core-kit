@@ -6,51 +6,78 @@ import { createProcessRunner } from "./process-runner.mjs";
 import { failed, passed } from "./result.mjs";
 
 const owners = Object.freeze({
-  knowledge: Object.freeze({
-    id: "knowledge:check",
-    script: "scripts/harness/check-knowledge.mjs",
-    success: "Repository knowledge is valid.",
-    remediation: "Run pnpm knowledge:check directly for native diagnostics.",
-  }),
-  contracts: Object.freeze({
-    id: "contracts:check",
-    script: "scripts/contracts/check-openapi.mjs",
-    success: "Generated API contracts are current.",
-    remediation: "Run pnpm contracts:check directly for native diagnostics.",
-  }),
-  risk: Object.freeze({
-    id: "risk:classify",
-    script: "scripts/harness/classify-risk.mjs",
-    success: "Change risk was classified.",
-    remediation: "Run pnpm risk:classify directly for native diagnostics.",
-  }),
-  evidence: Object.freeze({
-    id: "evidence:report",
-    script: "scripts/harness/operating-evidence-cli.mjs",
-    success: "Operating evidence is valid and was summarized.",
-    remediation: "Run pnpm harness:evidence directly for native diagnostics.",
-  }),
+  knowledge: owner(
+    "knowledge:check",
+    "scripts/harness/check-knowledge.mjs",
+    "Repository knowledge is valid.",
+    "Run pnpm knowledge:check directly for native diagnostics.",
+  ),
+  contracts: owner(
+    "contracts:check",
+    "scripts/contracts/check-openapi.mjs",
+    "Generated API contracts are current.",
+    "Run pnpm contracts:check directly for native diagnostics.",
+  ),
+  risk: owner(
+    "risk:classify",
+    "scripts/harness/classify-risk.mjs",
+    "Change risk was classified.",
+    "Run pnpm risk:classify directly for native diagnostics.",
+  ),
+  evidence: owner(
+    "evidence:report",
+    "scripts/harness/operating-evidence-cli.mjs",
+    "Operating evidence is valid and was summarized.",
+    "Run pnpm harness:evidence directly for native diagnostics.",
+  ),
+  "task-begin": owner(
+    "task:begin",
+    "scripts/harness/task-begin.mjs",
+    "Task baseline was authorized.",
+    "Run the native task-begin script for focused diagnostics.",
+  ),
+  "task-verify": owner(
+    "task:verify",
+    "scripts/harness/task-verify.mjs",
+    "Task candidate is ready for review.",
+    "Run the native task-verify script for focused diagnostics.",
+  ),
+  "task-status": taskControl("status", "Task status was read."),
+  "task-complete": taskControl(
+    "complete",
+    "Task state was completed and archived.",
+  ),
+  "task-recover": taskControl(
+    "recover",
+    "Terminal task state was recovered and archived.",
+  ),
 });
 
-/** @typedef {keyof typeof owners} ReadOnlyOwner */
+/** @typedef {keyof typeof owners} CommandOwner */
+/** @typedef {{ id: string, script: string, success: string, remediation: string, prefixArgs: readonly string[], structured: boolean }} OwnerDefinition */
 
 /**
- * @param {ReadOnlyOwner} owner
+ * @param {CommandOwner} ownerName
  * @param {readonly string[]} args
  * @param {{ root?: string, runProcess?: ReturnType<typeof createProcessRunner> }} [options]
  */
 export function runOwnedCommand(
-  owner,
+  ownerName,
   args,
   { root = process.cwd(), runProcess = createProcessRunner() } = {},
 ) {
-  const definition = owners[owner];
-  const result = runProcess("node", [definition.script, ...args], {
-    cwd: root,
-  });
+  const definition = owners[ownerName];
+  const result = runProcess(
+    "node",
+    [definition.script, ...definition.prefixArgs, ...args],
+    { cwd: root },
+  );
   const details = [
-    { name: "owner", value: owner },
+    { name: "owner", value: ownerName },
     { name: "duration-ms", value: result.durationMs },
+    ...(definition.structured && result.status === 0
+      ? structuredDetails(result.stdout)
+      : []),
   ];
 
   return result.status === 0
@@ -64,4 +91,70 @@ export function runOwnedCommand(
           { name: "remediation", value: definition.remediation },
         ],
       });
+}
+
+/**
+ * @param {string} id
+ * @param {string} script
+ * @param {string} success
+ * @param {string} remediation
+ * @param {readonly string[]} [prefixArgs]
+ * @param {boolean} [structured]
+ * @returns {Readonly<OwnerDefinition>}
+ */
+function owner(
+  id,
+  script,
+  success,
+  remediation,
+  prefixArgs = [],
+  structured = false,
+) {
+  return Object.freeze({
+    id,
+    script,
+    success,
+    remediation,
+    prefixArgs: Object.freeze(prefixArgs),
+    structured,
+  });
+}
+
+/** @param {"status" | "complete" | "recover"} command @param {string} success */
+function taskControl(command, success) {
+  return owner(
+    `task:${command}`,
+    "scripts/harness/task-control-cli.mjs",
+    success,
+    `Run the native task-control script with ${command} for focused diagnostics.`,
+    [command],
+    true,
+  );
+}
+
+/** @param {string} source @returns {import("./result.mjs").CommandDetail[]} */
+function structuredDetails(source) {
+  try {
+    const value = JSON.parse(source);
+    if (!value || typeof value !== "object" || Array.isArray(value)) return [];
+    return Object.entries(value).flatMap(([name, detail]) =>
+      /^[a-z][a-zA-Z0-9]*$/.test(name) &&
+      (typeof detail === "string" ||
+        typeof detail === "number" ||
+        typeof detail === "boolean" ||
+        detail === null)
+        ? [
+            {
+              name: name.replace(
+                /[A-Z]/g,
+                (letter) => `-${letter.toLowerCase()}`,
+              ),
+              value: detail,
+            },
+          ]
+        : [],
+    );
+  } catch {
+    return [];
+  }
 }

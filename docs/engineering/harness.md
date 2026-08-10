@@ -45,7 +45,10 @@ because browser installation and runtime cost are machine-specific.
 
 ## Task verification
 
-Start an active V2 task with `pnpm task:begin`. It captures its base revision,
+The canonical lifecycle is `frontendkit task
+begin|status|verify|complete|recover`; the `task:*` pnpm scripts remain
+compatibility delegates. Start an active V2 task with `task begin`. It captures
+its base revision,
 active-plan identity, narrow structured boundaries, and pre-existing changed
 paths in ignored `test-results/task-state.json`; it never stashes, restores, or
 claims ownership of those paths. `pnpm task:verify` then requires that baseline,
@@ -59,6 +62,20 @@ first failed lane. A failure records only its stable boundary code and a
 path/metadata task fingerprint. Repeating the same failure without a meaningful
 task change exhausts the plan's repair limit and escalates before another costly
 run. This is an execution bound, not automatic source repair.
+
+State schema 2 moves explicitly through `authorized`, `verifying`, `repairing`,
+`ready_for_review`, and terminal `handed_off`, `escalated`, or `failed` states.
+Every transition records its timestamp, stable reason, structured-boundary
+fingerprint, and content-derived candidate fingerprint. Checklist or evidence
+edits do not invalidate authority; changes to allowed paths/actions, maximum
+risk, or repair limit do. Candidate identity hashes contents and deletion state,
+so touching a file cannot reset the repair budget.
+
+`task complete` accepts only `ready_for_review`, transitions it to
+`handed_off`, archives the exact ignored state, and removes the active state.
+`task recover` accepts only terminal state. It refuses active or ambiguous state
+and unchanged escalated candidates, preventing recovery from becoming a repair
+budget reset. Schema-1 state is diagnostic-only and is never silently migrated.
 
 Use `pnpm task:verify -- --base <revision>` only when the task includes commits
 after that base; the default base is `HEAD`. To write sanitized machine evidence,

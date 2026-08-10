@@ -129,8 +129,14 @@ test("runs high-risk lanes in order and writes a sanitized summary", () => {
       path.join(root, "test-results/task-verification.json"),
       "utf8",
     );
-    assert.match(output, /"schemaVersion": 1/);
+    assert.match(output, /"schemaVersion": 2/);
     assert.doesNotMatch(output, /sensitive-value/);
+    assert.equal(
+      JSON.parse(
+        fs.readFileSync(path.join(root, "test-results/task-state.json")),
+      ).lifecycle,
+      "ready_for_review",
+    );
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -164,6 +170,9 @@ test("stops after the first failed lane and records remediation", () => {
     );
     assert.equal(summary.status, "failed");
     assert.equal(summary.failure.code, "lane-full-failed");
+    assert.equal(summary.failure.family, "integration");
+    assert.equal(summary.failure.owner, "code-owner");
+    assert.equal(summary.failure.repairable, true);
     assert.match(summary.failure.remediation, /pnpm verify/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

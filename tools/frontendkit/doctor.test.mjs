@@ -58,16 +58,23 @@ test("reports malformed private state without modifying it", () => {
 
 test("accepts matching private task state and plan fingerprint", () => {
   const fixture = createFixture();
+  const boundaries = {
+    allowedPaths: ["docs/"],
+    allowedActions: ["edit", "verify"],
+    maximumRisk: "high",
+    repairLimit: 2,
+  };
   write(
     fixture.root,
     "test-results/task-state.json",
     `${JSON.stringify({
-      schemaVersion: 1,
+      schemaVersion: 2,
       activePlan: fixture.planPath,
       planFingerprint: crypto
         .createHash("sha256")
-        .update(fixture.plan)
+        .update(JSON.stringify(boundaries))
         .digest("hex"),
+      boundaries,
     })}\n`,
   );
   const result = runDoctor({
@@ -87,7 +94,8 @@ test("accepts matching private task state and plan fingerprint", () => {
 function createFixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "frontendkit-doctor-"));
   const planPath = "docs/exec-plans/active/task.md";
-  const plan = "# Task\n\n**Risk:** high\n";
+  const plan =
+    "# Task\n\n**Risk:** high\n**Allowed paths:** docs/\n**Allowed actions:** edit, verify\n**Maximum risk:** high\n**Repair limit:** 2\n";
   write(root, ".nvmrc", "24.18.0\n");
   write(root, "package.json", '{"packageManager":"pnpm@11.15.0"}\n');
   write(root, planPath, plan);

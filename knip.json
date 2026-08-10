@@ -4,7 +4,10 @@
   "entry": [
     "scripts/contracts/check-openapi.mjs",
     "scripts/harness/check-knowledge.mjs",
-    "scripts/harness/operating-evidence-cli.mjs"
+    "scripts/harness/operating-evidence-cli.mjs",
+    "scripts/harness/task-begin.mjs",
+    "scripts/harness/task-control-cli.mjs",
+    "scripts/harness/task-verify.mjs"
   ],
   "ignore": [
     "src/contracts/example-api/generated.ts",

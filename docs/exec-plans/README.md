@@ -73,10 +73,10 @@ The accepted direction is documented in the
    [Canonical verification profiles](completed/2026-08-11_frontendkit-canonical-profiles.md)
 4. **Completed:**
    [Read-only controls and doctor](completed/2026-08-11_frontendkit-doctor-controls.md)
-5. **Active:**
-   [Task lifecycle and failure taxonomy](active/2026-08-11_frontendkit-task-lifecycle.md)
-6. **Queued:**
-   [Verified handoff](queued/2026-08-11_frontendkit-verified-handoff.md)
+5. **Completed:**
+   [Task lifecycle and failure taxonomy](completed/2026-08-11_frontendkit-task-lifecycle.md)
+6. **Active:**
+   [Verified handoff](active/2026-08-11_frontendkit-verified-handoff.md)
 7. **Queued:**
    [Controlled improvement machinery](queued/2026-08-11_frontendkit-controlled-improvement.md)
 8. **Queued:**

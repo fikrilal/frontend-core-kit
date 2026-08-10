@@ -67,6 +67,31 @@ test("parses read-only controls through one router", () => {
   assert.equal(parseCommand(["evidence", "report"]).owner, "evidence");
 });
 
+test("parses bounded task lifecycle commands", () => {
+  assert.deepEqual(parseCommand(["task", "begin", "--base", "HEAD"]), {
+    kind: "owned",
+    format: "human",
+    owner: "task-begin",
+    args: ["--base", "HEAD"],
+  });
+  assert.deepEqual(
+    parseCommand(["task", "verify", "--summary", "test-results/summary.json"]),
+    {
+      kind: "owned",
+      format: "human",
+      owner: "task-verify",
+      args: ["--summary", "test-results/summary.json"],
+    },
+  );
+  for (const command of ["status", "complete", "recover"]) {
+    assert.equal(parseCommand(["task", command]).owner, `task-${command}`);
+  }
+  assert.throws(
+    () => parseCommand(["task", "recover", "--base", "HEAD"]),
+    CliUsageError,
+  );
+});
+
 test("rejects unknown commands and malformed global options", () => {
   assert.throws(() => parseCommand(["unknown"]), CliUsageError);
   assert.throws(

@@ -5,6 +5,17 @@ import path from "node:path";
 import { findScopeViolations } from "./task-boundaries.mjs";
 
 const stateRelativePath = "test-results/task-state.json";
+const archiveRelativePath = "test-results/task-archive";
+const terminalStates = new Set(["handed_off", "escalated", "failed"]);
+const transitions = Object.freeze({
+  authorized: new Set(["verifying", "failed"]),
+  verifying: new Set(["repairing", "ready_for_review", "escalated", "failed"]),
+  repairing: new Set(["verifying", "escalated", "failed"]),
+  ready_for_review: new Set(["verifying", "handed_off", "failed"]),
+  handed_off: new Set(),
+  escalated: new Set(),
+  failed: new Set(),
+});
 
 export function initializeTaskState({
   root,
@@ -20,19 +31,33 @@ export function initializeTaskState({
     throw stateError(
       "task-state-exists",
       "A task baseline already exists for this repository worktree.",
-      "Complete or explicitly archive the current task before starting another baseline.",
+      "Complete or recover the current terminal task before starting another baseline.",
     );
   }
 
+  const occurredAt = now();
   const state = {
-    schemaVersion: 1,
-    startedAt: now(),
+    schemaVersion: 2,
+    startedAt: occurredAt,
     base,
     revision,
     activePlan: activePlan.path,
-    planFingerprint: fingerprint(activePlan.source),
+    planFingerprint: fingerprintBoundaries(boundaries),
     boundaries,
     preexistingChanges: changes,
+    lifecycle: "authorized",
+    candidateFingerprint: null,
+    candidatePaths: [],
+    transitions: [
+      transitionRecord({
+        from: null,
+        to: "authorized",
+        reason: "task-begin",
+        occurredAt,
+        planFingerprint: fingerprintBoundaries(boundaries),
+        candidateFingerprint: null,
+      }),
+    ],
     failures: [],
   };
   writeState(statePath, state);
@@ -55,7 +80,7 @@ export function readTaskState(root) {
     throw stateError(
       "task-state-invalid",
       "Task verification found an unreadable task baseline.",
-      "Archive the invalid test-results/task-state.json and start the task again.",
+      "Preserve the invalid file for diagnosis before manual recovery.",
     );
   }
 }
@@ -68,7 +93,7 @@ export function evaluateTaskScope({ root, state, activePlan, changes }) {
       "Start a new task baseline after changing the active execution plan.",
     );
   }
-  if (state.planFingerprint !== fingerprint(activePlan.source)) {
+  if (state.planFingerprint !== fingerprintBoundaries(activePlan.boundaries)) {
     throw stateError(
       "task-boundaries-changed",
       "Structured task boundaries changed after the task baseline was captured.",
@@ -95,21 +120,55 @@ export function evaluateTaskScope({ root, state, activePlan, changes }) {
   return {
     preexistingPaths: [...preexistingPaths].toSorted(),
     taskPaths,
-    taskFingerprint: fingerprintTaskPaths(root, taskPaths),
+    taskFingerprint: fingerprintCandidate(root, taskPaths),
   };
 }
 
-export function assertRepairBudget(state, scope) {
+export function beginVerification({ root, state, scope, now }) {
+  state.candidateFingerprint = scope.taskFingerprint;
+  state.candidatePaths = [...scope.taskPaths];
+  return transitionTaskState({
+    root,
+    state,
+    to: "verifying",
+    reason: "verification-started",
+    candidateFingerprint: scope.taskFingerprint,
+    now,
+  });
+}
+
+export function markReadyForReview({ root, state, scope, now }) {
+  return transitionTaskState({
+    root,
+    state,
+    to: "ready_for_review",
+    reason: "verification-passed",
+    candidateFingerprint: scope.taskFingerprint,
+    now,
+  });
+}
+
+export function assertRepairBudget({ root, state, scope, now }) {
   const previous = state.failures.at(-1);
   if (
     previous &&
-    previous.taskFingerprint === scope.taskFingerprint &&
+    previous.candidateFingerprint === scope.taskFingerprint &&
     previous.repeatCount >= state.boundaries.repairLimit
   ) {
+    if (state.lifecycle !== "escalated") {
+      transitionTaskState({
+        root,
+        state,
+        to: "escalated",
+        reason: "repair-budget-exhausted",
+        candidateFingerprint: scope.taskFingerprint,
+        now,
+      });
+    }
     throw stateError(
       "repair-budget-exhausted",
-      "The task reached its repair limit without a meaningful task change.",
-      "Change the task evidence meaningfully or request human direction before retrying.",
+      "The task reached its repair limit without a meaningful content change.",
+      "Change the candidate meaningfully or request human direction before recovery.",
     );
   }
 }
@@ -125,21 +184,206 @@ export function recordTaskFailure({
   const repeatCount =
     previous &&
     previous.failureCode === failureCode &&
-    previous.taskFingerprint === scope.taskFingerprint
+    previous.candidateFingerprint === scope.taskFingerprint
       ? previous.repeatCount + 1
       : 1;
-  const record = {
+  state.failures.push({
     occurredAt: now(),
     failureCode,
-    taskFingerprint: scope.taskFingerprint,
+    candidateFingerprint: scope.taskFingerprint,
     repeatCount,
-  };
-  state.failures.push(record);
-  writeState(taskStatePath(root), state);
+  });
+  transitionTaskState({
+    root,
+    state,
+    to: "repairing",
+    reason: failureCode,
+    candidateFingerprint: scope.taskFingerprint,
+    now,
+  });
   return {
     repeatCount,
     remaining: Math.max(0, state.boundaries.repairLimit - repeatCount),
   };
+}
+
+export function taskStatus(root) {
+  const state = readTaskState(root);
+  return {
+    lifecycle: state.lifecycle,
+    activePlan: state.activePlan,
+    repairCount: state.failures.length,
+    candidateFingerprint: state.candidateFingerprint,
+  };
+}
+
+export function completeTaskState({
+  root,
+  now = () => new Date().toISOString(),
+}) {
+  const state = readTaskState(root);
+  if (state.lifecycle !== "ready_for_review") {
+    throw stateError(
+      "task-not-ready",
+      "Only a verified ready_for_review task can be completed.",
+      "Run task verification successfully before task completion.",
+    );
+  }
+  if (
+    state.candidateFingerprint !==
+    fingerprintCandidate(root, state.candidatePaths)
+  ) {
+    throw stateError(
+      "task-candidate-changed",
+      "The verified candidate changed after reaching ready_for_review.",
+      "Rerun task verification for the current candidate before completion.",
+    );
+  }
+  transitionTaskState({
+    root,
+    state,
+    to: "handed_off",
+    reason: "task-completed",
+    candidateFingerprint: state.candidateFingerprint,
+    now,
+  });
+  return archiveTerminalState({ root, state });
+}
+
+export function recoverTaskState({
+  root,
+  now = () => new Date().toISOString(),
+}) {
+  const state = readTaskState(root);
+  if (!terminalStates.has(state.lifecycle)) {
+    throw stateError(
+      "task-recovery-active",
+      "Recovery refuses to archive active or ambiguous task state.",
+      "Verify, complete, or explicitly escalate the task before recovery.",
+    );
+  }
+  if (
+    state.lifecycle === "escalated" &&
+    state.candidateFingerprint ===
+      fingerprintCandidate(root, state.candidatePaths)
+  ) {
+    throw stateError(
+      "task-recovery-unchanged",
+      "Recovery cannot reset the repair budget for an unchanged candidate.",
+      "Make a meaningful candidate change or retain the escalation for human direction.",
+    );
+  }
+  return archiveTerminalState({ root, state, now });
+}
+
+function transitionTaskState({
+  root,
+  state,
+  to,
+  reason,
+  candidateFingerprint,
+  now = () => new Date().toISOString(),
+}) {
+  if (!transitions[state.lifecycle]?.has(to)) {
+    throw stateError(
+      "task-transition-invalid",
+      `Task lifecycle cannot transition from ${state.lifecycle} to ${to}.`,
+      "Use only the explicit task lifecycle commands for state changes.",
+    );
+  }
+  const occurredAt = now();
+  state.transitions.push(
+    transitionRecord({
+      from: state.lifecycle,
+      to,
+      reason,
+      occurredAt,
+      planFingerprint: state.planFingerprint,
+      candidateFingerprint,
+    }),
+  );
+  state.lifecycle = to;
+  state.candidateFingerprint = candidateFingerprint;
+  writeState(taskStatePath(root), state);
+  return state;
+}
+
+function archiveTerminalState({ root, state }) {
+  if (!terminalStates.has(state.lifecycle)) {
+    throw stateError(
+      "task-archive-nonterminal",
+      "Only exact terminal task state can be archived.",
+      "Move the task through an explicit terminal transition first.",
+    );
+  }
+  const directory = path.join(root, archiveRelativePath);
+  fs.mkdirSync(directory, { recursive: true });
+  const archiveName = `${state.startedAt.replaceAll(":", "-")}-${state.planFingerprint.slice(0, 12)}.json`;
+  const archivePath = path.join(directory, archiveName);
+  if (fs.existsSync(archivePath)) {
+    throw stateError(
+      "task-archive-exists",
+      "The exact task archive already exists.",
+      "Inspect the existing archive before changing task state.",
+    );
+  }
+  writeState(archivePath, state);
+  fs.unlinkSync(taskStatePath(root));
+  return {
+    archivePath: path.relative(root, archivePath).replaceAll("\\", "/"),
+    lifecycle: state.lifecycle,
+  };
+}
+
+function validateState(state) {
+  if (state?.schemaVersion === 1) {
+    throw stateError(
+      "task-state-legacy",
+      "Legacy task state is diagnostic-only and cannot be migrated safely.",
+      "Preserve it for diagnosis, then begin a new schema-v2 task baseline.",
+    );
+  }
+  if (
+    !state ||
+    state.schemaVersion !== 2 ||
+    typeof state.activePlan !== "string" ||
+    typeof state.planFingerprint !== "string" ||
+    !Object.hasOwn(transitions, state.lifecycle) ||
+    !state.boundaries ||
+    !Array.isArray(state.preexistingChanges?.changedPaths) ||
+    !Array.isArray(state.candidatePaths) ||
+    !Array.isArray(state.transitions) ||
+    !Array.isArray(state.failures)
+  ) {
+    throw stateError(
+      "task-state-invalid",
+      "Task verification found an invalid task baseline.",
+      "Preserve the invalid state for diagnosis before manual recovery.",
+    );
+  }
+  return state;
+}
+
+function fingerprintBoundaries(boundaries) {
+  return fingerprint(JSON.stringify(boundaries));
+}
+
+function fingerprintCandidate(root, paths) {
+  const hash = crypto.createHash("sha256");
+  for (const filePath of [...paths].toSorted()) {
+    hash.update(filePath).update("\0");
+    try {
+      const contents = fs.readFileSync(path.join(root, filePath));
+      hash.update("file\0").update(contents).update("\0");
+    } catch {
+      hash.update("missing\0");
+    }
+  }
+  return hash.digest("hex");
+}
+
+function transitionRecord(input) {
+  return input;
 }
 
 function taskStatePath(root) {
@@ -155,38 +399,6 @@ export class TaskStateFailure extends Error {
     super(failure.invariant);
     this.failure = failure;
   }
-}
-
-function validateState(state) {
-  if (
-    !state ||
-    state.schemaVersion !== 1 ||
-    typeof state.activePlan !== "string" ||
-    typeof state.planFingerprint !== "string" ||
-    !state.boundaries ||
-    !Array.isArray(state.preexistingChanges?.changedPaths) ||
-    !Array.isArray(state.failures)
-  ) {
-    throw stateError(
-      "task-state-invalid",
-      "Task verification found an invalid task baseline.",
-      "Archive the invalid test-results/task-state.json and start the task again.",
-    );
-  }
-  return state;
-}
-
-function fingerprintTaskPaths(root, paths) {
-  const states = paths.map((filePath) => {
-    const absolutePath = path.join(root, filePath);
-    try {
-      const stats = fs.statSync(absolutePath);
-      return [filePath, stats.size, Math.trunc(stats.mtimeMs)];
-    } catch {
-      return [filePath, "missing"];
-    }
-  });
-  return fingerprint(JSON.stringify(states));
 }
 
 function fingerprint(value) {
