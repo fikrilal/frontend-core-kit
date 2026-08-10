@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { PasswordResetConfirmRequestDto } from "@/contracts/lamara-api/runtime";
+import { PasswordResetConfirmRequestDto } from "@/contracts/example-api/runtime";
 
 import type { PasswordResetConfirmationActionState } from "./password-reset-confirmation-state";
 import { confirmPasswordReset } from "../server/auth-api";

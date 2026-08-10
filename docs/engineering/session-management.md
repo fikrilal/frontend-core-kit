@@ -2,14 +2,14 @@
 
 ## Current boundary
 
-Lamara uses a backend-for-frontend session:
+Frontend Core Kit uses a backend-for-frontend session:
 
 ```text
 browser
   -> HttpOnly opaque session cookie
   -> Next.js Server Action / Server Component
   -> process-memory session record
-  -> Lamara API access or refresh token
+  -> Example API access or refresh token
 ```
 
 The browser never receives API access or refresh tokens. The single Next.js
@@ -20,7 +20,7 @@ session expiry, version, and refresh state.
 
 `/login` validates email and password in a Server Action, calls the generated
 password-login contract, creates a new random web session, and sets
-`lamara_session` with `HttpOnly`, `SameSite=Lax`, `Path=/`, and `Secure` in
+`frontend_core_session` with `HttpOnly`, `SameSite=Lax`, `Path=/`, and `Secure` in
 production.
 
 Logout expires the browser cookie first, removes the in-memory record, and

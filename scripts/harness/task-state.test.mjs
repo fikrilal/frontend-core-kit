@@ -122,7 +122,7 @@ test("stops when the plan boundary changes after task start", () => {
 });
 
 function createRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "lamara-task-state-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "frontend-core-task-state-"));
 }
 
 function plan() {

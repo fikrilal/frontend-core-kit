@@ -1,6 +1,6 @@
-# Lamara Frontend Agent Guide
+# Frontend Core Kit Agent Guide
 
-Lamara Frontend is the web application for Lamara.
+Frontend Core Kit is a template-grade Next.js starter.
 
 ## Source Of Truth
 
@@ -19,7 +19,7 @@ Lamara Frontend is the web application for Lamara.
 
 ## UI Style Reference (pure shadcn default)
 
-Lamara Frontend is a template-grade Next.js starter. Its UI must use **pure
+Frontend Core Kit is a template-grade Next.js starter. Its UI must use **pure
 shadcn defaults** — the official shadcn new-york components and token set as
 shipped, with no custom design tokens, no hand-rolled primitives, and no
 bespoke styling layer. This is deliberate: a template must stay recognizable,

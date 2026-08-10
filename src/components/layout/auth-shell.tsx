@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { LamaraMark } from "@/components/brand/lamara-mark";
+import { FrontendCoreMark } from "@/components/brand/frontend-core-mark";
 import {
   Card,
   CardContent,
@@ -29,12 +29,12 @@ export function AuthShell({
       <Card className={width === "xl" ? "w-full max-w-xl" : "w-full max-w-sm"}>
         <CardHeader>
           <Link
-            aria-label="Lamara home"
+            aria-label="Frontend Core Kit home"
             className="inline-flex items-center gap-2 font-medium"
             href="/"
           >
-            <LamaraMark className="size-7" />
-            <span className="text-sm">Lamara</span>
+            <FrontendCoreMark className="size-7" />
+            <span className="text-sm">Frontend Core Kit</span>
           </Link>
         </CardHeader>
         <CardContent className="grid gap-6">

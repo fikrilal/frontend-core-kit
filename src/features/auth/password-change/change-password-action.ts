@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { changePasswordRequestDtoNewPasswordMin } from "@/contracts/lamara-api/runtime";
+import { changePasswordRequestDtoNewPasswordMin } from "@/contracts/example-api/runtime";
 import {
   clearSessionCookie,
   getConfiguredSessionService,

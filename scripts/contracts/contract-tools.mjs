@@ -12,7 +12,10 @@ import { format, resolveConfig } from "prettier";
 const scriptsDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 const repositoryRoot = path.resolve(scriptsDirectory, "../..");
-const contractDirectory = path.join(repositoryRoot, "src/contracts/lamara-api");
+const contractDirectory = path.join(
+  repositoryRoot,
+  "src/contracts/example-api",
+);
 export const snapshotPath = path.join(contractDirectory, "openapi.yaml");
 export const generatedPath = path.join(contractDirectory, "generated.ts");
 export const runtimeGeneratedPath = path.join(
@@ -144,7 +147,7 @@ export async function generateContractSource(inputPath = snapshotPath) {
 
 export async function generateRuntimeContractSource(inputPath = snapshotPath) {
   const temporaryDirectory = await fs.mkdtemp(
-    path.join(os.tmpdir(), "lamara-runtime-contract-"),
+    path.join(os.tmpdir(), "example-runtime-contract-"),
   );
   const temporaryOutputPath = path.join(
     temporaryDirectory,

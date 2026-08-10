@@ -27,7 +27,7 @@ test("edits the profile through the authenticated patch endpoint", async ({
   await expect(displayName).toHaveValue("Dante Alighieri");
 
   const sessionCookie = (await context.cookies()).find(
-    (cookie) => cookie.name === "lamara_session",
+    (cookie) => cookie.name === "frontend_core_session",
   );
   expect(sessionCookie?.httpOnly).toBe(true);
 });

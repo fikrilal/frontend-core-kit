@@ -24,7 +24,7 @@ export function readApiResult<TData, TMeta = unknown>(
       return invalidResponse(
         status,
         traceId,
-        "Lamara API returned an unexpected success content type.",
+        "Example API returned an unexpected success content type.",
       );
     }
 
@@ -33,7 +33,7 @@ export function readApiResult<TData, TMeta = unknown>(
       return invalidResponse(
         status,
         traceId,
-        "Lamara API returned an invalid success envelope.",
+        "Example API returned an invalid success envelope.",
       );
     }
 
@@ -42,7 +42,7 @@ export function readApiResult<TData, TMeta = unknown>(
       return invalidResponse(
         status,
         traceId,
-        "Lamara API returned data that does not match the contract.",
+        "Example API returned data that does not match the contract.",
       );
     }
 
@@ -66,7 +66,7 @@ export function readEmptyApiResult(
       return invalidResponse(
         status,
         traceId,
-        "Lamara API returned an unexpected non-empty success.",
+        "Example API returned an unexpected non-empty success.",
       );
     }
 
@@ -99,7 +99,7 @@ export function readOptionalApiResult<TData, TMeta = unknown>(
         return invalidResponse(
           status,
           traceId,
-          "Lamara API returned an unexpected success content type.",
+          "Example API returned an unexpected success content type.",
         );
       }
 
@@ -108,7 +108,7 @@ export function readOptionalApiResult<TData, TMeta = unknown>(
         return invalidResponse(
           status,
           traceId,
-          "Lamara API returned an invalid success envelope.",
+          "Example API returned an invalid success envelope.",
         );
       }
 
@@ -117,7 +117,7 @@ export function readOptionalApiResult<TData, TMeta = unknown>(
         return invalidResponse(
           status,
           traceId,
-          "Lamara API returned data that does not match the contract.",
+          "Example API returned data that does not match the contract.",
         );
       }
 
@@ -153,7 +153,7 @@ async function readResponse<TData, TMeta = unknown>(
         return invalidResponse(
           status,
           traceId,
-          "Lamara API returned invalid problem details.",
+          "Example API returned invalid problem details.",
         );
       }
 
@@ -183,7 +183,7 @@ async function readResponse<TData, TMeta = unknown>(
         failure: {
           kind: "timeout",
           outcome: "unknown",
-          message: "Lamara API request timed out.",
+          message: "Example API request timed out.",
         },
         status: null,
         traceId: error.requestId,
@@ -195,7 +195,7 @@ async function readResponse<TData, TMeta = unknown>(
         ok: false,
         failure: {
           kind: "cancelled",
-          message: "Lamara API request was cancelled.",
+          message: "Example API request was cancelled.",
         },
         status: null,
         traceId: error.requestId,
@@ -206,7 +206,7 @@ async function readResponse<TData, TMeta = unknown>(
       ok: false,
       failure: {
         kind: "network",
-        message: "Unable to reach Lamara API.",
+        message: "Unable to reach Example API.",
       },
       status: null,
       traceId: error.requestId,

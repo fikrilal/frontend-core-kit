@@ -4,10 +4,10 @@
 
 The frontend has:
 
-- a committed Lamara API compatibility snapshot;
+- a committed Example API compatibility snapshot;
 - generated TypeScript operation types and Zod runtime schemas;
 - a typed, server-only `openapi-fetch` client;
-- Lamara-specific response normalization;
+- Example-API-specific response normalization;
 - auth adapters for password login, registration, password-reset request and
   confirmation, email verification and resend, refresh, logout, and current
   user.
@@ -19,22 +19,22 @@ API or receives API credentials.
 ## Owned contract artifacts
 
 ```text
-src/contracts/lamara-api/openapi.yaml
+src/contracts/example-api/openapi.yaml
   Exact frontend compatibility lock.
 
-src/contracts/lamara-api/provenance.json
+src/contracts/example-api/provenance.json
   Backend repository, commit, source path, and snapshot SHA-256.
 
-src/contracts/lamara-api/generated.ts
+src/contracts/example-api/generated.ts
   Generated TypeScript. Never edit directly.
 
-src/contracts/lamara-api/runtime.generated.ts
+src/contracts/example-api/runtime.generated.ts
   Generated Zod schemas. Never edit directly.
 
-src/contracts/lamara-api/index.ts
+src/contracts/example-api/index.ts
   Public type-only export boundary.
 
-src/contracts/lamara-api/runtime.ts
+src/contracts/example-api/runtime.ts
   Explicit runtime-schema export boundary.
 ```
 
@@ -84,7 +84,7 @@ eligible `401` refresh/retry, and safe rate-limit/unavailable UI states; the
 browser never receives or stores the access token.
 
 `openapi-fetch` owns request construction and JSON serialization. The small
-Lamara boundary adds request IDs and normalizes JSON-compatible content types,
+Example boundary adds request IDs and normalizes JSON-compatible content types,
 complete envelopes, empty `204` responses, safe problem details, network
 failures, timeout, cancellation, and invalid responses. It does not persist
 tokens, set cookies, redirect, or choose user-facing copy.
@@ -106,7 +106,7 @@ this layer and are documented in
 ## Local configuration
 
 ```text
-LAMARA_API_BASE_URL=http://127.0.0.1:4000
+EXAMPLE_API_BASE_URL=http://127.0.0.1:4000
 LAMARA_SESSION_TTL_SECONDS=2592000
 ```
 

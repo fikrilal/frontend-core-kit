@@ -1,7 +1,7 @@
 {
-  "name": "lamara-frontend",
+  "name": "frontend-core-kit",
   "version": "0.1.0",
-  "description": "Public web app for Lamara.",
+  "description": "Frontend Core Kit — a template-grade Next.js starter.",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.15.0",

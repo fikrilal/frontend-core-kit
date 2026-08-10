@@ -1,14 +1,14 @@
 import "server-only";
 
-import type { paths } from "@/contracts/lamara-api";
+import type { paths } from "@/contracts/example-api";
 import { readApiConfig } from "@/server/config/env";
 import createClient, { type Client } from "openapi-fetch";
 
-export type LamaraApiClient = Client<paths>;
+export type ExampleApiClient = Client<paths>;
 
 type FetchImplementation = (request: Request) => Promise<Response>;
 
-type LamaraApiClientDependencies = Readonly<{
+type ExampleApiClientDependencies = Readonly<{
   baseUrl: string;
   fetch?: FetchImplementation;
   requestId?: () => string;
@@ -18,19 +18,19 @@ export class ApiRequestError extends Error {
   readonly requestId: string;
 
   constructor(requestId: string, cause: unknown) {
-    super("Lamara API request failed.", { cause });
+    super("Example API request failed.", { cause });
     this.name = "ApiRequestError";
     this.requestId = requestId;
   }
 }
 
-export function createLamaraApiClient({
+export function createExampleApiClient({
   baseUrl,
   fetch: fetchImplementation = globalThis.fetch,
   requestId: createRequestId = () => globalThis.crypto.randomUUID(),
-}: LamaraApiClientDependencies): LamaraApiClient {
+}: ExampleApiClientDependencies): ExampleApiClient {
   const normalizedBaseUrl = readApiConfig({
-    LAMARA_API_BASE_URL: baseUrl,
+    EXAMPLE_API_BASE_URL: baseUrl,
   }).apiBaseUrl;
 
   return createClient<paths>({
@@ -58,10 +58,10 @@ export function createLamaraApiClient({
   });
 }
 
-export function createConfiguredLamaraApiClient(): LamaraApiClient {
+export function createConfiguredExampleApiClient(): ExampleApiClient {
   const config = readApiConfig();
 
-  return createLamaraApiClient({
+  return createExampleApiClient({
     baseUrl: config.apiBaseUrl,
   });
 }

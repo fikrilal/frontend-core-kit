@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { passwordRegisterRequestDtoPasswordMin } from "@/contracts/lamara-api/runtime";
+import { passwordRegisterRequestDtoPasswordMin } from "@/contracts/example-api/runtime";
 
 import { establishAuthenticatedSession } from "../session/establish-authenticated-session";
 import type { RegisterActionState } from "./register-state";

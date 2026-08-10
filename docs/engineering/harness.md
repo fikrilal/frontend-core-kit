@@ -1,4 +1,4 @@
-# Lamara Frontend Engineering Harness
+# Frontend Core Kit Engineering Harness
 
 ## Commands
 
@@ -213,14 +213,14 @@ write permission. External actions are pinned to full commit SHAs with readable
 release comments; updates require reviewing and replacing both values.
 
 The workflow was independently proven by
-[GitHub Actions run 30682954749](https://github.com/Orymu/lamara-frontend/actions/runs/30682954749):
+[GitHub Actions run 30682954749](https://github.com/fikrilal/frontend-core-kit/actions/runs/30682954749):
 all four jobs passed on a clean hosted runner. A repository administrator can
 now create a rule for `main` requiring the unique `CI Required` status. No
 repository rule or auto-merge policy is currently configured by this phase.
 
 Phase 3.2's contract-validated fixture and backend-preflight changes were
 independently reproduced in
-[GitHub Actions run 30685359536](https://github.com/Orymu/lamara-frontend/actions/runs/30685359536):
+[GitHub Actions run 30685359536](https://github.com/fikrilal/frontend-core-kit/actions/runs/30685359536):
 all four jobs passed at commit `9d7b34b`.
 
 ## Maintainability fitness

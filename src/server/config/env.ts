@@ -37,7 +37,7 @@ const apiBaseUrlSchema = z
   .transform((value) => new URL(value).origin);
 
 const apiConfigSchema = z.object({
-  LAMARA_API_BASE_URL: apiBaseUrlSchema,
+  EXAMPLE_API_BASE_URL: apiBaseUrlSchema,
 });
 
 const sessionConfigSchema = z.object({
@@ -62,7 +62,7 @@ export function readApiConfig(
   const parsed = apiConfigSchema.parse(environment);
 
   return {
-    apiBaseUrl: parsed.LAMARA_API_BASE_URL,
+    apiBaseUrl: parsed.EXAMPLE_API_BASE_URL,
   };
 }
 

@@ -1,8 +1,8 @@
 import "server-only";
 
-import { AuthRefreshResponse } from "@/contracts/lamara-api/runtime";
+import { AuthRefreshResponse } from "@/contracts/example-api/runtime";
 import {
-  createConfiguredLamaraApiClient,
+  createConfiguredExampleApiClient,
   readApiResult,
   type ApiResult,
 } from "@/server/api";
@@ -33,7 +33,7 @@ export function getConfiguredSessionService(): SessionService {
 async function refreshApiSession(
   refreshToken: string,
 ): Promise<ApiResult<RefreshedSessionData>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(refreshPath, {
     body: { refreshToken },
     cache: "no-store",

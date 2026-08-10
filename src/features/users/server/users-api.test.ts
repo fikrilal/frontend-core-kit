@@ -102,7 +102,7 @@ afterEach(() => {
 describe("users API", () => {
   it("patches the current user with a bearer token and validates the envelope", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(jsonResponse({ data: currentUser }));
@@ -119,7 +119,7 @@ describe("users API", () => {
     if (!captured) {
       throw new Error("Expected fetch to be called.");
     }
-    expect(captured.url).toBe("https://api.lamara.dev/v1/me");
+    expect(captured.url).toBe("https://api.example.dev/v1/me");
     expect(captured.method).toBe("PATCH");
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("authorization")).toBe("Bearer access-token");
@@ -127,7 +127,7 @@ describe("users API", () => {
   });
 
   it("rejects a malformed envelope without leaking data", async () => {
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", () =>
       Promise.resolve(
         jsonResponse({
@@ -152,7 +152,7 @@ describe("users API", () => {
 
   it("lists the current user sessions with a bearer token and validates the envelope", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -174,14 +174,14 @@ describe("users API", () => {
     if (!captured) {
       throw new Error("Expected fetch to be called.");
     }
-    expect(captured.url).toBe("https://api.lamara.dev/v1/me/sessions");
+    expect(captured.url).toBe("https://api.example.dev/v1/me/sessions");
     expect(captured.method).toBe("GET");
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("authorization")).toBe("Bearer access-token");
   });
 
   it("rejects a malformed sessions envelope without leaking data", async () => {
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", () =>
       Promise.resolve(
         jsonResponse({
@@ -204,7 +204,7 @@ describe("users API", () => {
 
   it("revokes a session through the empty-response contract", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -228,7 +228,7 @@ describe("users API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/me/sessions/session-1/revoke",
+      "https://api.example.dev/v1/me/sessions/session-1/revoke",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -238,7 +238,7 @@ describe("users API", () => {
 
   it("requests account deletion through the empty-response contract", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -262,7 +262,7 @@ describe("users API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/me/account-deletion/request",
+      "https://api.example.dev/v1/me/account-deletion/request",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -272,7 +272,7 @@ describe("users API", () => {
 
   it("cancels account deletion through the empty-response contract", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -296,7 +296,7 @@ describe("users API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/me/account-deletion/cancel",
+      "https://api.example.dev/v1/me/account-deletion/cancel",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -306,7 +306,7 @@ describe("users API", () => {
 
   it("creates a profile image upload plan with a bearer token and validates the envelope", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(jsonResponse({ data: uploadPlanData }));
@@ -327,7 +327,7 @@ describe("users API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/me/profile-image/upload",
+      "https://api.example.dev/v1/me/profile-image/upload",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -337,7 +337,7 @@ describe("users API", () => {
 
   it("completes a profile image upload through the empty-response contract", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -364,7 +364,7 @@ describe("users API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/me/profile-image/complete",
+      "https://api.example.dev/v1/me/profile-image/complete",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -374,7 +374,7 @@ describe("users API", () => {
 
   it("loads the profile image url with a bearer token and validates the envelope", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(jsonResponse({ data: profileImageUrlData }));
@@ -391,7 +391,9 @@ describe("users API", () => {
     if (!captured) {
       throw new Error("Expected fetch to be called.");
     }
-    expect(captured.url).toBe("https://api.lamara.dev/v1/me/profile-image/url");
+    expect(captured.url).toBe(
+      "https://api.example.dev/v1/me/profile-image/url",
+    );
     expect(captured.method).toBe("GET");
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("authorization")).toBe("Bearer access-token");
@@ -399,7 +401,7 @@ describe("users API", () => {
 
   it("returns null when no profile image is set", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -423,7 +425,7 @@ describe("users API", () => {
 
   it("clears the profile image through the empty-response contract", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -446,7 +448,7 @@ describe("users API", () => {
     if (!captured) {
       throw new Error("Expected fetch to be called.");
     }
-    expect(captured.url).toBe("https://api.lamara.dev/v1/me/profile-image");
+    expect(captured.url).toBe("https://api.example.dev/v1/me/profile-image");
     expect(captured.method).toBe("DELETE");
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("authorization")).toBe("Bearer access-token");

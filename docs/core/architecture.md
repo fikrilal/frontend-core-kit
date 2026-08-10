@@ -1,8 +1,8 @@
-# Lamara Frontend Architecture
+# Frontend Core Kit Architecture
 
 ## Current system
 
-Lamara Frontend is one Next.js application with a generic public page and a
+Frontend Core Kit is one Next.js application with a generic public page and a
 narrow authenticated infrastructure proof.
 
 ```text
@@ -13,8 +13,8 @@ browser
         -> server API adapters
         -> session service
            -> process-memory store
-        -> generated Lamara API contract
-           -> Lamara backend
+        -> generated Example API contract
+           -> Example backend
 ```
 
 Implemented routes:
@@ -53,7 +53,7 @@ src/components/
   Cross-page layout, branding, theme behavior, and business-free primitives.
 
 src/server/api/
-  Shared typed HTTP construction and Lamara response normalization.
+  Shared typed HTTP construction and Example API response normalization.
 
 src/server/session/
   Opaque-cookie sessions, process-memory token storage, token rotation, and

@@ -1,13 +1,13 @@
 import "server-only";
 
-import type { operations } from "@/contracts/lamara-api";
+import type { operations } from "@/contracts/example-api";
 import {
   AuthPasswordRegisterResponse,
   AuthPasswordLoginResponse,
   UsersMeGetResponse,
-} from "@/contracts/lamara-api/runtime";
+} from "@/contracts/example-api/runtime";
 import {
-  createConfiguredLamaraApiClient,
+  createConfiguredExampleApiClient,
   readApiResult,
   readEmptyApiResult,
   type ApiResult,
@@ -58,7 +58,7 @@ export type CurrentUserData = CurrentUserEnvelope["data"];
 export async function registerWithPassword(
   input: PasswordRegisterInput,
 ): Promise<ApiResult<PasswordRegisterData>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(passwordRegisterPath, {
     body: input,
     cache: "no-store",
@@ -72,7 +72,7 @@ export async function registerWithPassword(
 export async function verifyEmail(
   input: EmailVerifyInput,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(emailVerifyPath, {
     body: input,
     cache: "no-store",
@@ -87,7 +87,7 @@ export async function changePassword(
   input: PasswordChangeInput,
   accessToken: string,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(passwordChangePath, {
     body: input,
     cache: "no-store",
@@ -104,7 +104,7 @@ export async function changePassword(
 export async function resendEmailVerification(
   accessToken: string,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(emailVerificationResendPath, {
     cache: "no-store",
     headers: {
@@ -120,7 +120,7 @@ export async function resendEmailVerification(
 export async function requestPasswordReset(
   input: PasswordResetRequestInput,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(passwordResetRequestPath, {
     body: input,
     cache: "no-store",
@@ -134,7 +134,7 @@ export async function requestPasswordReset(
 export async function confirmPasswordReset(
   input: PasswordResetConfirmInput,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(passwordResetConfirmPath, {
     body: input,
     cache: "no-store",
@@ -148,7 +148,7 @@ export async function confirmPasswordReset(
 export async function loginWithPassword(
   input: PasswordLoginInput,
 ): Promise<ApiResult<PasswordLoginData>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(passwordLoginPath, {
     body: input,
     cache: "no-store",
@@ -163,7 +163,7 @@ export async function loginWithPassword(
 export async function getCurrentUser(
   accessToken: string,
 ): Promise<ApiResult<CurrentUserData>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.GET(currentUserPath, {
     cache: "no-store",
     headers: {
@@ -179,7 +179,7 @@ export async function getCurrentUser(
 export async function logoutRemoteSession(
   refreshToken: string,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(logoutPath, {
     body: { refreshToken },
     cache: "no-store",

@@ -1,10 +1,11 @@
-export const siteUrl = "https://lamara.dev";
+export const siteUrl = "https://frontend-core-kit.example";
 
-export const siteName = "Lamara";
+export const siteName = "Frontend Core Kit";
 
-export const siteDescription = "A SaaS product currently under development.";
+export const siteDescription = "A SaaS starter currently under development.";
 
-export const siteOgAlt = "Lamara — a SaaS product under development.";
+export const siteOgAlt =
+  "Frontend Core Kit — a SaaS starter under development.";
 
 export const publicRoutes = [
   {

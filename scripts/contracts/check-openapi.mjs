@@ -17,7 +17,7 @@ let temporaryDirectory;
 
 try {
   temporaryDirectory = await fs.mkdtemp(
-    path.join(os.tmpdir(), "lamara-contract-check-"),
+    path.join(os.tmpdir(), "frontend-core-contract-check-"),
   );
   const temporaryTypePath = path.join(temporaryDirectory, "generated.ts");
   const temporaryRuntimePath = path.join(

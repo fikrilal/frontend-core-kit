@@ -24,7 +24,7 @@ test("login form exposes labels, focus order, errors, and no detectable WCAG A/A
   await page.goto("/login");
   await expectNoAccessibilityViolations(page);
 
-  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.getByRole("link", { name: "Frontend Core Kit home" }).focus();
   await page.keyboard.press("Tab");
   const email = page.getByLabel("Email");
   await expect(email).toBeFocused();
@@ -61,7 +61,7 @@ test("registration form exposes labels, password guidance, and no detectable WCA
     "new-password",
   );
 
-  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.getByRole("link", { name: "Frontend Core Kit home" }).focus();
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("Email")).toBeFocused();
   await expectKeyboardFocusIndicator(page.getByLabel("Email"));
@@ -87,7 +87,7 @@ test("password reset form exposes safe feedback and no detectable WCAG A/AA viol
     page.getByRole("heading", { name: "Reset your password" }),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.getByRole("link", { name: "Frontend Core Kit home" }).focus();
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("Email")).toBeFocused();
   await expectKeyboardFocusIndicator(page.getByLabel("Email"));
@@ -119,7 +119,7 @@ test("password reset confirmation exposes password guidance and no detectable WC
     "new-password",
   );
 
-  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.getByRole("link", { name: "Frontend Core Kit home" }).focus();
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("New password", { exact: true })).toBeFocused();
   await expectKeyboardFocusIndicator(
@@ -160,7 +160,7 @@ test("email verification exposes a labelled action and no detectable WCAG A/AA v
     page.getByRole("button", { name: "Verify email" }),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "Lamara home" }).focus();
+  await page.getByRole("link", { name: "Frontend Core Kit home" }).focus();
   await page.keyboard.press("Tab");
   const verifyButton = page.getByRole("button", { name: "Verify email" });
   await expect(verifyButton).toBeFocused();
@@ -182,7 +182,7 @@ test("protected route redirects to an accessible login page", async ({
 }) => {
   await page.goto("/app");
   await expect(page).toHaveURL(/\/login$/);
-  await expect(page).toHaveTitle("Sign in | Lamara");
+  await expect(page).toHaveTitle("Sign in | Frontend Core Kit");
   await expectNoAccessibilityViolations(page);
 });
 
@@ -190,7 +190,7 @@ test("authenticated foundation has landmarks and no detectable WCAG A/AA violati
   page,
 }) => {
   await signIn(page);
-  await expect(page).toHaveTitle("App | Lamara");
+  await expect(page).toHaveTitle("App | Frontend Core Kit");
   await expect(page.getByRole("banner")).toBeVisible();
   await expect(page.getByRole("main")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
@@ -229,7 +229,7 @@ test("profile editor exposes labelled fields, focus order, and no detectable WCA
 }) => {
   await signIn(page);
   await page.goto("/app/profile");
-  await expect(page).toHaveTitle("Profile | Lamara");
+  await expect(page).toHaveTitle("Profile | Frontend Core Kit");
   await expectNoAccessibilityViolations(page);
 
   const displayName = page.getByLabel("Display name");
@@ -257,7 +257,7 @@ test("sessions list has landmarks, labelled statuses, and no detectable WCAG A/A
 }) => {
   await signIn(page);
   await page.goto("/app/sessions");
-  await expect(page).toHaveTitle("Sessions | Lamara");
+  await expect(page).toHaveTitle("Sessions | Frontend Core Kit");
   await expect(page.getByRole("main")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
   await expect(page.getByText("active")).toHaveCount(1);
@@ -271,7 +271,7 @@ test("change-password form exposes labels, password guidance, and no detectable 
 }) => {
   await signIn(page);
   await page.goto("/app/password");
-  await expect(page).toHaveTitle("Change password | Lamara");
+  await expect(page).toHaveTitle("Change password | Frontend Core Kit");
   await expectNoAccessibilityViolations(page);
 
   await expect(
@@ -307,7 +307,7 @@ test("account-deletion request surface has landmarks and no detectable WCAG A/AA
 }) => {
   await signIn(page);
   await page.goto("/app/account-deletion");
-  await expect(page).toHaveTitle("Delete account | Lamara");
+  await expect(page).toHaveTitle("Delete account | Frontend Core Kit");
   await expect(page.getByRole("main")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
   await expect(

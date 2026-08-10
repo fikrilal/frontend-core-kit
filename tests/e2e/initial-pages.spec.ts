@@ -4,7 +4,7 @@ test("renders the generic landing page and opens sign in", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: "Lamara is taking shape." }),
+    page.getByRole("heading", { name: "Frontend Core Kit is taking shape." }),
   ).toBeVisible();
   await page
     .getByRole("link", { name: "Sign in", exact: true })
@@ -54,7 +54,7 @@ test("maps a backend login code to safe frontend copy", async ({
   await expect(page).toHaveURL(/\/login$/);
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(false);
 });
@@ -75,7 +75,7 @@ test("maps an existing registration email to safe frontend copy", async ({
   await expect(page).toHaveURL(/\/register$/);
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(false);
 });
@@ -98,7 +98,7 @@ test("requests reset instructions without revealing account existence", async ({
     messages.push(await status.textContent());
     expect(
       (await context.cookies()).some(
-        (cookie) => cookie.name === "lamara_session",
+        (cookie) => cookie.name === "frontend_core_session",
       ),
     ).toBe(false);
   }
@@ -120,7 +120,7 @@ test("maps password reset rate limiting to safe frontend copy", async ({
   await expect(page).toHaveURL(/\/forgot-password$/);
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(false);
 });
@@ -143,7 +143,7 @@ test("confirms a password reset and redirects without a session", async ({
   expect(page.url()).not.toContain("valid-reset-token");
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(false);
   const browserOwnedState = await page.evaluate(() => ({
@@ -180,7 +180,7 @@ test("maps invalid and expired reset tokens to safe frontend copy", async ({
 
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(false);
 });
@@ -202,7 +202,7 @@ test("verifies an email and redirects without a new session", async ({
   expect(page.url()).not.toContain("valid-verification-token");
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(false);
   const browserOwnedState = await page.evaluate(() => ({
@@ -247,7 +247,7 @@ test("maps invalid and expired email verification tokens to safe copy", async ({
 
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(false);
 });
@@ -346,7 +346,7 @@ test("registers a user with an opaque cookie and verification guidance", async (
   );
 
   const sessionCookie = (await context.cookies()).find(
-    (cookie) => cookie.name === "lamara_session",
+    (cookie) => cookie.name === "frontend_core_session",
   );
   expect(sessionCookie).toMatchObject({
     httpOnly: true,
@@ -408,7 +408,7 @@ test("resends verification email and maps rate limiting to safe copy", async ({
   expect(JSON.stringify(browserOwnedState)).not.toContain(".signature");
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(true);
 });
@@ -429,7 +429,7 @@ test("signs in with an opaque cookie and signs out", async ({
   await expect(page.getByText("user@example.com")).toBeVisible();
 
   const sessionCookie = (await context.cookies()).find(
-    (cookie) => cookie.name === "lamara_session",
+    (cookie) => cookie.name === "frontend_core_session",
   );
   expect(sessionCookie).toMatchObject({
     httpOnly: true,
@@ -449,7 +449,7 @@ test("signs in with an opaque cookie and signs out", async ({
   await expect(page).toHaveURL(/\/login$/);
   expect(
     (await context.cookies()).some(
-      (cookie) => cookie.name === "lamara_session",
+      (cookie) => cookie.name === "frontend_core_session",
     ),
   ).toBe(false);
 });

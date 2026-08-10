@@ -28,7 +28,7 @@ import {
   UsersMeProfileImageCompleteResponse,
   UsersMeProfileImageUrlResponse,
   UsersMeProfileImageClearResponse,
-} from "../../src/contracts/lamara-api/runtime.generated.ts";
+} from "../../src/contracts/example-api/runtime.generated.ts";
 
 export const fixtureContracts = Object.freeze({
   loginRequest: PasswordLoginRequestDto,

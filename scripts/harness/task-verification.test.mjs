@@ -321,7 +321,9 @@ test("leaves the Git-visible task state unchanged", () => {
 });
 
 function createRepository({ activePlanRisk = null } = {}) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lamara-task-verify-"));
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), "frontend-core-task-verify-"),
+  );
   git(root, "init");
   git(root, "config", "user.email", "test@example.com");
   git(root, "config", "user.name", "Test User");

@@ -1,14 +1,14 @@
-# Lamara Frontend Design Direction
+# Frontend Core Kit Design Direction
 
 ## Product status
 
-Lamara is a SaaS product under development. The detailed product position and
+Frontend Core Kit is a SaaS starter under development. The detailed product position and
 workflows are not finalized, so the current UI must remain neutral and
 technically honest.
 
 The foundation may communicate only:
 
-- Lamara exists and is under development;
+- Frontend Core Kit exists and is under development;
 - users can sign in with the implemented authentication mechanism;
 - an authenticated session is active;
 - users can sign out.
@@ -19,7 +19,7 @@ download behavior, or unsupported calls to action.
 ## Visual language
 
 The visual and interaction source of truth is the **pure shadcn default**
-(official shadcn new-york components and token set as shipped). Lamara
+(official shadcn new-york components and token set as shipped). Frontend Core Kit
 Frontend is a template-grade starter, so its UI must stay recognizable and
 upgradeable: no custom design tokens, no hand-rolled primitives, no bespoke
 styling layer.

@@ -2,7 +2,10 @@ import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
 
-export function LamaraMark({ className, ...props }: ComponentProps<"svg">) {
+export function FrontendCoreMark({
+  className,
+  ...props
+}: ComponentProps<"svg">) {
   return (
     <svg
       aria-hidden

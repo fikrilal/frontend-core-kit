@@ -608,9 +608,9 @@ api.listen(apiPort, "127.0.0.1", () => {
     {
       env: {
         ...process.env,
-        LAMARA_API_BASE_URL: `http://127.0.0.1:${apiPort}`,
+        EXAMPLE_API_BASE_URL: `http://127.0.0.1:${apiPort}`,
         LAMARA_SESSION_TTL_SECONDS: "3600",
-        LAMARA_NEXT_DIST_DIR: ".next-e2e",
+        NEXT_DIST_DIR: ".next-e2e",
       },
       stdio: "inherit",
     },

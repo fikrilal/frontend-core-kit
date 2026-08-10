@@ -6,10 +6,10 @@ describe("server configuration", () => {
   it("normalizes a valid API origin", () => {
     expect(
       readApiConfig({
-        LAMARA_API_BASE_URL: "https://api.lamara.dev/",
+        EXAMPLE_API_BASE_URL: "https://api.example.dev/",
       }),
     ).toEqual({
-      apiBaseUrl: "https://api.lamara.dev",
+      apiBaseUrl: "https://api.example.dev",
     });
   });
 
@@ -26,15 +26,15 @@ describe("server configuration", () => {
 
   it.each([
     undefined,
-    "ftp://api.lamara.dev",
-    "https://user:secret@api.lamara.dev",
-    "https://api.lamara.dev/v1",
-    "https://api.lamara.dev?target=other",
-    "https://api.lamara.dev#fragment",
+    "ftp://api.example.dev",
+    "https://user:secret@api.example.dev",
+    "https://api.example.dev/v1",
+    "https://api.example.dev?target=other",
+    "https://api.example.dev#fragment",
   ])("rejects an invalid API origin: %s", (value) => {
     expect(() =>
       readApiConfig({
-        LAMARA_API_BASE_URL: value,
+        EXAMPLE_API_BASE_URL: value,
       }),
     ).toThrow();
   });

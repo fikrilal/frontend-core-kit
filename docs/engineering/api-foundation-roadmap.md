@@ -11,7 +11,7 @@ work. It does not authorize speculative implementation.
 ```text
 feature server adapter
   -> typed openapi-fetch client
-  -> Lamara API
+  -> Example API
   -> shared response normalization
   -> generated Zod envelope validation
   -> ApiResult<TData, TMeta>

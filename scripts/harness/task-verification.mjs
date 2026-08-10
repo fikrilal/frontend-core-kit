@@ -365,7 +365,7 @@ function verifyRepository({ root, execute }) {
     throw taskError(
       "git-repository",
       "Task verification must run inside a Git worktree.",
-      "Run the command from the Lamara repository checkout.",
+      "Run the command from the Frontend Core Kit repository checkout.",
     );
   }
 }

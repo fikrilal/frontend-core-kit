@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { createProfileImageUploadRequestDtoSizeBytesMax } from "@/contracts/lamara-api/runtime";
+import { createProfileImageUploadRequestDtoSizeBytesMax } from "@/contracts/example-api/runtime";
 import {
   clearSessionCookie,
   getConfiguredSessionService,

@@ -13,7 +13,7 @@ export async function ProfilePage() {
 
   return (
     <AuthShell
-      description="Update how you appear in Lamara."
+      description="Update how you appear in Frontend Core Kit."
       headingId="profile-heading"
       title="Your profile"
     >

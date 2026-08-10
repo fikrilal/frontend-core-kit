@@ -1,4 +1,4 @@
-export { createConfiguredLamaraApiClient } from "./client";
+export { createConfiguredExampleApiClient } from "./client";
 export {
   readApiResult,
   readEmptyApiResult,

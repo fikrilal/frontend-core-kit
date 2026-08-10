@@ -5,7 +5,7 @@ import process from "node:process";
 
 import { checkBackendReadiness } from "./backend-preflight.mjs";
 
-if (!process.env.LAMARA_API_BASE_URL && fs.existsSync(".env.local")) {
+if (!process.env.EXAMPLE_API_BASE_URL && fs.existsSync(".env.local")) {
   process.loadEnvFile(".env.local");
 }
 

@@ -4,7 +4,7 @@
 
 **Captured:** 2026-08-01
 
-**Scope:** Lamara Frontend repository and GitHub-hosted CI
+**Scope:** Frontend Core Kit repository and GitHub-hosted CI
 
 **Threshold status:** descriptive measurements only
 
@@ -48,12 +48,12 @@ The inventory below is recorded from the verification run in this baseline:
 
 | Layer                        | Count | Scope                                                               |
 | ---------------------------- | ----: | ------------------------------------------------------------------- |
-| Vitest unit/component/server |    60 | Application and server-boundary behavior                            |
+| Vitest unit/component/server |   237 | Application and server-boundary behavior                            |
 | Contract Node tests          |     6 | Contract tooling and deterministic generation                       |
-| Harness Node tests           |    48 | Knowledge, risk, task loop/handoff, and operating-evidence fixtures |
-| Testing-tool Node tests      |     7 | Auth fixture contracts and sanitized backend preflight              |
-| Playwright scenarios         |    14 | Public, auth/session, accessibility, visual, and 404                |
-| Visual baselines             |     5 | Light/dark landing, login/error, and authenticated state            |
+| Harness Node tests           |    49 | Knowledge, risk, task loop/handoff, and operating-evidence fixtures |
+| Testing-tool Node tests      |    14 | Auth fixture contracts and sanitized backend preflight              |
+| Playwright scenarios         |    69 | Public, auth/session, users, accessibility, visual, and 404         |
+| Visual baselines             |    23 | Landing, auth, users, and account states                            |
 
 Counts describe current test cases, not requirements coverage. They must not be
 used as a target that encourages low-value tests.
@@ -67,7 +67,7 @@ runtime:
 | --------------------- | ------ | --------- | ----------------------------------- |
 | `pnpm verify:fast`    | passed | 24.25 s   | Full fast deterministic gate        |
 | `pnpm verify`         | passed | 32.79 s   | Fast controls plus production build |
-| `pnpm verify:runtime` | passed | 8.0 s     | Fourteen Chromium scenarios         |
+| `pnpm verify:runtime` | passed | ~30 s     | Sixty-nine Chromium scenarios       |
 
 These values establish an observation point for future calibration. A later
 phase may introduce regression budgets only after multiple comparable samples.
@@ -78,7 +78,7 @@ The repository has credible local and independent CI feedback for its small impl
 formatting, typing, contracts, focused behavior, architecture boundaries,
 production compilation, and browser flows. The least-privilege CI workflow
 reproduced that evidence successfully in
-[run 30682954749](https://github.com/Orymu/lamara-frontend/actions/runs/30682954749).
+[run 30682954749](https://github.com/fikrilal/frontend-core-kit/actions/runs/30682954749).
 There is still no required repository rule,
 real-backend smoke lane, container evidence, or calibrated security sensor.
 Accessibility and visual regression now have deterministic first-line sensors,
@@ -115,4 +115,4 @@ cleanup also removed an unused Zod schema that was never executed and therefore
 misrepresented an internal session record as runtime-validated.
 
 The complete maintainability gate was independently reproduced in
-[GitHub Actions run 30684371899](https://github.com/Orymu/lamara-frontend/actions/runs/30684371899).
+[GitHub Actions run 30684371899](https://github.com/fikrilal/frontend-core-kit/actions/runs/30684371899).

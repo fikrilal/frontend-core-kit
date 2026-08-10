@@ -14,7 +14,7 @@ export function LoginPage({
 }> = {}) {
   return (
     <AuthShell
-      description="Use your Lamara account to continue."
+      description="Use your account to continue."
       headingId="login-heading"
       title="Sign in"
     >

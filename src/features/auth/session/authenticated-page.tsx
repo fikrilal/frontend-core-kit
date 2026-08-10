@@ -1,4 +1,4 @@
-import { LamaraMark } from "@/components/brand/lamara-mark";
+import { FrontendCoreMark } from "@/components/brand/frontend-core-mark";
 
 import { EmailVerificationResendForm } from "../email-verification/email-verification-resend-form";
 import { loadAuthenticatedUser } from "./load-authenticated-user";
@@ -11,8 +11,8 @@ export async function AuthenticatedPage() {
     <div className="bg-muted/35 min-h-svh">
       <header className="border-border bg-background border-b">
         <div className="mx-auto flex h-14 max-w-5xl items-center gap-2 px-5">
-          <LamaraMark className="size-7" />
-          <span className="text-sm font-medium">Lamara</span>
+          <FrontendCoreMark className="size-7" />
+          <span className="text-sm font-medium">Frontend Core Kit</span>
           <div className="flex-1" />
           <form action={logoutAction}>
             <button
@@ -33,7 +33,7 @@ export async function AuthenticatedPage() {
           <h1 className="text-2xl font-semibold tracking-tight">
             {result.ok
               ? "You are signed in."
-              : "Lamara is temporarily unavailable."}
+              : "Frontend Core Kit is temporarily unavailable."}
           </h1>
           {result.ok ? (
             <>

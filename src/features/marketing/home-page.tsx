@@ -13,11 +13,11 @@ export function MarketingHome() {
           id="hero-title"
           className="text-4xl leading-[1.05] font-semibold tracking-[-0.04em] text-balance sm:text-6xl"
         >
-          Lamara is taking shape.
+          Frontend Core Kit is taking shape.
         </h1>
         <p className="text-muted-foreground mt-6 max-w-xl text-base leading-7 text-pretty sm:text-lg">
-          Lamara is a SaaS product currently under development. Product details
-          will be shared when they are ready.
+          Frontend Core Kit is a SaaS starter currently under development.
+          Product details will be shared when they are ready.
         </p>
         <div className="mt-8">
           <Button asChild>

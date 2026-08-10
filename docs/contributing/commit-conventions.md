@@ -1,6 +1,6 @@
 # Commit Conventions
 
-Lamara Web uses semantic scoped commit messages for maintainability, review
+Frontend Core Kit uses semantic scoped commit messages for maintainability, review
 clarity, and agent coordination.
 
 ## Format

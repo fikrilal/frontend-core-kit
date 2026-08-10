@@ -1,4 +1,4 @@
-# Lamara Frontend Documentation
+# Frontend Core Kit Documentation
 
 These documents distinguish implemented behavior from planned work. Accepted
 future API capabilities live in the engineering roadmap; unresolved proposals

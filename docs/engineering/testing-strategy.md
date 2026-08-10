@@ -1,4 +1,4 @@
-# Lamara Frontend Testing Strategy
+# Frontend Core Kit Testing Strategy
 
 ## Principles
 
@@ -115,7 +115,7 @@ to accept the current rendering. Generated diffs and actual images stay under
 the ignored `test-results/` directory.
 
 `pnpm backend:preflight` is an explicit, read-only developer diagnostic. It
-loads `LAMARA_API_BASE_URL` from the process or `.env.local`, calls only
+loads `EXAMPLE_API_BASE_URL` from the process or `.env.local`, calls only
 `GET /ready`, and validates the JSON with the committed generated schema. Output
 reports only configuration, reachability, HTTP readiness, JSON, or contract
 status; it never prints the configured origin or response body. It is not part

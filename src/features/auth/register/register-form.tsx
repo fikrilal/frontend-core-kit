@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { passwordRegisterRequestDtoPasswordMin } from "@/contracts/lamara-api/runtime";
+import { passwordRegisterRequestDtoPasswordMin } from "@/contracts/example-api/runtime";
 
 import { registerAction } from "./register-action";
 import type { RegisterActionState, RegisterError } from "./register-state";

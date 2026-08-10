@@ -7,7 +7,7 @@ import { RegisterForm } from "./register-form";
 export function RegisterPage() {
   return (
     <AuthShell
-      description="Use your email to create a Lamara account."
+      description="Use your email to create an account."
       headingId="register-heading"
       title="Create your account"
     >

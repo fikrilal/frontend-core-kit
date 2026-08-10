@@ -1,8 +1,8 @@
-# Lamara Frontend Design System
+# Frontend Core Kit Design System
 
 ## Current foundation
 
-Lamara uses the **pure shadcn default** as its design system — the official
+Frontend Core Kit uses the **pure shadcn default** as its design system — the official
 shadcn new-york components and token set as shipped:
 
 - Tailwind CSS 4 with the shadcn default `globals.css` (`:root` / `.dark`

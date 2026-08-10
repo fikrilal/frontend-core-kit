@@ -158,7 +158,9 @@ test("reports broken local links and unindexed proposals", () => {
 });
 
 function withFixture(run) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lamara-knowledge-test-"));
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), "frontend-core-knowledge-test-"),
+  );
   try {
     for (const folder of ["active", "queued", "completed"]) {
       fs.mkdirSync(path.join(root, "docs/exec-plans", folder), {

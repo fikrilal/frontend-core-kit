@@ -7,7 +7,7 @@ import {
   patchMeProfileDtoDisplayNameMax,
   patchMeProfileDtoFamilyNameMax,
   patchMeProfileDtoGivenNameMax,
-} from "@/contracts/lamara-api/runtime";
+} from "@/contracts/example-api/runtime";
 import {
   clearSessionCookie,
   getConfiguredSessionService,

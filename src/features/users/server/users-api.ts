@@ -1,14 +1,14 @@
 import "server-only";
 
-import type { operations } from "@/contracts/lamara-api";
+import type { operations } from "@/contracts/example-api";
 import {
   UsersMePatchResponse,
   UsersMeSessionsListResponse,
   UsersMeProfileImageUploadResponse,
   UsersMeProfileImageUrlResponse,
-} from "@/contracts/lamara-api/runtime";
+} from "@/contracts/example-api/runtime";
 import {
-  createConfiguredLamaraApiClient,
+  createConfiguredExampleApiClient,
   readApiResult,
   readEmptyApiResult,
   readOptionalApiResult,
@@ -60,7 +60,7 @@ export async function patchCurrentUser(
   input: PatchMeInput,
   accessToken: string,
 ): Promise<ApiResult<PatchMeData>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.PATCH(currentUserPath, {
     body: input,
     cache: "no-store",
@@ -77,7 +77,7 @@ export async function patchCurrentUser(
 export async function listSessions(
   accessToken: string,
 ): Promise<ApiResult<SessionsListData>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.GET(sessionsPath, {
     cache: "no-store",
     headers: {
@@ -94,7 +94,7 @@ export async function revokeSession(
   sessionId: RevokeSessionInput,
   accessToken: string,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(revokeSessionPath, {
     cache: "no-store",
     headers: {
@@ -113,7 +113,7 @@ export async function revokeSession(
 export async function requestAccountDeletion(
   accessToken: string,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(accountDeletionRequestPath, {
     cache: "no-store",
     headers: {
@@ -129,7 +129,7 @@ export async function requestAccountDeletion(
 export async function cancelAccountDeletion(
   accessToken: string,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(accountDeletionCancelPath, {
     cache: "no-store",
     headers: {
@@ -146,7 +146,7 @@ export async function createProfileImageUploadPlan(
   input: ProfileImageUploadInput,
   accessToken: string,
 ): Promise<ApiResult<ProfileImageUploadData>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(profileImageUploadPath, {
     body: input,
     cache: "no-store",
@@ -164,7 +164,7 @@ export async function completeProfileImageUpload(
   input: ProfileImageCompleteInput,
   accessToken: string,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.POST(profileImageCompletePath, {
     body: input,
     cache: "no-store",
@@ -181,7 +181,7 @@ export async function completeProfileImageUpload(
 export async function getProfileImageUrl(
   accessToken: string,
 ): Promise<ApiResult<ProfileImageUrlData | null>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.GET(profileImageUrlPath, {
     cache: "no-store",
     headers: {
@@ -197,7 +197,7 @@ export async function getProfileImageUrl(
 export async function clearProfileImage(
   accessToken: string,
 ): Promise<ApiResult<undefined>> {
-  const client = createConfiguredLamaraApiClient();
+  const client = createConfiguredExampleApiClient();
   const request = client.DELETE(profileImagePath, {
     cache: "no-store",
     headers: {

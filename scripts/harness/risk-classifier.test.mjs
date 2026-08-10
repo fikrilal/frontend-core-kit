@@ -147,11 +147,13 @@ test("renders a bounded summary without plan contents", () => {
 
   assert.match(summary, /Effective/);
   assert.match(summary, /src\/server\/api\/client\.ts/);
-  assert.doesNotMatch(summary, /LAMARA_API_BASE_URL/);
+  assert.doesNotMatch(summary, /EXAMPLE_API_BASE_URL/);
 });
 
 test("computes changed paths from real git revisions without shell interpolation", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lamara-risk-git-"));
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), "frontend-core-risk-git-"),
+  );
   try {
     git(root, "init");
     git(root, "config", "user.email", "test@example.com");
@@ -181,7 +183,9 @@ test("computes changed paths from real git revisions without shell interpolation
 });
 
 test("writes GitHub outputs and a compact summary from revision evidence", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lamara-risk-cli-"));
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), "frontend-core-risk-cli-"),
+  );
   try {
     git(root, "init");
     git(root, "config", "user.email", "test@example.com");

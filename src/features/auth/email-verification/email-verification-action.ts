@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { VerifyEmailRequestDto } from "@/contracts/lamara-api/runtime";
+import { VerifyEmailRequestDto } from "@/contracts/example-api/runtime";
 
 import type { EmailVerificationActionState } from "./email-verification-state";
 import { verifyEmail } from "../server/auth-api";

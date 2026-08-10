@@ -206,7 +206,7 @@ function executor(calls) {
     if (command === "git" && args.join(" ") === "remote get-url origin") {
       return {
         status: 0,
-        stdout: "git@github.com:Orymu/lamara-frontend.git\n",
+        stdout: "git@github.com:fikrilal/frontend-core-kit.git\n",
       };
     }
     if (command === "git" && args.join(" ") === "diff --cached --quiet") {

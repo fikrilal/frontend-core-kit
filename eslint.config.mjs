@@ -93,8 +93,8 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.{ts,tsx}"],
     ignores: [
       "src/**/*.test.{ts,tsx}",
-      "src/contracts/lamara-api/generated.ts",
-      "src/contracts/lamara-api/runtime.generated.ts",
+      "src/contracts/example-api/generated.ts",
+      "src/contracts/example-api/runtime.generated.ts",
     ],
     rules: {
       complexity: ["error", 12],
@@ -117,7 +117,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     // Generator-owned and verified byte-for-byte by contracts:check.
-    "src/contracts/lamara-api/generated.ts",
+    "src/contracts/example-api/generated.ts",
     // Plain Node CJS tooling (require-based).
     "scripts/**/*.cjs",
     "commitlint.config.cjs",

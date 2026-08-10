@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { createLamaraApiClient } from "./client";
+import { createExampleApiClient } from "./client";
 
 const loginInput = {
   email: "dante@example.com",
   password: "correct horse battery staple",
 };
 
-describe("createLamaraApiClient", () => {
+describe("createExampleApiClient", () => {
   it("configures the OpenAPI client and preserves a request ID", async () => {
     let captured: Request | undefined;
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev/",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev/",
       requestId: () => "frontend-request-id",
       fetch: (request) => {
         captured = request;
@@ -34,7 +34,7 @@ describe("createLamaraApiClient", () => {
       throw new Error("Expected fetch to be called.");
     }
 
-    expect(captured.url).toBe("https://api.lamara.dev/v1/auth/password/login");
+    expect(captured.url).toBe("https://api.example.dev/v1/auth/password/login");
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("accept")).toBe("application/json");

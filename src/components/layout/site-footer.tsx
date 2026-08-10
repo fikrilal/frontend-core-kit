@@ -5,7 +5,7 @@ export function SiteFooter() {
     <footer className="mx-auto w-full max-w-2xl px-6 py-8">
       <Separator className="mb-6" />
       <p className="text-muted-foreground text-sm">
-        Lamara is currently under development.
+        Frontend Core Kit is currently under development.
       </p>
     </footer>
   );

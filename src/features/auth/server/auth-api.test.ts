@@ -89,7 +89,7 @@ afterEach(() => {
 describe("auth API", () => {
   it("uses the generated endpoint contract and returns validated registration data", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(jsonResponse({ data: registerData }));
@@ -110,7 +110,7 @@ describe("auth API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/auth/password/register",
+      "https://api.example.dev/v1/auth/password/register",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -119,7 +119,7 @@ describe("auth API", () => {
 
   it("uses the generated endpoint contract and returns validated login data", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -147,7 +147,7 @@ describe("auth API", () => {
       throw new Error("Expected fetch to be called.");
     }
 
-    expect(captured.url).toBe("https://api.lamara.dev/v1/auth/password/login");
+    expect(captured.url).toBe("https://api.example.dev/v1/auth/password/login");
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
     expect(await captured.json()).toEqual(input);
@@ -160,7 +160,7 @@ describe("auth API", () => {
 
   it("uses the generated email-verification contract and validates the empty response", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -183,7 +183,7 @@ describe("auth API", () => {
     if (!captured) {
       throw new Error("Expected fetch to be called.");
     }
-    expect(captured.url).toBe("https://api.lamara.dev/v1/auth/email/verify");
+    expect(captured.url).toBe("https://api.example.dev/v1/auth/email/verify");
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
     expect(await captured.json()).toEqual(emailVerifyInput);
@@ -191,7 +191,7 @@ describe("auth API", () => {
 
   it("changes the password with a bearer token and validates the empty response", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -214,7 +214,9 @@ describe("auth API", () => {
     if (!captured) {
       throw new Error("Expected fetch to be called.");
     }
-    expect(captured.url).toBe("https://api.lamara.dev/v1/auth/password/change");
+    expect(captured.url).toBe(
+      "https://api.example.dev/v1/auth/password/change",
+    );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("authorization")).toBe("Bearer access-token");
@@ -223,7 +225,7 @@ describe("auth API", () => {
 
   it("resends email verification with the server-owned access token", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -247,7 +249,7 @@ describe("auth API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/auth/email/verification/resend",
+      "https://api.example.dev/v1/auth/email/verification/resend",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -257,7 +259,7 @@ describe("auth API", () => {
 
   it("uses the generated endpoint contract and validates the empty reset response", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -281,7 +283,7 @@ describe("auth API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/auth/password/reset/request",
+      "https://api.example.dev/v1/auth/password/reset/request",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -290,7 +292,7 @@ describe("auth API", () => {
 
   it("uses the generated confirmation contract and validates the empty response", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -314,7 +316,7 @@ describe("auth API", () => {
       throw new Error("Expected fetch to be called.");
     }
     expect(captured.url).toBe(
-      "https://api.lamara.dev/v1/auth/password/reset/confirm",
+      "https://api.example.dev/v1/auth/password/reset/confirm",
     );
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
@@ -322,7 +324,7 @@ describe("auth API", () => {
   });
 
   it("rejects invalid login data without returning token values", async () => {
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", () =>
       Promise.resolve(
         jsonResponse({
@@ -342,7 +344,7 @@ describe("auth API", () => {
       ok: false,
       failure: {
         kind: "invalid-response",
-        message: "Lamara API returned data that does not match the contract.",
+        message: "Example API returned data that does not match the contract.",
       },
       status: 200,
     });
@@ -353,7 +355,7 @@ describe("auth API", () => {
 
   it("loads the current user with a bearer token", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(jsonResponse({ data: currentUser }));
@@ -370,7 +372,7 @@ describe("auth API", () => {
     if (!captured) {
       throw new Error("Expected fetch to be called.");
     }
-    expect(captured.url).toBe("https://api.lamara.dev/v1/me");
+    expect(captured.url).toBe("https://api.example.dev/v1/me");
     expect(captured.method).toBe("GET");
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("authorization")).toBe("Bearer access-token");
@@ -378,7 +380,7 @@ describe("auth API", () => {
 
   it("logs out through the empty-response contract", async () => {
     let captured: Request | undefined;
-    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubEnv("EXAMPLE_API_BASE_URL", "https://api.example.dev");
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
@@ -401,7 +403,7 @@ describe("auth API", () => {
     if (!captured) {
       throw new Error("Expected fetch to be called.");
     }
-    expect(captured.url).toBe("https://api.lamara.dev/v1/auth/logout");
+    expect(captured.url).toBe("https://api.example.dev/v1/auth/logout");
     expect(captured.method).toBe("POST");
     expect(captured.cache).toBe("no-store");
     expect(await captured.json()).toEqual({ refreshToken: "refresh-token" });

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { describe, expect, it } from "vitest";
 
-import { createLamaraApiClient } from "./client";
+import { createExampleApiClient } from "./client";
 import { readApiResult, readEmptyApiResult } from "./response";
 
 const loginPath = "/v1/auth/password/login";
@@ -22,8 +22,8 @@ describe("readApiResult", () => {
       data: dataSchema,
       meta: z.object({ nextCursor: z.string().nullable() }),
     });
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "request-id",
       fetch: () =>
         Promise.resolve(
@@ -52,8 +52,8 @@ describe("readApiResult", () => {
   });
 
   it("rejects a successful response with an unexpected content type", async () => {
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "request-id",
       fetch: () =>
         Promise.resolve(
@@ -80,8 +80,8 @@ describe("readApiResult", () => {
   });
 
   it("parses problem details and prefers the response request ID", async () => {
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "frontend-request-id",
       fetch: () =>
         Promise.resolve(
@@ -163,8 +163,8 @@ describe("readApiResult", () => {
       ),
     },
   ])("handles $name without returning the raw body", async ({ response }) => {
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "request-id",
       fetch: () => Promise.resolve(response),
     });
@@ -182,7 +182,7 @@ describe("readApiResult", () => {
       ok: false,
       failure: {
         kind: "invalid-response",
-        message: "Lamara API returned invalid problem details.",
+        message: "Example API returned invalid problem details.",
       },
       status: response.status,
       traceId: "request-id",
@@ -192,8 +192,8 @@ describe("readApiResult", () => {
   });
 
   it("handles malformed successful JSON without returning its body", async () => {
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "request-id",
       fetch: () =>
         Promise.resolve(
@@ -216,7 +216,7 @@ describe("readApiResult", () => {
       ok: false,
       failure: {
         kind: "invalid-response",
-        message: "Lamara API returned an invalid success envelope.",
+        message: "Example API returned an invalid success envelope.",
       },
       status: 200,
       traceId: "request-id",
@@ -225,18 +225,18 @@ describe("readApiResult", () => {
   });
 
   it("distinguishes network, timeout, and cancellation failures", async () => {
-    const networkClient = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const networkClient = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "network-id",
       fetch: () => Promise.reject(new TypeError("connection failed")),
     });
-    const timeoutClient = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const timeoutClient = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "timeout-id",
       fetch: abortablePendingFetch,
     });
-    const cancelledClient = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const cancelledClient = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "cancelled-id",
       fetch: abortablePendingFetch,
     });
@@ -290,8 +290,8 @@ describe("readApiResult", () => {
   });
 
   it("does not convert programmer errors into network failures", async () => {
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       fetch: abortablePendingFetch,
     });
     const circularBody = {
@@ -314,8 +314,8 @@ describe("readApiResult", () => {
 
 describe("readEmptyApiResult", () => {
   it("accepts an empty 204 response without parsing JSON", async () => {
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "request-id",
       fetch: () => Promise.resolve(new Response(null, { status: 204 })),
     });
@@ -336,8 +336,8 @@ describe("readEmptyApiResult", () => {
   });
 
   it("rejects an unexpected non-empty success status", async () => {
-    const client = createLamaraApiClient({
-      baseUrl: "https://api.lamara.dev",
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
       requestId: () => "request-id",
       fetch: () => Promise.resolve(jsonResponse({ data: null })),
     });

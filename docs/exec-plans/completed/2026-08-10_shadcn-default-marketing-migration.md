@@ -1,7 +1,7 @@
 # 2026-08-10 Shadcn Default Marketing And Layout Migration
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for UI behavior
 **Risk:** medium
 **Authority:** implement and verify the shadcn-default migration of the marketing and shared layout chrome against the accepted pure-shadcn-default design-system proposal; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows

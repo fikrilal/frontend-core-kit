@@ -134,7 +134,7 @@ test("authenticated foundation matches its visual baseline", async ({
   await page.getByLabel("Password").fill("test-password");
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/app$/);
-  await expect(page).toHaveTitle("App | Lamara");
+  await expect(page).toHaveTitle("App | Frontend Core Kit");
   await expect(page).toHaveScreenshot("authenticated.png", screenshotOptions);
 });
 
@@ -163,7 +163,7 @@ test("profile editor and its saved state match their visual baselines", async ({
   await expect(page).toHaveURL(/\/app$/);
 
   await page.goto("/app/profile");
-  await expect(page).toHaveTitle("Profile | Lamara");
+  await expect(page).toHaveTitle("Profile | Frontend Core Kit");
   await expect(page).toHaveScreenshot("profile.png", screenshotOptions);
 
   await page.getByLabel("Display name").fill("Dante Alighieri");
@@ -182,7 +182,7 @@ test("sessions list matches its visual baseline", async ({ page }) => {
   await expect(page).toHaveURL(/\/app$/);
 
   await page.goto("/app/sessions");
-  await expect(page).toHaveTitle("Sessions | Lamara");
+  await expect(page).toHaveTitle("Sessions | Frontend Core Kit");
   await expect(page).toHaveScreenshot("sessions.png", screenshotOptions);
 });
 
@@ -196,7 +196,7 @@ test("change-password page and its error state match their visual baselines", as
   await expect(page).toHaveURL(/\/app$/);
 
   await page.goto("/app/password");
-  await expect(page).toHaveTitle("Change password | Lamara");
+  await expect(page).toHaveTitle("Change password | Frontend Core Kit");
   await expect(page).toHaveScreenshot("change-password.png", screenshotOptions);
 
   await page.getByLabel("Current password").fill("wrong-password");
@@ -222,7 +222,7 @@ test("account-deletion request page matches its visual baseline", async ({
   await expect(page).toHaveURL(/\/app$/);
 
   await page.goto("/app/account-deletion");
-  await expect(page).toHaveTitle("Delete account | Lamara");
+  await expect(page).toHaveTitle("Delete account | Frontend Core Kit");
   await expect(page).toHaveScreenshot(
     "account-deletion-request.png",
     screenshotOptions,
@@ -239,7 +239,7 @@ test("account-deletion pending state matches its visual baseline", async ({
   await expect(page).toHaveURL(/\/app$/);
 
   await page.goto("/app/account-deletion");
-  await expect(page).toHaveTitle("Delete account | Lamara");
+  await expect(page).toHaveTitle("Delete account | Frontend Core Kit");
   await expect(page).toHaveScreenshot(
     "account-deletion-pending.png",
     screenshotOptions,

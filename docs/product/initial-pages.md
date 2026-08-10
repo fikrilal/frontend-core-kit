@@ -2,7 +2,7 @@
 
 ## Product status
 
-Lamara is a SaaS product under development. Detailed positioning, wedding
+Frontend Core Kit is a SaaS starter under development. Detailed positioning, wedding
 workflows, roles, pricing, and public product pages are not finalized and must
 not be invented by the frontend.
 
@@ -54,7 +54,7 @@ features.
 
 ## Copy rules
 
-- Describe Lamara only as a SaaS product under development.
+- Describe Frontend Core Kit only as a SaaS starter under development.
 - Do not claim product capabilities until they are explicitly decided and
   implemented.
 - Do not carry forward desktop, AI usage, download, local-first, report, or

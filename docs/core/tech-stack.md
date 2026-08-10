@@ -1,4 +1,4 @@
-# Lamara Frontend Technology Stack
+# Frontend Core Kit Technology Stack
 
 ## Active stack
 
@@ -11,7 +11,7 @@
 | Styling         | Tailwind CSS 4                 | Tokens and component styling                      |
 | API contracts   | openapi-typescript 7.13, Orval | Generated types and Zod schemas                   |
 | API validation  | Zod 4                          | Generated response validation                     |
-| HTTP client     | openapi-fetch 0.17             | Typed server-only Lamara API calls                |
+| HTTP client     | openapi-fetch 0.17             | Typed server-only Example API calls               |
 | Session store   | Process memory                 | Single-instance sessions and refresh coordination |
 | Package manager | pnpm 11.15                     | Pinned in `package.json`                          |
 | Unit tests      | Vitest and Node test           | UI/utilities and contract tooling                 |

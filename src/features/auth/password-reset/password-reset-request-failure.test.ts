@@ -29,16 +29,16 @@ describe("mapPasswordResetRequestFailure", () => {
   );
 
   it.each<ApiFailure>([
-    { kind: "network", message: "Unable to reach Lamara API." },
+    { kind: "network", message: "Unable to reach Example API." },
     {
       kind: "timeout",
       outcome: "unknown",
-      message: "Lamara API request timed out.",
+      message: "Example API request timed out.",
     },
-    { kind: "cancelled", message: "Lamara API request was cancelled." },
+    { kind: "cancelled", message: "Example API request was cancelled." },
     {
       kind: "invalid-response",
-      message: "Lamara API returned an invalid response.",
+      message: "Example API returned an invalid response.",
     },
   ])("maps $kind failures to unavailable", (failure) => {
     expect(

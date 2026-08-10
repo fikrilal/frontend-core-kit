@@ -1,4 +1,4 @@
-import { ReadyGetResponse } from "../../src/contracts/lamara-api/runtime.generated.ts";
+import { ReadyGetResponse } from "../../src/contracts/example-api/runtime.generated.ts";
 
 const timeoutMs = 5_000;
 
@@ -6,7 +6,7 @@ export async function checkBackendReadiness({
   environment = process.env,
   fetchImpl = fetch,
 } = {}) {
-  const configured = readApiOrigin(environment.LAMARA_API_BASE_URL);
+  const configured = readApiOrigin(environment.EXAMPLE_API_BASE_URL);
   if (!configured.ok) return configured;
 
   let response;
@@ -60,7 +60,7 @@ function readApiOrigin(value) {
   if (!value) {
     return failure(
       "missing_config",
-      "Backend preflight failed: LAMARA_API_BASE_URL is missing. Configure it in the process environment or .env.local.",
+      "Backend preflight failed: EXAMPLE_API_BASE_URL is missing. Configure it in the process environment or .env.local.",
     );
   }
 
@@ -80,7 +80,7 @@ function readApiOrigin(value) {
   } catch {
     return failure(
       "invalid_config",
-      "Backend preflight failed: LAMARA_API_BASE_URL must be an HTTP(S) origin without credentials, path, query, or fragment.",
+      "Backend preflight failed: EXAMPLE_API_BASE_URL must be an HTTP(S) origin without credentials, path, query, or fragment.",
     );
   }
 }

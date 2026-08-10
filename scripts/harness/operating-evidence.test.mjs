@@ -49,7 +49,9 @@ test("accepts a reviewed, diverse operating sample for human review only", () =>
 });
 
 test("rejects missing plan sources and free-form fields", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lamara-evidence-"));
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), "frontend-core-evidence-"),
+  );
   try {
     write(root, "docs/engineering/harness-operating-evidence.json", {
       schemaVersion: 2,
@@ -80,7 +82,9 @@ test("rejects missing plan sources and free-form fields", () => {
 });
 
 test("rejects a boundary that is inconsistent with repair state", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lamara-evidence-"));
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), "frontend-core-evidence-"),
+  );
   try {
     write(root, "docs/exec-plans/completed/task.md", "# Completed\n");
     write(root, "docs/engineering/harness-operating-evidence.json", {

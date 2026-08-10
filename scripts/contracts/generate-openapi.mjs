@@ -19,7 +19,7 @@ try {
     writeFileAtomic(generatedPath, typeSource),
     writeFileAtomic(runtimeGeneratedPath, runtimeSource),
   ]);
-  console.log("Generated Lamara API TypeScript types and Zod schemas.");
+  console.log("Generated Example API TypeScript types and Zod schemas.");
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;

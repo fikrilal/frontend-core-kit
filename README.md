@@ -1,6 +1,6 @@
-# Lamara Frontend
+# Frontend Core Kit
 
-Web application for Lamara, a SaaS product under development.
+Template-grade Next.js starter with a generic landing page, authentication, and account surfaces built on pure shadcn defaults.
 
 ## Current scope
 

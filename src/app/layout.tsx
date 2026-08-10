@@ -39,7 +39,7 @@ export const metadata: Metadata = {
       url: "https://github.com/fikrilal",
     },
   ],
-  keywords: ["Lamara", "SaaS", "software"],
+  keywords: ["Frontend Core Kit", "SaaS", "starter"],
   manifest: "/manifest.webmanifest",
   robots: {
     index: true,
