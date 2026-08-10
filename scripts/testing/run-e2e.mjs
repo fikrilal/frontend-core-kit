@@ -43,6 +43,24 @@ const api = createServer(async (request, response) => {
       );
     }
     if (
+      parsed.email === "with-image@example.com" &&
+      parsed.password === "test-password"
+    ) {
+      return contractJson(
+        response,
+        200,
+        "password login response",
+        fixtureContracts.loginResponse,
+        {
+          data: {
+            accessToken: accessToken(hasImageMe),
+            refreshToken: "e2e-refresh-token",
+            user: hasImageMe,
+          },
+        },
+      );
+    }
+    if (
       parsed.email !== "user@example.com" ||
       parsed.password !== "test-password"
     ) {
@@ -210,6 +228,38 @@ const api = createServer(async (request, response) => {
     response.statusCode = 204;
     response.removeHeader("Content-Type");
     return response.end();
+  }
+
+  if (request.method === "GET" && request.url === "/v1/me/profile-image/url") {
+    if (!request.headers.authorization?.startsWith("Bearer ")) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+    const accessTokenValue = request.headers.authorization.slice(
+      "Bearer ".length,
+    );
+    const user = tokenUsers.get(accessTokenValue);
+    if (!user) {
+      return problem(response, 401, "UNAUTHORIZED");
+    }
+
+    if (!user.profile.profileImageFileId) {
+      response.statusCode = 204;
+      response.removeHeader("Content-Type");
+      return response.end();
+    }
+
+    return contractJson(
+      response,
+      200,
+      "profile image url response",
+      fixtureContracts.profileImageUrlResponse,
+      {
+        data: {
+          expiresAt: "2026-08-08T12:40:00.000Z",
+          url: "https://r2.example.com/e2e-render",
+        },
+      },
+    );
   }
 
   if (
@@ -631,6 +681,16 @@ const pendingDeletionMe = {
   accountDeletion: {
     requestedAt: "2026-07-10T12:34:56.789Z",
     scheduledFor: "2026-08-09T12:34:56.789Z",
+  },
+};
+
+const hasImageMe = {
+  ...me,
+  email: "with-image@example.com",
+  id: "e2e-with-image-user-id",
+  profile: {
+    ...me.profile,
+    profileImageFileId: "e2e-profile-image-file-id",
   },
 };
 

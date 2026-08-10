@@ -26,6 +26,7 @@ import {
   UsersMeProfileImageUploadResponse,
   CompleteProfileImageUploadRequestDto,
   UsersMeProfileImageCompleteResponse,
+  UsersMeProfileImageUrlResponse,
 } from "../../src/contracts/lamara-api/runtime.generated.ts";
 
 export const fixtureContracts = Object.freeze({
@@ -56,6 +57,7 @@ export const fixtureContracts = Object.freeze({
   profileImageUploadResponse: UsersMeProfileImageUploadResponse,
   profileImageCompleteRequest: CompleteProfileImageUploadRequestDto,
   profileImageCompleteResponse: UsersMeProfileImageCompleteResponse,
+  profileImageUrlResponse: UsersMeProfileImageUrlResponse,
 });
 
 export function parseFixtureContract(boundary, schema, value) {

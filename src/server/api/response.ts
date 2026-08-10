@@ -79,6 +79,61 @@ export function readEmptyApiResult(
   });
 }
 
+export function readOptionalApiResult<TData, TMeta = unknown>(
+  request: Promise<OpenApiResponse>,
+  schema: z.ZodType<ApiEnvelope<TData, TMeta>>,
+): Promise<ApiResult<TData | null, TMeta>> {
+  return readResponse<TData | null, TMeta>(
+    request,
+    (result, status, traceId) => {
+      if (status === 204) {
+        return {
+          ok: true,
+          data: null,
+          status,
+          traceId,
+        };
+      }
+
+      if (!hasJsonMediaType(result.response)) {
+        return invalidResponse(
+          status,
+          traceId,
+          "Lamara API returned an unexpected success content type.",
+        );
+      }
+
+      const json = parseJson(result.data);
+      if (!json.ok) {
+        return invalidResponse(
+          status,
+          traceId,
+          "Lamara API returned an invalid success envelope.",
+        );
+      }
+
+      const parsedEnvelope = schema.safeParse(json.value);
+      if (!parsedEnvelope.success) {
+        return invalidResponse(
+          status,
+          traceId,
+          "Lamara API returned data that does not match the contract.",
+        );
+      }
+
+      return {
+        ok: true,
+        data: parsedEnvelope.data.data,
+        ...("meta" in parsedEnvelope.data
+          ? { meta: parsedEnvelope.data.meta }
+          : {}),
+        status,
+        traceId,
+      };
+    },
+  );
+}
+
 async function readResponse<TData, TMeta = unknown>(
   request: Promise<OpenApiResponse>,
   readSuccess: (

@@ -23,8 +23,9 @@ Implemented routes:
 - `/login`: email/password login;
 - `/app`: protected current-user proof, not a product dashboard;
 - `/app/profile`: authenticated profile editor through `PATCH /v1/me`, with a
-  profile-image upload-plan action through `POST /v1/me/profile-image/upload`
-  and upload confirmation through `POST /v1/me/profile-image/complete`;
+  profile-image upload-plan action through `POST /v1/me/profile-image/upload`,
+  upload confirmation through `POST /v1/me/profile-image/complete`, and the
+  current image rendered via `GET /v1/me/profile-image/url`;
 - `/app/sessions`: authenticated sessions list through `GET /v1/me/sessions`
   with per-session revocation through `POST /v1/me/sessions/{sessionId}/revoke`;
 - `/app/password`: authenticated change-password form through

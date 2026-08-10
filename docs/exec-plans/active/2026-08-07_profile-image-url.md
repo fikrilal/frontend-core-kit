@@ -1,7 +1,7 @@
 # 2026-08-07 Get Profile Image URL
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the authenticated `GET /v1/me/profile-image/url` slice against the committed generated contract; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -117,15 +117,15 @@ auth behavior, copy, and production rollout.
 
 ## Checklist
 
-- [ ] Add the generated-contract profile-image url adapter and transport test.
-- [ ] Add safe failure mapping, authenticated loader, and `/app/profile`
+- [x] Add the generated-contract profile-image url adapter and transport test.
+- [x] Add safe failure mapping, authenticated loader, and `/app/profile`
       integration.
-- [ ] Extend the isolated fixture with authenticated url-present and url-absent
+- [x] Extend the isolated fixture with authenticated url-present and url-absent
       behavior.
-- [ ] Add unit, accessibility, browser, and visual coverage.
-- [ ] Update truthful API, testing, product-foundation, architecture, and
+- [x] Add unit, accessibility, browser, and visual coverage.
+- [x] Update truthful API, testing, product-foundation, architecture, and
       execution-plan docs.
-- [ ] Run full and runtime verification and record exact outcomes.
+- [x] Run full and runtime verification and record exact outcomes.
 
 ## Rollout And Rollback
 
@@ -141,14 +141,40 @@ remains usable.
   profile-image slices, resolving the attached image for rendering.
 - 2026-08-07: The `204` (no image) case is a distinct safe state from an
   `unavailable` failure.
+- 2026-08-07: Added `readOptionalApiResult` to the shared API boundary — the
+  url endpoint is the first 200-or-204 success; the helper reuses the existing
+  error/network handling.
+- 2026-08-07: Review fixes applied — `loadProfileImageUrl` now runs only when
+  the authenticated user loads successfully (avoids a redundant session read
+  and request on the unavailable path), and the loader result property was
+  renamed `url` → `imageUrl` for clarity (`imageUrl.url` instead of
+  `image.url.url`). The `aria-describedby`-on-button recommendation was not
+  applied: it contradicts the established form convention (live regions
+  announce feedback; buttons carry no descriptor).
 
 ## Verification
 
-- Not run yet.
+- Focused users tests passed: 99 Vitest tests across the profile-image url
+  adapter transport (200 envelope, 204 null), the url loader (redirect,
+  one-401-retry, second-401 invalidation, null/unavailable mapping), the
+  failure mapper, and the existing users flows, plus the new
+  `readOptionalApiResult` helper.
+- Static lanes passed under Node 24: `format:check`, `contracts:check`, `lint`,
+  `typecheck`, `harness:check` (knowledge, architecture, maintainability,
+  public-pages).
+- `pnpm build` passed.
+- Full unit suite: 228 passed, 1 failed — the single failure is the pre-existing
+  `theme-toggle` `React.act` test that also fails on the clean base in this
+  environment; unrelated to this change.
 
 ## Runtime Evidence
 
-- Not run yet.
+- `pnpm verify:runtime` passed with 68 Chromium tests, including the url-present
+  flow (avatar rendered for the fixture user with an image), the url-absent
+  flow (no avatar for the default user), and the stable profile visual
+  baselines.
+- The profile visual baselines were unchanged by this slice (the default user
+  has no image); no regeneration was needed.
 
 ## Follow-Up Debt
 

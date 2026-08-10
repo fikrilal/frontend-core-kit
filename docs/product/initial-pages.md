@@ -23,8 +23,9 @@ The auth/session foundation also includes:
 - `/app`: generic authenticated proof using the current-user API;
 - `/app/profile`: authenticated profile editor for display name, given name,
   and family name through `PATCH /v1/me`, with a profile-image upload-plan
-  action through `POST /v1/me/profile-image/upload` and upload confirmation
-  through `POST /v1/me/profile-image/complete`;
+  action through `POST /v1/me/profile-image/upload`, upload confirmation
+  through `POST /v1/me/profile-image/complete`, and the current image
+  rendered via `GET /v1/me/profile-image/url`;
 - `/app/sessions`: authenticated read-only list of the current user's sessions
   through `GET /v1/me/sessions`, with per-session revocation through
   `POST /v1/me/sessions/{sessionId}/revoke`;

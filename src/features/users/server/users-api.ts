@@ -5,11 +5,13 @@ import {
   UsersMePatchResponse,
   UsersMeSessionsListResponse,
   UsersMeProfileImageUploadResponse,
+  UsersMeProfileImageUrlResponse,
 } from "@/contracts/lamara-api/runtime";
 import {
   createConfiguredLamaraApiClient,
   readApiResult,
   readEmptyApiResult,
+  readOptionalApiResult,
   type ApiResult,
 } from "@/server/api";
 
@@ -20,6 +22,7 @@ const accountDeletionRequestPath = "/v1/me/account-deletion/request" as const;
 const accountDeletionCancelPath = "/v1/me/account-deletion/cancel" as const;
 const profileImageUploadPath = "/v1/me/profile-image/upload" as const;
 const profileImageCompletePath = "/v1/me/profile-image/complete" as const;
+const profileImageUrlPath = "/v1/me/profile-image/url" as const;
 const usersRequestTimeoutMs = 10_000;
 
 type PatchMeOperation = operations["users.me.patch"];
@@ -35,6 +38,9 @@ type ProfileImageUploadEnvelope =
   ProfileImageUploadOperation["responses"][200]["content"]["application/json"];
 type ProfileImageCompleteOperation =
   operations["users.me.profileImage.complete"];
+type ProfileImageUrlOperation = operations["users.me.profileImage.url"];
+type ProfileImageUrlEnvelope =
+  ProfileImageUrlOperation["responses"][200]["content"]["application/json"];
 
 export type PatchMeInput =
   PatchMeOperation["requestBody"]["content"]["application/json"];
@@ -47,6 +53,7 @@ export type ProfileImageUploadInput =
 export type ProfileImageUploadData = ProfileImageUploadEnvelope["data"];
 export type ProfileImageCompleteInput =
   ProfileImageCompleteOperation["requestBody"]["content"]["application/json"];
+export type ProfileImageUrlData = ProfileImageUrlEnvelope["data"];
 
 export async function patchCurrentUser(
   input: PatchMeInput,
@@ -168,4 +175,20 @@ export async function completeProfileImageUpload(
   });
 
   return readEmptyApiResult(request);
+}
+
+export async function getProfileImageUrl(
+  accessToken: string,
+): Promise<ApiResult<ProfileImageUrlData | null>> {
+  const client = createConfiguredLamaraApiClient();
+  const request = client.GET(profileImageUrlPath, {
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    parseAs: "text",
+    signal: AbortSignal.timeout(usersRequestTimeoutMs),
+  });
+
+  return readOptionalApiResult(request, UsersMeProfileImageUrlResponse);
 }

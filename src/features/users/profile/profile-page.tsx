@@ -3,11 +3,14 @@ import Link from "next/link";
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
 import { loadAuthenticatedUser } from "../../auth/session/load-authenticated-user";
+import { loadProfileImageUrl } from "../profile-image/load-profile-image-url";
 import { ProfileImageUploadPlanForm } from "../profile-image/upload-plan-form";
 import { UpdateProfileForm } from "./update-profile-form";
 
 export async function ProfilePage() {
   const result = await loadAuthenticatedUser();
+  const image = result.ok ? await loadProfileImageUrl() : null;
+  const imageUrl = image?.ok ? image.imageUrl : null;
 
   return (
     <main className="bg-muted/35 flex min-h-svh items-center justify-center px-4 py-12">
@@ -38,6 +41,14 @@ export async function ProfilePage() {
 
         {result.ok ? (
           <>
+            {imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                alt="Your profile"
+                className="border-border mb-6 size-20 rounded-full border object-cover"
+                src={imageUrl.url}
+              />
+            ) : null}
             <UpdateProfileForm
               displayName={result.user.profile.displayName}
               givenName={result.user.profile.givenName}

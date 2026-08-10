@@ -1,7 +1,7 @@
 # 2026-08-07 Complete Profile Image Upload
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for auth behavior
 **Risk:** high
 **Authority:** implement and verify the authenticated `POST /v1/me/profile-image/complete` slice against the committed generated contract; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows

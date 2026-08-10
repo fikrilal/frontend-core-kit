@@ -99,6 +99,29 @@ test("maps upload rate limiting to safe feedback", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("shows no profile image when none is set", async ({ page }) => {
+  await signIn(page);
+
+  await page.goto("/app/profile");
+  await expect(page.locator("img[alt='Your profile']")).toHaveCount(0);
+});
+
+test("shows the profile image when one is set", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("with-image@example.com");
+  await page.getByLabel("Password").fill("test-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/app$/);
+
+  await page.goto("/app/profile");
+  const avatar = page.locator("img[alt='Your profile']");
+  await expect(avatar).toHaveCount(1);
+  await expect(avatar).toHaveAttribute(
+    "src",
+    "https://r2.example.com/e2e-render",
+  );
+});
+
 async function signIn(page: Page) {
   await page.goto("/login");
   await page.getByLabel("Email").fill("user@example.com");

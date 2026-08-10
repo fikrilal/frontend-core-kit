@@ -4,6 +4,7 @@ import {
   cancelAccountDeletion,
   completeProfileImageUpload,
   createProfileImageUploadPlan,
+  getProfileImageUrl,
   listSessions,
   patchCurrentUser,
   requestAccountDeletion,
@@ -86,6 +87,11 @@ const uploadPlanData = {
 const completeUploadInput = {
   fileId: "file-id",
 } satisfies ProfileImageCompleteInput;
+
+const profileImageUrlData = {
+  expiresAt: "2026-01-10T12:40:00.000Z",
+  url: "https://r2.example.com/render",
+};
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -363,6 +369,55 @@ describe("users API", () => {
     expect(captured.cache).toBe("no-store");
     expect(captured.headers.get("authorization")).toBe("Bearer access-token");
     expect(await captured.json()).toEqual(completeUploadInput);
+  });
+
+  it("loads the profile image url with a bearer token and validates the envelope", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(jsonResponse({ data: profileImageUrlData }));
+    });
+
+    const result = await getProfileImageUrl("access-token");
+
+    expect(result).toMatchObject({
+      ok: true,
+      data: profileImageUrlData,
+      status: 200,
+    });
+    expect(captured).toBeDefined();
+    if (!captured) {
+      throw new Error("Expected fetch to be called.");
+    }
+    expect(captured.url).toBe("https://api.lamara.dev/v1/me/profile-image/url");
+    expect(captured.method).toBe("GET");
+    expect(captured.cache).toBe("no-store");
+    expect(captured.headers.get("authorization")).toBe("Bearer access-token");
+  });
+
+  it("returns null when no profile image is set", async () => {
+    let captured: Request | undefined;
+    vi.stubEnv("LAMARA_API_BASE_URL", "https://api.lamara.dev");
+    vi.stubGlobal("fetch", (request: Request) => {
+      captured = request;
+      return Promise.resolve(
+        new Response(null, {
+          status: 204,
+          headers: { "X-Request-Id": "backend-request-id" },
+        }),
+      );
+    });
+
+    const result = await getProfileImageUrl("access-token");
+
+    expect(result).toEqual({
+      ok: true,
+      data: null,
+      status: 204,
+      traceId: "backend-request-id",
+    });
+    expect(captured).toBeDefined();
   });
 });
 
