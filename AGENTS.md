@@ -11,34 +11,37 @@ Lamara Frontend is the web application for Lamara.
 - API integration: `docs/engineering/api-integration.md`
 - Initial pages: `docs/product/initial-pages.md`
 - Design direction: `docs/design/design-direction.md`
-- Design system (shadcn / chanhdai / beUI): `docs/design/design-system.md`
+- Design system (pure shadcn default): `docs/design/design-system.md`
 - Harness: `docs/engineering/harness.md`
 - Testing strategy: `docs/engineering/testing-strategy.md`
 - Execution plans: `docs/exec-plans/README.md`
 - Commit conventions: `docs/contributing/commit-conventions.md`
 
-## UI Style Reference (identical look)
+## UI Style Reference (pure shadcn default)
 
-Lamara Frontend UI must match these local codebases. Treat them as the **visual and
-interaction source of truth** for layout chrome, density, cards, headers,
-contribution/heatmap graphs, typography, and component craft. Prefer copying
-patterns from them over inventing a third style.
+Lamara Frontend is a template-grade Next.js starter. Its UI must use **pure
+shadcn defaults** — the official shadcn new-york components and token set as
+shipped, with no custom design tokens, no hand-rolled primitives, and no
+bespoke styling layer. This is deliberate: a template must stay recognizable,
+upgradeable (`shadcn add`/upgrade just works), and low-surprise for consumers.
 
-| Role                         | Absolute path                               | What to use it for                                                                         |
-| ---------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| **Primary craft / registry** | `/home/fikrilal/devs/_tmp`                  | chanhdai-style site, shadcn registry craft, panels, typography, marketing + app chrome     |
-| **Product UI patterns**      | `/home/fikrilal/devs/personal/code-alchemy` | Portfolio app patterns (e.g. contribution graph, profile panels, tooltips, footer legends) |
+| Role           | Source                                             | What to use it for                                                                                                     |
+| -------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Components** | `src/components/ui/**` (installed shadcn defaults) | All buttons, inputs, cards, alerts, badges, and form primitives. Features compose these; they never re-implement them. |
+| **Tokens**     | shadcn default `globals.css` (`:root` / `.dark`)   | All colors, radii, and shadows. Do not add custom tokens without a shadcn convention requiring them.                   |
 
 Rules for agents:
 
-1. Before building or redesigning UI, **open the matching pattern in those repos**
-   (do not rely on memory alone).
-2. Aim for **identical** visual language: spacing, borders, muted hierarchy,
-   header density, card surfaces, motion restraint — not “inspired by”.
-3. When something already exists there (heatmap, tooltip, panel, topbar),
-   **port structure/classes/geometry** rather than freehanding a Lamara-only look.
+1. Before building or redesigning UI, **use the installed shadcn primitives**
+   (`@/components/ui/*`); do not write inline class strings that duplicate a
+   shadcn component.
+2. Keep the shadcn default styling: same token set, same radius, same
+   component variants. Customize only through documented shadcn conventions.
+3. When a needed component is not installed, add it with the shadcn CLI
+   (`pnpm dlx shadcn@latest add <component>`) rather than hand-writing it.
 4. Document durable UI decisions in `docs/design/design-system.md`; keep this
-   section as the pinned path map.
+   section as the pinned source of truth. The shadcn-default direction
+   supersedes the previous chanhdai/code-alchemy visual references.
 
 ## Commit Messages
 
@@ -146,5 +149,4 @@ a harness rule, test, script, scaffold, or doc update.
   handlers, or client-side refresh needs.
 - Use actual product visuals or product-faithful assets for public pages.
 - Keep public copy concrete and technically honest.
-- Match UI style to `/home/fikrilal/devs/_tmp` and
-  `/home/fikrilal/devs/personal/code-alchemy` (see **UI Style Reference**).
+- Match UI style to the pure shadcn default (see **UI Style Reference**).

@@ -18,24 +18,22 @@ download behavior, or unsupported calls to action.
 
 ## Visual language
 
-The visual and interaction references are:
+The visual and interaction source of truth is the **pure shadcn default**
+(official shadcn new-york components and token set as shipped). Lamara
+Frontend is a template-grade starter, so its UI must stay recognizable and
+upgradeable: no custom design tokens, no hand-rolled primitives, no bespoke
+styling layer.
 
-- `/home/fikrilal/devs/_tmp`
-- `/home/fikrilal/devs/personal/code-alchemy`
+The shadcn default provides:
 
-Reuse their structural language:
+- the neutral token set (`:root` / `.dark`) for colors, radii, and borders;
+- standard component primitives (buttons, inputs, cards, alerts, badges) in
+  `src/components/ui/**`;
+- the default light/dark theme contract.
 
-- narrow centered rails;
-- soft line boundaries;
-- compact chrome;
-- neutral surfaces;
-- restrained type hierarchy;
-- sparse motion;
-- direct form labels and feedback.
-
-Use the existing restrained ember accent for identity and important state.
-Avoid generic gradients, abstract hero art, oversized startup copy, fake
-product panels, and decorative motion.
+Customize only through documented shadcn conventions (variants, `cn()`, the
+installed primitive set). The previous chanhdai/code-alchemy references are
+superseded and are not used as a visual source of truth.
 
 ## Current composition
 

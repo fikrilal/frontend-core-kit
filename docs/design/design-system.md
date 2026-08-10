@@ -2,50 +2,44 @@
 
 ## Current foundation
 
-Lamara uses:
+Lamara uses the **pure shadcn default** as its design system — the official
+shadcn new-york components and token set as shipped:
 
-- Tailwind CSS 4;
-- local CSS variables in `src/app/globals.css`;
-- local React components;
-- light and dark themes;
-- `clsx` plus `tailwind-merge` through `cn`;
-- a neutral palette with one ember accent.
+- Tailwind CSS 4 with the shadcn default `globals.css` (`:root` / `.dark`
+  token set, `@theme inline`, `@custom-variant dark`);
+- shadcn primitives installed under `src/components/ui/**` (buttons, inputs,
+  cards, alerts, badges, form primitives);
+- light and dark themes via the shadcn default contract;
+- `cn()` (`clsx` + `tailwind-merge`) from `src/lib/utils.ts`.
 
-The current shared components are limited to active landing-page needs:
-
-```text
-src/components/brand/lamara-mark.tsx
-src/components/layout/marketing-shell.tsx
-src/components/layout/rail.tsx
-src/components/layout/section-divider.tsx
-src/components/layout/site-footer.tsx
-src/components/layout/site-topbar.tsx
-src/components/theme/*
-```
-
-There is no broad component library yet.
+There is no custom token layer, no hand-rolled primitive set, and no bespoke
+styling vocabulary. The previous chanhdai/code-alchemy visual references are
+superseded; this is a deliberate template decision (see
+`docs/planning/pure-shadcn-default-design-system-proposal.md`).
 
 ## Adoption rules
 
-When an active feature needs a reusable primitive:
+When a feature needs a reusable primitive:
 
-1. inspect matching patterns in the two pinned reference repositories;
-2. start with shadcn-compatible conventions where useful;
-3. copy the smallest required behavior into local source;
-4. remove unused variants, dependencies, and motion;
+1. use an installed shadcn component (`@/components/ui/*`) — do not write
+   inline class strings that duplicate it;
+2. if the component is not installed, add it with the shadcn CLI
+   (`pnpm dlx shadcn@latest add <component>`);
+3. keep the shadcn default styling: same token set, same radius, same
+   variants;
+4. customize only through documented shadcn conventions;
 5. keep product language in the owning feature;
 6. preserve accessibility and reduced-motion behavior;
 7. add tests for meaningful interaction.
 
-Do not preinstall registry packages or retain components for hypothetical pages.
-`components.json` records CLI aliases and reference registries; it does not make
-those registries runtime dependencies.
+Do not hand-fork shadcn components, and do not add custom design tokens
+without a shadcn convention requiring them.
 
 ## Component boundaries
 
 - `components/layout`: cross-page chrome.
 - `components/theme`: browser theme behavior.
-- `components/ui`: generic primitives only when active use exists.
+- `components/ui`: installed shadcn primitives; business-free.
 - `features/<feature>`: product copy, product panels, and feature behavior.
 
 Default to Server Components. A leaf component becomes client-side only when it
@@ -53,19 +47,12 @@ needs a browser API or event handler.
 
 ## Tokens
 
-The current token set covers:
+The token set is the shadcn default: background, foreground, card, muted,
+muted-foreground, border, input, ring, primary, secondary, accent, destructive,
+popover, and radius roles, with light and dark values in `:root` / `.dark`.
 
-- background and foreground;
-- muted surface and text;
-- border and soft structural line;
-- product surface;
-- ember accent;
-- success signal;
-- font and radius roles.
-
-Add tokens only after repeated use demonstrates a stable role.
-
-Text colors must retain WCAG AA contrast against their intended surface in both
+Do not add custom tokens without a shadcn convention requiring them. Text
+colors must retain WCAG AA contrast against their intended surface in both
 themes. Interactive elements must expose a visible `:focus-visible` indicator;
 do not remove the browser outline unless a ring or equivalent indicator replaces
 it. The browser accessibility suite enforces the implemented page states, while

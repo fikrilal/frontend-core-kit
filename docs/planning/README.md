@@ -6,6 +6,10 @@ Accepted proposals:
 
 - [Agent-first harness and loop engineering](agent-harness-loop-engineering-proposal.md)
 
+Proposed:
+
+- [Pure shadcn default design system](pure-shadcn-default-design-system-proposal.md)
+
 Retired background:
 
 - [Superseded API core proposal](api-core-network-proposal.md)

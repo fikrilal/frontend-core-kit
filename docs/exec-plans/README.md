@@ -83,8 +83,16 @@ Implementation is split into independently reviewable plans:
     [Profile image upload complete](completed/2026-08-07_profile-image-upload-complete.md)
 17. **Completed:**
     [Profile image url](completed/2026-08-07_profile-image-url.md)
-18. **Active:**
-    [Profile image clear](active/2026-08-07_profile-image-clear.md)
+18. **Completed:**
+    [Profile image clear](completed/2026-08-07_profile-image-clear.md)
+19. **Active:**
+    [Shadcn default foundation](active/2026-08-10_shadcn-default-foundation.md)
+20. **Queued:**
+    [Shadcn default auth migration](queued/2026-08-10_shadcn-default-auth-migration.md)
+21. **Queued:**
+    [Shadcn default users migration](queued/2026-08-10_shadcn-default-users-migration.md)
+22. **Queued:**
+    [Shadcn default marketing migration](queued/2026-08-10_shadcn-default-marketing-migration.md)
 
 ## Agent Harness Sequence
 
