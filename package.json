@@ -39,9 +39,10 @@
     "maintainability:check": "knip --include files,exports,dependencies --include-entry-exports",
     "public-pages:check": "node scripts/harness/check-public-pages.mjs",
     "harness:check": "pnpm knowledge:check && pnpm architecture:check && pnpm maintainability:check && pnpm public-pages:check",
-    "verify:fast": "pnpm format:check && pnpm contracts:check && pnpm lint && pnpm typecheck && pnpm test && pnpm harness:check",
-    "verify": "pnpm format:check && pnpm contracts:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm harness:check",
-    "verify:runtime": "pnpm test:e2e",
+    "verify:fast": "pnpm frontendkit -- verify --profile fast",
+    "verify": "pnpm frontendkit -- verify --profile full",
+    "verify:ci": "pnpm frontendkit -- verify --profile ci",
+    "verify:runtime": "pnpm frontendkit -- verify --profile runtime",
     "commitlint": "commitlint",
     "setup:hooks": "node scripts/install-git-hooks.cjs"
   },

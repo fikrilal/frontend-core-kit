@@ -1,7 +1,7 @@
 # 2026-08-11 Frontendkit Canonical Verification Profiles
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit canonical verification profiles and compatibility delegates; do not push, deploy, publish, or weaken any existing gate
@@ -72,12 +72,12 @@ phase.
 
 ## Checklist
 
-- [ ] Implement the profile registry and executor.
-- [ ] Register the `verify` CLI command.
-- [ ] Delegate pnpm aliases to `frontendkit`.
-- [ ] Update CI to consume the registry.
-- [ ] Add profile, failure, and parity tests.
-- [ ] Run verification and record evidence.
+- [x] Implement the profile registry and executor.
+- [x] Register the `verify` CLI command.
+- [x] Delegate pnpm aliases to `frontendkit`.
+- [x] Update CI to consume the registry.
+- [x] Add profile, failure, and parity tests.
+- [x] Run verification and record evidence.
 
 ## Rollout And Rollback
 
@@ -88,14 +88,28 @@ strings and removes the profile adapter without changing underlying tools.
 
 - 2026-08-11: Preserve sequential fail-fast execution because it is simple and
   matches the current gate semantics.
+- 2026-08-11: Added a dedicated frontendkit typecheck step to every deterministic
+  profile. The old gate did not typecheck JavaScript CLI sources, so preserving
+  effective coverage would have left the new control plane unchecked.
+- 2026-08-11: The first fast-profile run stopped at maintainability because
+  `helpLines` was unnecessarily exported. Made it private and reran the same
+  profile successfully; no gate was weakened.
 
 ## Verification
 
-- Not run yet.
+- `pnpm test:frontendkit` passed: 13 tests.
+- `pnpm test:harness` passed: 64 tests.
+- `pnpm typecheck:frontendkit` passed.
+- `pnpm format:check` passed.
+- `pnpm verify:fast` passed through the compatibility delegate: 7 steps in
+  43.2 seconds.
+- `pnpm verify` passed through the compatibility delegate: 8 steps in 55.9
+  seconds.
 
 ## Runtime Evidence
 
-- Runtime profile invocation will be exercised without changing snapshots.
+- `pnpm verify:runtime` passed through the compatibility delegate: 1 browser
+  step in 41.8 seconds; snapshots were not updated.
 
 ## Follow-Up Debt
 

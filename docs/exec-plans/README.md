@@ -69,10 +69,10 @@ The accepted direction is documented in the
    [Password registration](completed/2026-08-01_auth-password-registration.md)
 2. **Completed:**
    [Frontendkit CLI foundation](completed/2026-08-11_frontendkit-cli-foundation.md)
-3. **Active:**
-   [Canonical verification profiles](active/2026-08-11_frontendkit-canonical-profiles.md)
-4. **Queued:**
-   [Read-only controls and doctor](queued/2026-08-11_frontendkit-doctor-controls.md)
+3. **Completed:**
+   [Canonical verification profiles](completed/2026-08-11_frontendkit-canonical-profiles.md)
+4. **Active:**
+   [Read-only controls and doctor](active/2026-08-11_frontendkit-doctor-controls.md)
 5. **Queued:**
    [Task lifecycle and failure taxonomy](queued/2026-08-11_frontendkit-task-lifecycle.md)
 6. **Queued:**

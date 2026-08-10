@@ -1,7 +1,7 @@
 # 2026-08-11 Frontendkit Read-Only Controls And Doctor
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit read-only CLI controls and diagnostics; do not push, publish, deploy, install tools, edit source through doctor, or contact external services

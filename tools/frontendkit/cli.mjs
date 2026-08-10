@@ -29,7 +29,7 @@ export function runCli({
     stdout(
       command.format === "json" ? renderJson(result) : renderHuman(result),
     );
-    return exitCodes.success;
+    return result.status === "passed" ? exitCodes.success : exitCodes.failure;
   } catch (error) {
     const usage = error instanceof CliUsageError;
     const result = failed({

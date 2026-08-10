@@ -10,6 +10,7 @@ const validRisks = new Set(Object.keys(riskOrder));
 const highRiskRules = [
   rule("CI or automation policy", (file) => file.startsWith(".github/")),
   rule("harness implementation", (file) => file.startsWith("scripts/harness/")),
+  rule("frontendkit harness", (file) => file.startsWith("tools/frontendkit/")),
   rule("API contract", (file) => file.startsWith("src/contracts/")),
   rule("contract tooling", (file) => file.startsWith("scripts/contracts/")),
   rule("authentication", (file) => file.startsWith("src/features/auth/")),

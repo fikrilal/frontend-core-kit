@@ -46,6 +46,14 @@ test("raises low declarations for high-risk paths", () => {
   );
 });
 
+test("treats frontendkit implementation as high-risk harness code", () => {
+  assert.deepEqual(classifyPath("tools/frontendkit/command.mjs"), {
+    path: "tools/frontendkit/command.mjs",
+    risk: "high",
+    rule: "frontendkit harness",
+  });
+});
+
 test("keeps a high plan declaration for medium paths", () => {
   const planPath = "docs/exec-plans/completed/plan.md";
   const result = classifyRisk({
@@ -278,8 +286,8 @@ test("keeps the GitHub workflow least-privilege and branch-protection ready", ()
   assert.match(workflow, /name: CI Required/);
   assert.equal((workflow.match(/name: CI Required/g) ?? []).length, 1);
   assert.match(workflow, /pnpm install --frozen-lockfile/);
-  assert.match(workflow, /run: pnpm verify\n/);
-  assert.match(workflow, /run: pnpm verify:runtime/);
+  assert.match(workflow, /run: pnpm frontendkit -- verify --profile ci\n/);
+  assert.match(workflow, /run: pnpm frontendkit -- verify --profile runtime/);
   assert.match(workflow, /if: needs\.risk\.outputs\.risk != 'low'/);
   assert.equal(actionPins(workflow, "actions/checkout").length, 4);
   assert.equal(actionPins(workflow, "actions/setup-node").length, 4);

@@ -17,12 +17,30 @@ test("parses help and a single global JSON option", () => {
   });
 });
 
+test("parses canonical verification profiles", () => {
+  assert.deepEqual(parseCommand(["verify", "--profile", "fast"]), {
+    kind: "verify",
+    format: "human",
+    profile: "fast",
+  });
+  assert.deepEqual(parseCommand(["--json", "verify", "--profile", "runtime"]), {
+    kind: "verify",
+    format: "json",
+    profile: "runtime",
+  });
+});
+
 test("rejects unknown commands and malformed global options", () => {
   assert.throws(() => parseCommand(["unknown"]), CliUsageError);
   assert.throws(
     () => parseCommand(["help", "--json", "--json"]),
     CliUsageError,
   );
+  assert.throws(
+    () => parseCommand(["verify", "--profile", "unknown"]),
+    CliUsageError,
+  );
+  assert.throws(() => parseCommand(["verify"]), CliUsageError);
 });
 
 test("renders stable human and JSON help", () => {
@@ -30,6 +48,7 @@ test("renders stable human and JSON help", () => {
   assert.equal(human.exitCode, 0);
   assert.match(human.stdout, /^Frontendkit repository harness\./);
   assert.match(human.stdout, /Usage: pnpm frontendkit/);
+  assert.match(human.stdout, /verify --profile/);
   assert.equal(human.stderr, "");
 
   const json = capture(["--json", "help"]);
