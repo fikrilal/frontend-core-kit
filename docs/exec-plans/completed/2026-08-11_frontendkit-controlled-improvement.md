@@ -1,11 +1,11 @@
 # 2026-08-11 Frontendkit Controlled Improvement Machinery
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit sanitized evidence and read-only improvement machinery; do not create an unsupported hypothesis, mutate policy, lower risk or gates, push, deploy, or contact external systems
-**Allowed paths:** tools/frontendkit/, scripts/harness/, package.json, docs/engineering/, docs/exec-plans/
+**Allowed paths:** tools/frontendkit/, scripts/harness/, package.json, knip.json, docs/engineering/, docs/exec-plans/
 **Allowed actions:** plan, edit, verify, commit
 **Maximum risk:** high
 **Repair limit:** 2
@@ -78,12 +78,12 @@ authority.
 
 ## Checklist
 
-- [ ] Extend candidate-bound operating evidence safely.
-- [ ] Add deterministic eligibility and trend analysis.
-- [ ] Add improvement ledger schema and empty current ledger.
-- [ ] Add check/analyze/shadow commands and tests.
-- [ ] Document human hypothesis and keep/revert ownership.
-- [ ] Run verification and record evidence.
+- [x] Extend candidate-bound operating evidence safely.
+- [x] Add deterministic eligibility and trend analysis.
+- [x] Add improvement ledger schema and empty current ledger.
+- [x] Add check/analyze/shadow commands and tests.
+- [x] Document human hypothesis and keep/revert ownership.
+- [x] Run verification and record evidence.
 
 ## Rollout And Rollback
 
@@ -94,15 +94,33 @@ removes the analyzer and ledger but retains reviewed operating evidence.
 
 - 2026-08-11: Do not fabricate a second risk class or recurring signal for the
   sake of demonstrating activation.
+- 2026-08-11: Migrated operating evidence to schema 3 with exact historical Git
+  revisions, repair counts, selected lanes, stop families, and terminal
+  reasons. The explicitly unknown historical boundary remains unknown.
+- 2026-08-11: Added `knip.json` to the plan boundary so the retained native
+  improvement analyzer remains an explicit diagnostic entry after CLI
+  delegation.
 
 ## Verification
 
-- Not run yet.
+- `pnpm test:frontendkit` passed: 24 tests.
+- `pnpm test:harness` passed: 71 tests, including privacy rejection, multiple
+  evaluating-hypothesis rejection, deterministic keep/revert fixtures, and
+  before/after no-mutation evidence.
+- `pnpm typecheck:frontendkit`, `pnpm maintainability:check`,
+  `pnpm format:check`, and `pnpm knowledge:check` passed.
+- `pnpm verify` passed: 8 canonical steps in 45.8 seconds.
 
 ## Runtime Evidence
 
-- Real current-ledger output and fixture-only eligible shadow evaluation will be
-  recorded separately.
+- Real `improve check` reported a valid empty ledger.
+- Real `improve analyze` and `improve shadow` both reported
+  `disabled / operating-evidence-insufficient`, 3 records, 0 hypotheses, and no
+  decision.
+- Eligible fixture evidence produced deterministic keep and revert outcomes
+  without changing stored hypothesis status.
+- `pnpm verify:runtime` passed: 1 browser step in 27.1 seconds; snapshots were
+  not updated.
 
 ## Follow-Up Debt
 

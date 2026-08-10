@@ -126,6 +126,20 @@ classes, including a medium/high task and a repair or escalation. Even then, its
 only outcome is `ready-for-human-review`; it never expands autonomy or changes
 harness policy.
 
+Operating evidence schema 3 binds every reviewed task to an exact candidate Git
+revision, selected lanes, repair count, stable stop family, and terminal reason.
+The separate [improvement ledger](harness-improvements.json) begins empty and
+permits at most one human-approved `evaluating` hypothesis. Its contract pins
+baseline/shadow task IDs, target and rollback paths, one attributable metric,
+minimum effect, false-positive and duration budgets, and unchanged risk/lanes.
+
+`frontendkit improve check|analyze|shadow` is deterministic and read-only.
+Analysis remains `disabled` while operating evidence is insufficient. Shadow
+analysis can only recommend `keep` or `revert`; it never edits hypothesis status
+or harness policy. A human owns proposal approval and the final keep/revert
+decision. Prompts, logs, diffs, review prose, secrets, environment values, user
+data, and external URLs are forbidden from both ledgers.
+
 CI repeats these commands from a clean checkout. Local results remain repair
 feedback; GitHub Actions is the independent integration run once the workflow
 has been pushed.

@@ -10,11 +10,14 @@ report. With fewer than three eligible records, the command reports
 autonomy expansion automatically.
 
 Each record in [the JSON ledger](harness-operating-evidence.json) uses schema
-version 2 and contains only:
+version 3 and contains only:
 
 - a lower-case task identifier and a local completed-plan path;
+- an exact candidate Git revision;
 - risk, first-pass/eventual outcome, attempt count, and total gate duration;
 - categorical repair/escalation and human-intervention reasons;
+- repair count, selected risk-owned lanes, stable stop family, and terminal
+  reason;
 - a categorical failed verification boundary (`none`, `unknown`, `preflight`,
   `fast`, `full`, or `runtime`);
 - boolean false-positive, CI-reproduction, and independent-review markers.

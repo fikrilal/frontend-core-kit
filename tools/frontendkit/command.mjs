@@ -19,6 +19,7 @@ const helpLines = Object.freeze([
   "  task begin|status|verify|complete|recover",
   "                                      Control the bounded task lifecycle.",
   "  handoff [options]                   Run verified handoff preflight.",
+  "  improve check|analyze|shadow        Analyze controlled improvement.",
   "  --json                              Emit bounded structured output.",
 ]);
 
@@ -119,6 +120,15 @@ export function parseCommand(args) {
       args: parseHandoffArguments(values.slice(1)),
     };
   }
+  if (values[0] === "improve" && isImproveCommand(values[1])) {
+    requireLength(values, 2, "Improvement commands accept no arguments.");
+    return {
+      kind: "owned",
+      format,
+      owner: `improve-${values[1]}`,
+      args: [],
+    };
+  }
 
   throw new CliUsageError(`Unknown frontendkit command: ${values[0]}.`);
 }
@@ -126,6 +136,11 @@ export function parseCommand(args) {
 /** @param {string} value @returns {value is "begin" | "status" | "verify" | "complete" | "recover"} */
 function isTaskCommand(value) {
   return ["begin", "status", "verify", "complete", "recover"].includes(value);
+}
+
+/** @param {string | undefined} value @returns {value is "check" | "analyze" | "shadow"} */
+function isImproveCommand(value) {
+  return value !== undefined && ["check", "analyze", "shadow"].includes(value);
 }
 
 /**
@@ -149,7 +164,8 @@ export function executeCommand(command, options) {
           { name: "command-evidence", value: helpLines[9] },
           { name: "command-task", value: helpLines[10] },
           { name: "command-handoff", value: helpLines[12] },
-          { name: "option-json", value: helpLines[13] },
+          { name: "command-improve", value: helpLines[13] },
+          { name: "option-json", value: helpLines[14] },
         ],
       });
     case "doctor":

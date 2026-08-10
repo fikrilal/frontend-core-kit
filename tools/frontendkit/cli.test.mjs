@@ -108,6 +108,19 @@ test("parses handoff without shell-like passthrough", () => {
   );
 });
 
+test("parses read-only improvement commands", () => {
+  for (const command of ["check", "analyze", "shadow"]) {
+    assert.equal(
+      parseCommand(["improve", command]).owner,
+      `improve-${command}`,
+    );
+  }
+  assert.throws(
+    () => parseCommand(["improve", "analyze", "--write"]),
+    CliUsageError,
+  );
+});
+
 test("rejects unknown commands and malformed global options", () => {
   assert.throws(() => parseCommand(["unknown"]), CliUsageError);
   assert.throws(

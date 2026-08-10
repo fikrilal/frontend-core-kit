@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const evidencePath = "docs/engineering/harness-operating-evidence.json";
-const evidenceSchemaVersion = 2;
+const evidenceSchemaVersion = 3;
 const risks = new Set(["low", "medium", "high"]);
 const outcomes = new Set(["completed", "blocked"]);
 const events = new Set([
@@ -28,6 +28,19 @@ const failureBoundaries = new Set([
   "fast",
   "full",
   "runtime",
+]);
+const stopFamilies = new Set([
+  "none",
+  "preflight",
+  "knowledge",
+  "scope",
+  "contract",
+  "architecture",
+  "maintainability",
+  "behavior",
+  "build",
+  "runtime",
+  "integration",
 ]);
 
 export function readOperatingEvidence(root) {
@@ -78,6 +91,8 @@ export function summarizeOperatingEvidence(evidence) {
     ).length,
     ciReproducedCount: records.filter((record) => record.ciReproduced).length,
     falsePositiveCount: records.filter((record) => record.falsePositive).length,
+    candidateBoundCount: records.filter((record) => record.candidateRevision)
+      .length,
     attempts,
     elapsedSeconds,
     riskCounts,
@@ -222,6 +237,28 @@ function validateRecord({ root, record }) {
     );
   }
   if (
+    typeof record.candidateRevision !== "string" ||
+    !/^[a-f0-9]{40}$/.test(record.candidateRevision) ||
+    !stopFamilies.has(record.stopFamily) ||
+    typeof record.terminalReason !== "string" ||
+    !/^(?:none|[a-z]+(?:[.-][a-z0-9]+)+)$/.test(record.terminalReason) ||
+    !Number.isInteger(record.repairCount) ||
+    record.repairCount !== record.attempts - 1
+  ) {
+    throw recordError(
+      "Each record must bind an exact candidate and stable stop outcome.",
+    );
+  }
+  const expectedLanes = record.risk === "low" ? ["fast"] : ["full", "runtime"];
+  if (
+    !Array.isArray(record.selectedLanes) ||
+    JSON.stringify(record.selectedLanes) !== JSON.stringify(expectedLanes)
+  ) {
+    throw recordError(
+      "Selected lanes must match the conservative risk profile.",
+    );
+  }
+  if (
     !events.has(record.repairOrEscalation) ||
     !interventions.has(record.humanIntervention) ||
     !failureBoundaries.has(record.failureBoundary)
@@ -265,13 +302,18 @@ function validateRecord({ root, record }) {
   const allowedKeys = new Set([
     "id",
     "plan",
+    "candidateRevision",
     "risk",
     "firstPass",
     "eventualOutcome",
     "attempts",
+    "repairCount",
     "gateDurationSeconds",
     "repairOrEscalation",
     "failureBoundary",
+    "stopFamily",
+    "terminalReason",
+    "selectedLanes",
     "humanIntervention",
     "falsePositive",
     "ciReproduced",

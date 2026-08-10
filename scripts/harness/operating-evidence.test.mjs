@@ -13,7 +13,7 @@ import {
 } from "./operating-evidence.mjs";
 
 test("reports insufficient evidence without inventing a recommendation", () => {
-  const summary = summarizeOperatingEvidence({ schemaVersion: 2, records: [] });
+  const summary = summarizeOperatingEvidence({ schemaVersion: 3, records: [] });
   const assessment = evaluateOperatingProof(summary);
 
   assert.equal(assessment.status, "insufficient");
@@ -23,7 +23,7 @@ test("reports insufficient evidence without inventing a recommendation", () => {
 
 test("accepts a reviewed, diverse operating sample for human review only", () => {
   const summary = summarizeOperatingEvidence({
-    schemaVersion: 2,
+    schemaVersion: 3,
     records: [
       record({ id: "task-low", risk: "low", firstPass: true }),
       record({
@@ -54,7 +54,7 @@ test("rejects missing plan sources and free-form fields", () => {
   );
   try {
     write(root, "docs/engineering/harness-operating-evidence.json", {
-      schemaVersion: 2,
+      schemaVersion: 3,
       records: [record({ plan: "docs/exec-plans/completed/missing.md" })],
     });
     assert.throws(
@@ -64,7 +64,7 @@ test("rejects missing plan sources and free-form fields", () => {
 
     write(root, "docs/exec-plans/completed/task.md", "# Completed\n");
     write(root, "docs/engineering/harness-operating-evidence.json", {
-      schemaVersion: 2,
+      schemaVersion: 3,
       records: [
         {
           ...record({ plan: "docs/exec-plans/completed/task.md" }),
@@ -88,7 +88,7 @@ test("rejects a boundary that is inconsistent with repair state", () => {
   try {
     write(root, "docs/exec-plans/completed/task.md", "# Completed\n");
     write(root, "docs/engineering/harness-operating-evidence.json", {
-      schemaVersion: 2,
+      schemaVersion: 3,
       records: [
         record({
           plan: "docs/exec-plans/completed/task.md",
@@ -109,13 +109,18 @@ test("rejects a boundary that is inconsistent with repair state", () => {
 function record({
   id = "task-one",
   plan = "docs/exec-plans/completed/task.md",
+  candidateRevision = "a".repeat(40),
   risk = "low",
   firstPass = true,
   eventualOutcome = "completed",
   attempts = 1,
+  repairCount = attempts - 1,
   gateDurationSeconds = 30,
   repairOrEscalation = "none",
   failureBoundary = "none",
+  stopFamily = failureBoundary === "none" ? "none" : "integration",
+  terminalReason = failureBoundary === "none" ? "none" : "integration.failure",
+  selectedLanes = risk === "low" ? ["fast"] : ["full", "runtime"],
   humanIntervention = "none",
   falsePositive = false,
   ciReproduced = true,
@@ -124,13 +129,18 @@ function record({
   return {
     id,
     plan,
+    candidateRevision,
     risk,
     firstPass,
     eventualOutcome,
     attempts,
+    repairCount,
     gateDurationSeconds,
     repairOrEscalation,
     failureBoundary,
+    stopFamily,
+    terminalReason,
+    selectedLanes,
     humanIntervention,
     falsePositive,
     ciReproduced,

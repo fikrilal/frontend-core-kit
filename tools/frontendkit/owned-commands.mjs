@@ -57,6 +57,15 @@ const owners = Object.freeze({
     "Task handoff preflight or publication completed.",
     "Run the native task-handoff script for focused diagnostics.",
   ),
+  "improve-check": improvement("check", "Improvement ledger is valid."),
+  "improve-analyze": improvement(
+    "analyze",
+    "Improvement eligibility was analyzed.",
+  ),
+  "improve-shadow": improvement(
+    "shadow",
+    "Improvement shadow evidence was analyzed.",
+  ),
 });
 
 /** @typedef {keyof typeof owners} CommandOwner */
@@ -133,6 +142,18 @@ function taskControl(command, success) {
     "scripts/harness/task-control-cli.mjs",
     success,
     `Run the native task-control script with ${command} for focused diagnostics.`,
+    [command],
+    true,
+  );
+}
+
+/** @param {"check" | "analyze" | "shadow"} command @param {string} success */
+function improvement(command, success) {
+  return owner(
+    `improve:${command}`,
+    "scripts/harness/improvement-cli.mjs",
+    success,
+    `Run the native improvement analyzer with ${command} for focused diagnostics.`,
     [command],
     true,
   );

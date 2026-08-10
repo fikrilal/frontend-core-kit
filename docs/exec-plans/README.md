@@ -77,9 +77,9 @@ The accepted direction is documented in the
    [Task lifecycle and failure taxonomy](completed/2026-08-11_frontendkit-task-lifecycle.md)
 6. **Completed:**
    [Verified handoff](completed/2026-08-11_frontendkit-verified-handoff.md)
-7. **Active:**
-   [Controlled improvement machinery](active/2026-08-11_frontendkit-controlled-improvement.md)
-8. **Queued:**
-   [Dogfood and completion audit](queued/2026-08-11_frontendkit-dogfood-completion.md)
+7. **Completed:**
+   [Controlled improvement machinery](completed/2026-08-11_frontendkit-controlled-improvement.md)
+8. **Active:**
+   [Dogfood and completion audit](active/2026-08-11_frontendkit-dogfood-completion.md)
 
 Do not introduce product workflows until a real product decision exists.

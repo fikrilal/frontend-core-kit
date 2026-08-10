@@ -4,6 +4,7 @@
   "entry": [
     "scripts/contracts/check-openapi.mjs",
     "scripts/harness/check-knowledge.mjs",
+    "scripts/harness/improvement-cli.mjs",
     "scripts/harness/operating-evidence-cli.mjs",
     "scripts/harness/task-begin.mjs",
     "scripts/harness/task-control-cli.mjs",
