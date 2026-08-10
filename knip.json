@@ -1,6 +1,11 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "includeEntryExports": true,
+  "entry": [
+    "scripts/contracts/check-openapi.mjs",
+    "scripts/harness/check-knowledge.mjs",
+    "scripts/harness/operating-evidence-cli.mjs"
+  ],
   "ignore": [
     "src/contracts/example-api/generated.ts",
     "src/contracts/example-api/runtime.generated.ts",

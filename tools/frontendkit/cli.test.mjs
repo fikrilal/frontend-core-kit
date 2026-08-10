@@ -30,6 +30,43 @@ test("parses canonical verification profiles", () => {
   });
 });
 
+test("parses read-only controls through one router", () => {
+  assert.deepEqual(parseCommand(["doctor"]), {
+    kind: "doctor",
+    format: "human",
+  });
+  assert.deepEqual(parseCommand(["knowledge", "check"]), {
+    kind: "owned",
+    format: "human",
+    owner: "knowledge",
+    args: [],
+  });
+  assert.deepEqual(parseCommand(["contracts", "check", "--json"]), {
+    kind: "owned",
+    format: "json",
+    owner: "contracts",
+    args: [],
+  });
+  assert.deepEqual(
+    parseCommand([
+      "risk",
+      "classify",
+      "--",
+      "--base",
+      "HEAD^",
+      "--head",
+      "HEAD",
+    ]),
+    {
+      kind: "owned",
+      format: "human",
+      owner: "risk",
+      args: ["--base", "HEAD^", "--head", "HEAD"],
+    },
+  );
+  assert.equal(parseCommand(["evidence", "report"]).owner, "evidence");
+});
+
 test("rejects unknown commands and malformed global options", () => {
   assert.throws(() => parseCommand(["unknown"]), CliUsageError);
   assert.throws(
@@ -41,6 +78,11 @@ test("rejects unknown commands and malformed global options", () => {
     CliUsageError,
   );
   assert.throws(() => parseCommand(["verify"]), CliUsageError);
+  assert.throws(() => parseCommand(["doctor", "fix"]), CliUsageError);
+  assert.throws(
+    () => parseCommand(["risk", "classify", "--base", "HEAD"]),
+    CliUsageError,
+  );
 });
 
 test("renders stable human and JSON help", () => {

@@ -1,20 +1,28 @@
 // @ts-check
 
 import { CliUsageError, passed } from "./result.mjs";
+import { runDoctor } from "./doctor.mjs";
+import { runOwnedCommand } from "./owned-commands.mjs";
 import { runVerificationProfile, verificationProfiles } from "./profiles.mjs";
 
 const helpLines = Object.freeze([
   "Usage: pnpm frontendkit -- <command> [options]",
   "  help                                Show this help.",
+  "  doctor                              Inspect local harness readiness.",
   "  verify --profile <fast|full|runtime|ci>",
   "                                      Run a canonical verification profile.",
+  "  knowledge check                     Validate repository knowledge.",
+  "  contracts check                     Check generated API contracts.",
+  "  risk classify --base <rev> --head <rev>",
+  "                                      Classify changed-path risk.",
+  "  evidence check|report               Inspect operating evidence.",
   "  --json                              Emit bounded structured output.",
 ]);
 
 /** @typedef {"human" | "json"} OutputFormat */
 
 /**
- * @typedef {{ kind: "help", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile }} ParsedCommand
+ * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").ReadOnlyOwner, args: readonly string[] }} ParsedCommand
  */
 
 /**
@@ -22,8 +30,7 @@ const helpLines = Object.freeze([
  * @returns {ParsedCommand}
  */
 export function parseCommand(args) {
-  const values = [...args];
-  if (values[0] === "--") values.shift();
+  const values = args.filter((value) => value !== "--");
   const jsonIndexes = values.flatMap((value, index) =>
     value === "--json" ? [index] : [],
   );
@@ -40,6 +47,11 @@ export function parseCommand(args) {
     return { kind: "help", format };
   }
 
+  if (values[0] === "doctor") {
+    requireLength(values, 1, "The doctor command accepts no arguments.");
+    return { kind: "doctor", format };
+  }
+
   if (values[0] === "verify") {
     if (values.length !== 3 || values[1] !== "--profile") {
       throw new CliUsageError("Use verify --profile <fast|full|runtime|ci>.");
@@ -51,12 +63,36 @@ export function parseCommand(args) {
     return { kind: "verify", format, profile };
   }
 
+  if (values[0] === "knowledge" && values[1] === "check") {
+    requireLength(values, 2, "The knowledge check accepts no arguments.");
+    return { kind: "owned", format, owner: "knowledge", args: [] };
+  }
+  if (values[0] === "contracts" && values[1] === "check") {
+    requireLength(values, 2, "The contracts check accepts no arguments.");
+    return { kind: "owned", format, owner: "contracts", args: [] };
+  }
+  if (values[0] === "risk" && values[1] === "classify") {
+    return {
+      kind: "owned",
+      format,
+      owner: "risk",
+      args: parseRiskArguments(values.slice(2)),
+    };
+  }
+  if (
+    values[0] === "evidence" &&
+    (values[1] === "check" || values[1] === "report")
+  ) {
+    requireLength(values, 2, "Evidence inspection accepts no arguments.");
+    return { kind: "owned", format, owner: "evidence", args: [] };
+  }
+
   throw new CliUsageError(`Unknown frontendkit command: ${values[0]}.`);
 }
 
 /**
  * @param {ParsedCommand} command
- * @param {Parameters<typeof runVerificationProfile>[1]} [options]
+ * @param {Parameters<typeof runDoctor>[0] & Parameters<typeof runVerificationProfile>[1]} [options]
  */
 export function executeCommand(command, options) {
   switch (command.kind) {
@@ -67,16 +103,55 @@ export function executeCommand(command, options) {
         details: [
           { name: "usage", value: helpLines[0] },
           { name: "command-help", value: helpLines[1] },
-          { name: "command-verify", value: helpLines[2] },
-          { name: "option-json", value: helpLines[4] },
+          { name: "command-doctor", value: helpLines[2] },
+          { name: "command-verify", value: helpLines[3] },
+          { name: "command-knowledge", value: helpLines[5] },
+          { name: "command-contracts", value: helpLines[6] },
+          { name: "command-risk", value: helpLines[7] },
+          { name: "command-evidence", value: helpLines[9] },
+          { name: "option-json", value: helpLines[10] },
         ],
       });
+    case "doctor":
+      return runDoctor(options);
     case "verify":
       return runVerificationProfile(command.profile, options);
+    case "owned":
+      return runOwnedCommand(command.owner, command.args, options);
   }
 }
 
 /** @param {string} value @returns {value is import("./profiles.mjs").VerificationProfile} */
 function isVerificationProfile(value) {
   return Object.hasOwn(verificationProfiles, value);
+}
+
+/** @param {readonly string[]} values */
+function parseRiskArguments(values) {
+  if (
+    values.length !== 4 ||
+    values.filter((value) => value === "--base").length !== 1 ||
+    values.filter((value) => value === "--head").length !== 1
+  ) {
+    throw new CliUsageError(
+      "Use risk classify --base <revision> --head <revision>.",
+    );
+  }
+  for (let index = 0; index < values.length; index += 2) {
+    if (
+      !["--base", "--head"].includes(values[index]) ||
+      !values[index + 1] ||
+      values[index + 1].startsWith("--")
+    ) {
+      throw new CliUsageError(
+        "Use risk classify --base <revision> --head <revision>.",
+      );
+    }
+  }
+  return values;
+}
+
+/** @param {readonly string[]} values @param {number} expected @param {string} message */
+function requireLength(values, expected, message) {
+  if (values.length !== expected) throw new CliUsageError(message);
 }

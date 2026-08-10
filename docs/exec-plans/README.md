@@ -71,10 +71,10 @@ The accepted direction is documented in the
    [Frontendkit CLI foundation](completed/2026-08-11_frontendkit-cli-foundation.md)
 3. **Completed:**
    [Canonical verification profiles](completed/2026-08-11_frontendkit-canonical-profiles.md)
-4. **Active:**
-   [Read-only controls and doctor](active/2026-08-11_frontendkit-doctor-controls.md)
-5. **Queued:**
-   [Task lifecycle and failure taxonomy](queued/2026-08-11_frontendkit-task-lifecycle.md)
+4. **Completed:**
+   [Read-only controls and doctor](completed/2026-08-11_frontendkit-doctor-controls.md)
+5. **Active:**
+   [Task lifecycle and failure taxonomy](active/2026-08-11_frontendkit-task-lifecycle.md)
 6. **Queued:**
    [Verified handoff](queued/2026-08-11_frontendkit-verified-handoff.md)
 7. **Queued:**

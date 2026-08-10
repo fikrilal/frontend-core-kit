@@ -2,6 +2,26 @@
 
 ## Commands
 
+`frontendkit` is the canonical repository-local harness CLI:
+
+```bash
+pnpm frontendkit -- doctor
+pnpm frontendkit -- verify --profile fast
+pnpm frontendkit -- knowledge check
+pnpm frontendkit -- contracts check
+pnpm frontendkit -- risk classify --base <revision> --head <revision>
+pnpm frontendkit -- evidence report
+```
+
+`doctor` is a read-only pre-task check. It reports stable blockers and warnings
+for exact Node/pnpm versions, Git worktree identity, the active plan, ignored
+task state, required Chromium, and committed contract prerequisites. It does not
+install, regenerate, verify, clean, contact a backend, or modify repository
+state. Use `--json` for bounded structured output; native commands remain
+available when detailed diagnostics are needed.
+
+Existing pnpm names remain compatibility delegates:
+
 ```bash
 pnpm verify:fast
 pnpm verify
@@ -15,6 +35,7 @@ format:check
 contracts:check
 lint
 typecheck
+typecheck:frontendkit
 test
 harness:check
 ```
@@ -184,11 +205,11 @@ they are not quality budgets until evidence supports a threshold.
 of path-derived risk and any changed V1/V2 execution-plan declaration. Automation
 may raise declared risk and never lower it.
 
-| Minimum risk | Changed boundaries                                                                                          |
-| ------------ | ----------------------------------------------------------------------------------------------------------- |
-| High         | CI/harness, auth, authenticated routes, server code, contracts, dependencies, environment/deployment config |
-| Medium       | Other application source, tests, scripts, public assets, and build/test config                              |
-| Low          | Documentation and narrow repository metadata                                                                |
+| Minimum risk | Changed boundaries                                                                                                      |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| High         | CI/harness/frontendkit, auth, authenticated routes, server code, contracts, dependencies, environment/deployment config |
+| Medium       | Other application source, tests, scripts, public assets, and build/test config                                          |
+| Low          | Documentation and narrow repository metadata                                                                            |
 
 Unknown paths default to medium. Changed execution plans must be V1/V2 documents
 with valid risk metadata at the target revision. The classifier writes only
@@ -201,9 +222,10 @@ read-only repository permission, a pinned Ubuntu runner image, and bounded job
 timeouts:
 
 1. `CI Risk` checks out full history and classifies the change.
-2. `CI Verify` performs a frozen install and runs `pnpm verify` for every risk.
-3. `CI Runtime` installs Chromium and runs `pnpm verify:runtime` for medium/high
-   changes; low-risk changes skip it.
+2. `CI Verify` performs a frozen install and runs the canonical `ci` profile for
+   every risk.
+3. `CI Runtime` installs Chromium and runs the canonical `runtime` profile for
+   medium/high changes; low-risk changes skip it.
 4. `CI Required` independently checks upstream outcomes and provides one stable
    aggregate status.
 

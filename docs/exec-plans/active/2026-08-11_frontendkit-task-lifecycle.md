@@ -1,7 +1,7 @@
 # 2026-08-11 Frontendkit Task Lifecycle And Failure Taxonomy
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement, verify, and commit task lifecycle, recovery, candidate identity, and failure classification; do not push, publish, deploy, broaden task authority, or erase active evidence
