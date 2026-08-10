@@ -1,7 +1,7 @@
 # 2026-08-10 Shadcn Default Foundation
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for UI behavior
 **Risk:** high
 **Authority:** implement and verify the shadcn default foundation slice against the accepted pure-shadcn-default design-system proposal; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -101,14 +101,14 @@ theme behavior.
 
 ## Checklist
 
-- [ ] Run the shadcn CLI init; replace `globals.css` tokens with the default
+- [x] Run the shadcn CLI init; replace `globals.css` tokens with the default
       set and install the base primitives.
-- [ ] Remove custom tokens and their utilities once unreferenced.
-- [ ] Fix `components.json` aliases; unify `cn()` on `@/lib/utils`; delete
+- [x] Remove custom tokens and their utilities once unreferenced.
+- [x] Fix `components.json` aliases; unify `cn()` on `@/lib/utils`; delete
       `src/lib/cn.ts`.
-- [ ] Reconcile the theme scripts to the shadcn default contract.
-- [ ] Update design docs and architecture docs for the foundation state.
-- [ ] Run full and runtime verification and record exact outcomes.
+- [x] Reconcile the theme scripts to the shadcn default contract.
+- [x] Update design docs and architecture docs for the foundation state.
+- [x] Run full and runtime verification and record exact outcomes.
 
 ## Rollout And Rollback
 

@@ -2,6 +2,9 @@
 
 import { useActionState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+
 import { resendEmailVerificationAction } from "./email-verification-resend-action";
 import type {
   EmailVerificationResendActionState,
@@ -18,46 +21,44 @@ export function EmailVerificationResendForm() {
     resendEmailVerificationAction,
     initialState,
   );
-  const feedbackId = state.error
-    ? "email-verification-resend-error"
-    : state.sent
-      ? "email-verification-resend-success"
-      : undefined;
 
   return (
     <form action={action} className="mt-4 grid gap-3">
       {state.sent ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-muted-foreground text-sm"
+
           id="email-verification-resend-success"
           role="status"
         >
-          A new verification email is on its way. Check your inbox.
-        </p>
+          <AlertDescription>
+            A new verification email is on its way. Check your inbox.
+          </AlertDescription>
+        </Alert>
       ) : null}
       {state.error ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-sm text-red-600 dark:text-red-400"
           id="email-verification-resend-error"
-          role="alert"
+          variant="destructive"
         >
-          {messageForEmailVerificationResendError(state.error)}
-        </p>
+          <AlertDescription className="!text-destructive">
+            {messageForEmailVerificationResendError(state.error)}
+          </AlertDescription>
+        </Alert>
       ) : null}
-      <button
-        aria-describedby={feedbackId}
-        className="border-border bg-background hover:bg-muted/50 focus-visible:ring-foreground/25 h-10 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+      <Button
+        className="border-border bg-background hover:bg-muted/50"
         disabled={pending}
         type="submit"
+        variant="outline"
       >
         {pending
           ? "Sending verification email…"
           : state.sent
             ? "Send another verification email"
             : "Resend verification email"}
-      </button>
+      </Button>
     </form>
   );
 }

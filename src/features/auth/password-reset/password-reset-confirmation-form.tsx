@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import { confirmPasswordResetAction } from "./password-reset-confirmation-action";
 import type {
   PasswordResetConfirmationActionState,
@@ -30,67 +35,46 @@ function ConfirmationForm({ token }: Readonly<{ token: string }>) {
   return (
     <form action={action} className="grid gap-5">
       <input name="token" type="hidden" value={token} />
-      <PasswordInput
-        ariaDescribedBy={
-          errorId ? `${passwordHintId} ${errorId}` : passwordHintId
-        }
-        id="password-reset-confirmation-new-password"
-        label="New password"
-        name="newPassword"
-      >
+      <div className="grid gap-2">
+        <Label htmlFor="password-reset-confirmation-new-password">
+          New password
+        </Label>
+        <Input
+          aria-describedby={
+            errorId ? `${passwordHintId} ${errorId}` : passwordHintId
+          }
+          aria-invalid={errorId ? true : undefined}
+          autoComplete="new-password"
+          id="password-reset-confirmation-new-password"
+          minLength={10}
+          name="newPassword"
+          required
+          type="password"
+        />
         <p className="text-muted-foreground text-xs" id={passwordHintId}>
           Use at least 10 characters.
         </p>
-      </PasswordInput>
-      <PasswordInput
-        ariaDescribedBy={errorId}
-        id="password-reset-confirmation-password"
-        label="Confirm new password"
-        name="passwordConfirmation"
-      />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="password-reset-confirmation-password">
+          Confirm new password
+        </Label>
+        <Input
+          aria-describedby={errorId}
+          aria-invalid={errorId ? true : undefined}
+          autoComplete="new-password"
+          id="password-reset-confirmation-password"
+          minLength={10}
+          name="passwordConfirmation"
+          required
+          type="password"
+        />
+      </div>
       <ConfirmationError error={state.error} id={errorId} />
-      <button
-        className="bg-foreground text-background hover:bg-foreground/90 focus-visible:ring-foreground/25 h-10 rounded-lg px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={pending}
-        type="submit"
-      >
+      <Button disabled={pending} type="submit">
         {pending ? "Updating password…" : "Update password"}
-      </button>
+      </Button>
     </form>
-  );
-}
-
-function PasswordInput({
-  ariaDescribedBy,
-  children,
-  id,
-  label,
-  name,
-}: Readonly<{
-  ariaDescribedBy?: string;
-  children?: React.ReactNode;
-  id: string;
-  label: string;
-  name: string;
-}>) {
-  return (
-    <div className="grid gap-2">
-      <label className="text-sm font-medium" htmlFor={id}>
-        {label}
-      </label>
-      <input
-        aria-describedby={ariaDescribedBy}
-        aria-invalid={ariaDescribedBy?.includes("error") ? true : undefined}
-        autoComplete="new-password"
-        className="border-border bg-background focus:border-foreground focus-visible:ring-foreground/25 h-10 rounded-lg border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-        id={id}
-        minLength={10}
-        name={name}
-        required
-        type="password"
-      />
-      {children}
-    </div>
   );
 }
 
@@ -102,27 +86,26 @@ function ConfirmationError({
   id: string | undefined;
 }>) {
   return error ? (
-    <p
-      aria-live="polite"
-      className="text-sm text-red-600 dark:text-red-400"
-      id={id}
-    >
-      {messageForPasswordResetConfirmationError(error)}
-    </p>
+    <Alert aria-live="polite" id={id} variant="destructive">
+      <AlertDescription className="!text-destructive">
+        {messageForPasswordResetConfirmationError(error)}
+      </AlertDescription>
+    </Alert>
   ) : null;
 }
 
 function InvalidResetLink() {
   return (
     <div className="grid gap-4">
-      <p
+      <Alert
         aria-live="polite"
-        className="border-border bg-muted/35 text-muted-foreground rounded-lg border p-3 text-sm"
         id="password-reset-confirmation-error"
         role="status"
       >
-        This password reset link is invalid or expired. Request a new one.
-      </p>
+        <AlertDescription>
+          This password reset link is invalid or expired. Request a new one.
+        </AlertDescription>
+      </Alert>
       <Link
         className="text-foreground text-center text-sm font-medium underline"
         href="/forgot-password"

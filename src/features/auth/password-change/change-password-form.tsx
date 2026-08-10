@@ -2,6 +2,11 @@
 
 import { useActionState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import { changePasswordRequestDtoNewPasswordMin } from "@/contracts/lamara-api/runtime";
 
 import { changePasswordAction } from "./change-password-action";
@@ -36,14 +41,11 @@ function PasswordField({
 }: PasswordFieldProps) {
   return (
     <div className="grid gap-2">
-      <label className="text-sm font-medium" htmlFor={id}>
-        {label}
-      </label>
-      <input
+      <Label htmlFor={id}>{label}</Label>
+      <Input
         aria-describedby={describedBy}
         aria-invalid={error ? true : undefined}
         autoComplete={autoComplete}
-        className="border-border bg-background focus:border-foreground focus-visible:ring-foreground/25 h-10 rounded-lg border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         id={id}
         minLength={minLength}
         name={name}
@@ -91,32 +93,30 @@ export function ChangePasswordForm() {
       />
 
       {state.changed ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-muted-foreground text-sm"
+
           id="change-password-success"
           role="status"
         >
-          Your password was changed.
-        </p>
+          <AlertDescription>Your password was changed.</AlertDescription>
+        </Alert>
       ) : null}
       {state.error ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-sm text-red-600 dark:text-red-400"
           id="change-password-error"
+          variant="destructive"
         >
-          {messageForChangePasswordError(state.error)}
-        </p>
+          <AlertDescription className="!text-destructive">
+            {messageForChangePasswordError(state.error)}
+          </AlertDescription>
+        </Alert>
       ) : null}
 
-      <button
-        className="bg-foreground text-background hover:bg-foreground/90 focus-visible:ring-foreground/25 h-10 rounded-lg px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={pending}
-        type="submit"
-      >
+      <Button disabled={pending} type="submit">
         {pending ? "Changing password…" : "Change password"}
-      </button>
+      </Button>
     </form>
   );
 }

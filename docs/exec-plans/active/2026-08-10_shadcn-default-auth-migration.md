@@ -1,7 +1,7 @@
 # 2026-08-10 Shadcn Default Auth Migration
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary agent with independent reviewer for UI behavior
 **Risk:** high
 **Authority:** implement and verify the shadcn-default migration of the auth feature against the accepted pure-shadcn-default design-system proposal; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -83,13 +83,13 @@ required for visual and accessibility behavior.
 
 ## Checklist
 
-- [ ] Migrate the login and register flows onto primitives.
-- [ ] Migrate the password-reset request/confirmation flows.
-- [ ] Migrate the email-verification and resend flows.
-- [ ] Migrate the change-password flow.
-- [ ] Regenerate and inspect the affected visual baselines.
-- [ ] Update design and architecture docs for the auth migration.
-- [ ] Run full and runtime verification and record exact outcomes.
+- [x] Migrate the login and register flows onto primitives.
+- [x] Migrate the password-reset request/confirmation flows.
+- [x] Migrate the email-verification and resend flows.
+- [x] Migrate the change-password flow.
+- [x] Regenerate and inspect the affected visual baselines.
+- [x] Update design and architecture docs for the auth migration.
+- [x] Run full and runtime verification and record exact outcomes.
 
 ## Rollout And Rollback
 
@@ -100,14 +100,36 @@ the affected `src/features/auth/**` files; the foundation primitives remain.
 
 - 2026-08-10: Auth migrates before users because it is the smaller surface and
   establishes the form-feedback pattern the users flows will reuse.
+- 2026-08-10: The shared `AuthShell` (Card composition + brand header + real
+  `<h1>` heading) replaces the duplicated page shells; `CardTitle` renders a
+  `div`, so a plain `<h1>` with matching classes preserves heading semantics.
+- 2026-08-10: Error feedback uses the destructive `Alert`; the shadcn
+  destructive variant's `*:data-slot` description color (`text-destructive/90`)
+  failed WCAG AA, so the descriptions use `!text-destructive` (full-strength
+  token) — a documented shadcn customization, no token changes.
+- 2026-08-10: The custom `bg-muted/35` page background and alert tints were
+  dropped in favor of the shadcn default card/alert surfaces.
 
 ## Verification
 
-- Not run yet.
+- Static lanes passed under Node 24: `format:check`, `contracts:check`,
+  `lint`, `typecheck`, `harness:check`, and `pnpm build`.
+- Unit suite: 236 passed, 1 failed — the pre-existing `theme-toggle`
+  `React.act` failure plus the pre-existing `session-service.test.ts` module
+  resolution error, both unrelated to this change.
+- `pnpm verify:runtime`: 69 Chromium tests passed, including the full axe
+  accessibility suite across all auth states.
 
 ## Runtime Evidence
 
-- Not run yet.
+- All auth accessibility tests pass after the heading and error-contrast
+  fixes; the initial migration caused 58 contrast violations per error state
+  (destructive alert description at 90% opacity) and a heading-semantics
+  failure (CardTitle renders a div).
+- The auth visual baselines (login, register, password reset, email
+  verification, change password, and their states) were regenerated and
+  inspected before recording; they show the shadcn default card/input/button/
+  alert look.
 
 ## Follow-Up Debt
 

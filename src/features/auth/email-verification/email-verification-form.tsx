@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+
 import { verifyEmailAction } from "./email-verification-action";
 import type {
   EmailVerificationActionState,
@@ -38,14 +41,9 @@ function VerificationForm({ token }: Readonly<{ token: string }>) {
         account.
       </p>
       <VerificationError error={state.error} id={errorId} />
-      <button
-        aria-describedby={errorId}
-        className="bg-foreground text-background hover:bg-foreground/90 focus-visible:ring-foreground/25 h-10 rounded-lg px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={pending}
-        type="submit"
-      >
+      <Button aria-describedby={errorId} disabled={pending} type="submit">
         {pending ? "Verifying email…" : "Verify email"}
-      </button>
+      </Button>
     </form>
   );
 }
@@ -58,28 +56,22 @@ function VerificationError({
   id: string | undefined;
 }>) {
   return error ? (
-    <p
-      aria-live="polite"
-      className="text-sm text-red-600 dark:text-red-400"
-      id={id}
-      role="alert"
-    >
-      {messageForEmailVerificationError(error)}
-    </p>
+    <Alert aria-live="polite" id={id} variant="destructive">
+      <AlertDescription className="!text-destructive">
+        {messageForEmailVerificationError(error)}
+      </AlertDescription>
+    </Alert>
   ) : null;
 }
 
 function InvalidVerificationLink() {
   return (
     <div className="grid gap-4">
-      <p
-        aria-live="polite"
-        className="border-border bg-muted/35 text-muted-foreground rounded-lg border p-3 text-sm"
-        id="email-verification-error"
-        role="status"
-      >
-        This email verification link is invalid or expired. Return to sign in.
-      </p>
+      <Alert aria-live="polite" id="email-verification-error" role="status">
+        <AlertDescription>
+          This email verification link is invalid or expired. Return to sign in.
+        </AlertDescription>
+      </Alert>
       <Link
         className="text-foreground text-center text-sm font-medium underline"
         href="/login"
