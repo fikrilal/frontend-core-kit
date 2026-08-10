@@ -2,6 +2,9 @@
 
 import { useActionState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+
 import { cancelAccountDeletionAction } from "./cancel-account-deletion-action";
 import type { CancelAccountDeletionActionState } from "./cancel-account-deletion-state";
 
@@ -19,32 +22,36 @@ export function CancelAccountDeletionForm() {
   return (
     <form action={action} className="grid gap-3">
       {state.cancelled ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-muted-foreground text-sm"
+          className="bg-muted/35"
           id="cancel-account-deletion-success"
           role="status"
         >
-          Your account deletion was canceled.
-        </p>
+          <AlertDescription>
+            Your account deletion was canceled.
+          </AlertDescription>
+        </Alert>
       ) : null}
       {state.error ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-sm text-red-600 dark:text-red-400"
           id="cancel-account-deletion-error"
+          variant="destructive"
         >
-          Canceling account deletion is temporarily unavailable. Please try
-          again.
-        </p>
+          <AlertDescription className="!text-destructive">
+            Canceling account deletion is temporarily unavailable. Please try
+            again.
+          </AlertDescription>
+        </Alert>
       ) : null}
-      <button
-        className="border-border bg-background hover:bg-muted/50 focus-visible:ring-foreground/25 h-10 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+      <Button
         disabled={pending || state.cancelled}
         type="submit"
+        variant="outline"
       >
         {pending ? "Canceling deletion…" : "Cancel account deletion"}
-      </button>
+      </Button>
     </form>
   );
 }

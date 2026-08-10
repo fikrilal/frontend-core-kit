@@ -2,6 +2,11 @@
 
 import { useActionState, useState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import { updateProfileAction } from "./update-profile-action";
 import type {
   UpdateProfileActionState,
@@ -43,14 +48,11 @@ function ProfileField({
 }: ProfileFieldProps) {
   return (
     <div className="grid gap-2">
-      <label className="text-sm font-medium" htmlFor={id}>
-        {label}
-      </label>
-      <input
+      <Label htmlFor={id}>{label}</Label>
+      <Input
         aria-describedby={describedBy}
         aria-invalid={error ? true : undefined}
         autoComplete={autoComplete}
-        className="border-border bg-background focus:border-foreground focus-visible:ring-foreground/25 h-10 rounded-lg border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         id={id}
         maxLength={100}
         name={name}
@@ -176,34 +178,30 @@ export function UpdateProfileForm({
       />
 
       {isSaved ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-muted-foreground text-sm"
+          className="bg-muted/35"
           id="update-profile-success"
           role="status"
         >
-          Your profile was updated.
-        </p>
+          <AlertDescription>Your profile was updated.</AlertDescription>
+        </Alert>
       ) : null}
       {state.error ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-sm text-red-600 dark:text-red-400"
           id="update-profile-error"
-          role="alert"
+          variant="destructive"
         >
-          {messageForUpdateProfileError(state.error)}
-        </p>
+          <AlertDescription className="!text-destructive">
+            {messageForUpdateProfileError(state.error)}
+          </AlertDescription>
+        </Alert>
       ) : null}
 
-      <button
-        aria-describedby={feedbackId}
-        className="bg-foreground text-background hover:bg-foreground/90 focus-visible:ring-foreground/25 h-10 rounded-lg px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={pending}
-        type="submit"
-      >
+      <Button disabled={pending} type="submit">
         {pending ? "Saving…" : "Save profile"}
-      </button>
+      </Button>
     </form>
   );
 }

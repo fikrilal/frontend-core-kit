@@ -2,6 +2,11 @@
 
 import { useActionState, useState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import { createProfileImageUploadPlanAction } from "./upload-plan-action";
 import { CompleteProfileImageUploadForm } from "./complete-upload-form";
 import type {
@@ -32,14 +37,11 @@ export function ProfileImageUploadPlanForm() {
           value={file ? String(file.size) : ""}
         />
         <div className="grid gap-2">
-          <label className="text-sm font-medium" htmlFor="profile-image-file">
-            Profile image
-          </label>
-          <input
+          <Label htmlFor="profile-image-file">Profile image</Label>
+          <Input
             accept="image/jpeg,image/png,image/webp"
             aria-describedby={feedbackId}
             aria-invalid={state.error ? true : undefined}
-            className="border-border bg-background focus:border-foreground focus-visible:ring-foreground/25 h-10 rounded-lg border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             id="profile-image-file"
             name="file"
             onChange={(event) => setFile(event.target.files?.[0] ?? null)}
@@ -50,37 +52,41 @@ export function ProfileImageUploadPlanForm() {
         {!state.plan ? (
           <>
             {state.error ? (
-              <p
+              <Alert
                 aria-live="polite"
-                className="text-sm text-red-600 dark:text-red-400"
                 id="profile-image-upload-error"
+                variant="destructive"
               >
-                {messageForProfileImageUploadError(state.error)}
-              </p>
+                <AlertDescription className="!text-destructive">
+                  {messageForProfileImageUploadError(state.error)}
+                </AlertDescription>
+              </Alert>
             ) : null}
 
-            <button
-              className="border-border bg-background hover:bg-muted/50 focus-visible:ring-foreground/25 h-10 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            <Button
               disabled={pending || file === null}
               type="submit"
+              variant="outline"
             >
               {pending ? "Preparing upload…" : "Prepare upload"}
-            </button>
+            </Button>
           </>
         ) : null}
       </form>
 
       {state.plan ? (
         <div className="grid gap-3">
-          <p
+          <Alert
             aria-live="polite"
-            className="text-muted-foreground text-sm"
+            className="bg-muted/35"
             id="profile-image-upload-success"
             role="status"
           >
-            Upload plan ready. Next, confirm the upload to set your profile
-            image.
-          </p>
+            <AlertDescription>
+              Upload plan ready. Next, confirm the upload to set your profile
+              image.
+            </AlertDescription>
+          </Alert>
           <CompleteProfileImageUploadForm fileId={state.plan.fileId} />
         </div>
       ) : null}

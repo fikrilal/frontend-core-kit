@@ -1,7 +1,7 @@
 # 2026-08-10 Shadcn Default Users Migration
 
 **Plan version:** 2
-**Status:** queued
+**Status:** active
 **Owner:** primary agent with independent reviewer for UI behavior
 **Risk:** high
 **Authority:** implement and verify the shadcn-default migration of the users feature against the accepted pure-shadcn-default design-system proposal; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows
@@ -92,12 +92,12 @@ Human review remains required for visual and accessibility behavior.
 
 ## Checklist
 
-- [ ] Migrate the profile and profile-image flows onto primitives.
-- [ ] Migrate the sessions list and revoke flows (Badge status pills).
-- [ ] Migrate the account-deletion request/cancel flows.
-- [ ] Regenerate and inspect the affected visual baselines.
-- [ ] Update design and architecture docs for the users migration.
-- [ ] Run full and runtime verification and record exact outcomes.
+- [x] Migrate the profile and profile-image flows onto primitives.
+- [x] Migrate the sessions list and revoke flows (Badge status pills).
+- [x] Migrate the account-deletion request/cancel flows.
+- [x] Regenerate and inspect the affected visual baselines.
+- [x] Update design and architecture docs for the users migration.
+- [x] Run full and runtime verification and record exact outcomes.
 
 ## Rollout And Rollback
 
@@ -108,14 +108,31 @@ The users migration lands flow by flow. Roll back by reverting the affected
 
 - 2026-08-10: Users migrates after auth, reusing the established form-feedback
   and card-shell patterns.
+- 2026-08-10: The sessions page uses the `AuthShell` with the `xl` width; the
+  revoke button uses the `outline` `sm` `Button`; error/status feedback uses
+  the destructive/default `Alert` with `!text-destructive` error text (same
+  convention as the auth migration).
+- 2026-08-10: The profile-image forms keep their sibling-form structure (no
+  nested forms) with `Button`/`Input`/`Label`/`Alert` primitives.
 
 ## Verification
 
-- Not run yet.
+- Static lanes passed under Node 24: `format:check`, `contracts:check`,
+  `lint`, `typecheck`, `harness:check`, and `pnpm build`.
+- Unit suite: 236 passed, 1 failed — the pre-existing `theme-toggle`
+  `React.act` failure, unrelated to this change.
+- `pnpm verify:runtime`: 69 Chromium tests passed, including the full axe
+  accessibility suite across all users states and the nested-form (upload-plan
+  → complete) e2e flow.
 
 ## Runtime Evidence
 
-- Not run yet.
+- The users visual baselines (profile, profile-saved, sessions,
+  account-deletion request, account-deletion pending) were regenerated and
+  inspected before recording; they show the shadcn default card/input/button/
+  badge/alert look.
+- All users accessibility tests pass; no contrast regressions after the
+  migration.
 
 ## Follow-Up Debt
 

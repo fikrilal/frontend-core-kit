@@ -2,6 +2,9 @@
 
 import { useActionState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+
 import { revokeSessionAction } from "./revoke-session-action";
 import type {
   RevokeSessionActionState,
@@ -27,31 +30,35 @@ export function RevokeSessionForm({ sessionId }: RevokeSessionFormProps) {
     <form action={action} className="grid justify-items-end gap-1">
       <input name="sessionId" type="hidden" value={sessionId} />
       {state.revoked ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-muted-foreground text-xs"
+          className="bg-muted/35 px-3 py-1.5 text-xs"
           id={`revoke-session-success-${sessionId}`}
           role="status"
         >
-          Revoked.
-        </p>
+          <AlertDescription>Revoked.</AlertDescription>
+        </Alert>
       ) : null}
       {state.error ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-xs text-red-600 dark:text-red-400"
+          className="px-3 py-1.5 text-xs"
           id={`revoke-session-error-${sessionId}`}
+          variant="destructive"
         >
-          {messageForRevokeSessionError(state.error)}
-        </p>
+          <AlertDescription className="!text-destructive">
+            {messageForRevokeSessionError(state.error)}
+          </AlertDescription>
+        </Alert>
       ) : null}
-      <button
-        className="border-border bg-background hover:bg-muted/50 focus-visible:ring-foreground/25 h-8 rounded-lg border px-3 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+      <Button
         disabled={pending || state.revoked}
+        size="sm"
         type="submit"
+        variant="outline"
       >
         {pending ? "Revoking…" : "Revoke"}
-      </button>
+      </Button>
     </form>
   );
 }

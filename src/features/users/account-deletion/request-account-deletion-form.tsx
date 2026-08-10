@@ -2,6 +2,9 @@
 
 import { useActionState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+
 import { requestAccountDeletionAction } from "./request-account-deletion-action";
 import type {
   RequestAccountDeletionActionState,
@@ -22,31 +25,36 @@ export function RequestAccountDeletionForm() {
   return (
     <form action={action} className="grid gap-3">
       {state.requested ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-muted-foreground text-sm"
+          className="bg-muted/35"
           id="request-account-deletion-success"
           role="status"
         >
-          Your account deletion was scheduled. You can cancel it within 30 days.
-        </p>
+          <AlertDescription>
+            Your account deletion was scheduled. You can cancel it within 30
+            days.
+          </AlertDescription>
+        </Alert>
       ) : null}
       {state.error ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-sm text-red-600 dark:text-red-400"
           id="request-account-deletion-error"
+          variant="destructive"
         >
-          {messageForRequestAccountDeletionError(state.error)}
-        </p>
+          <AlertDescription className="!text-destructive">
+            {messageForRequestAccountDeletionError(state.error)}
+          </AlertDescription>
+        </Alert>
       ) : null}
-      <button
-        className="border-border bg-background hover:bg-muted/50 focus-visible:ring-foreground/25 h-10 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+      <Button
         disabled={pending || state.requested}
         type="submit"
+        variant="outline"
       >
         {pending ? "Scheduling deletion…" : "Request account deletion"}
-      </button>
+      </Button>
     </form>
   );
 }

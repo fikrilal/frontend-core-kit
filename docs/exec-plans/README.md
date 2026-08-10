@@ -87,10 +87,10 @@ Implementation is split into independently reviewable plans:
     [Profile image clear](completed/2026-08-07_profile-image-clear.md)
 19. **Completed:**
     [Shadcn default foundation](completed/2026-08-10_shadcn-default-foundation.md)
-20. **Active:**
-    [Shadcn default auth migration](active/2026-08-10_shadcn-default-auth-migration.md)
-21. **Queued:**
-    [Shadcn default users migration](queued/2026-08-10_shadcn-default-users-migration.md)
+20. **Completed:**
+    [Shadcn default auth migration](completed/2026-08-10_shadcn-default-auth-migration.md)
+21. **Active:**
+    [Shadcn default users migration](active/2026-08-10_shadcn-default-users-migration.md)
 22. **Queued:**
     [Shadcn default marketing migration](queued/2026-08-10_shadcn-default-marketing-migration.md)
 

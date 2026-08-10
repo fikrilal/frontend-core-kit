@@ -1,7 +1,7 @@
 # 2026-08-10 Shadcn Default Auth Migration
 
 **Plan version:** 2
-**Status:** active
+**Status:** completed
 **Owner:** primary agent with independent reviewer for UI behavior
 **Risk:** high
 **Authority:** implement and verify the shadcn-default migration of the auth feature against the accepted pure-shadcn-default design-system proposal; do not change backend behavior, alter session storage, commit, push, deploy, merge, or introduce product workflows

@@ -2,6 +2,9 @@
 
 import { useActionState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+
 import { completeProfileImageUploadAction } from "./complete-upload-action";
 import type {
   CompleteProfileImageUploadActionState,
@@ -29,32 +32,34 @@ export function CompleteProfileImageUploadForm({
     <form action={action} className="grid gap-3">
       <input name="fileId" type="hidden" value={fileId} />
       {state.completed ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-muted-foreground text-sm"
+          className="bg-muted/35"
           id="profile-image-complete-success"
           role="status"
         >
-          Your profile image was updated.
-        </p>
+          <AlertDescription>Your profile image was updated.</AlertDescription>
+        </Alert>
       ) : null}
       {state.error ? (
-        <p
+        <Alert
           aria-live="polite"
-          className="text-sm text-red-600 dark:text-red-400"
           id="profile-image-complete-error"
+          variant="destructive"
         >
-          {messageForCompleteProfileImageUploadError(state.error)}
-        </p>
+          <AlertDescription className="!text-destructive">
+            {messageForCompleteProfileImageUploadError(state.error)}
+          </AlertDescription>
+        </Alert>
       ) : null}
 
-      <button
-        className="border-border bg-background hover:bg-muted/50 focus-visible:ring-foreground/25 h-10 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+      <Button
         disabled={pending || state.completed}
         type="submit"
+        variant="outline"
       >
         {pending ? "Confirming upload…" : "Confirm upload"}
-      </button>
+      </Button>
     </form>
   );
 }
