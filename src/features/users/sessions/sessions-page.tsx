@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Badge } from "@/components/ui/badge";
 import { LamaraMark } from "@/components/brand/lamara-mark";
 
 import { loadSessions } from "./load-sessions";
@@ -62,9 +63,9 @@ export async function SessionsPage() {
                       </p>
                     )}
                   </div>
-                  <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs capitalize">
+                  <Badge className="capitalize" variant="secondary">
                     {session.status}
-                  </span>
+                  </Badge>
                 </div>
                 {session.current ? null : (
                   <RevokeSessionForm sessionId={session.id} />

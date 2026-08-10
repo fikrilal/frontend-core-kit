@@ -1,5 +1,5 @@
 import { Rail, RailViewport } from "@/components/layout/rail";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 
 interface SectionDividerProps {
   topLine?: boolean;

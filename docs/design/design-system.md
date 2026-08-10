@@ -7,10 +7,15 @@ shadcn new-york components and token set as shipped:
 
 - Tailwind CSS 4 with the shadcn default `globals.css` (`:root` / `.dark`
   token set, `@theme inline`, `@custom-variant dark`);
-- shadcn primitives installed under `src/components/ui/**` (buttons, inputs,
-  cards, alerts, badges, form primitives);
+- shadcn primitives installed under `src/components/ui/**` (`button`, `input`,
+  `label`, `card`, `alert`, `badge`, `separator`, `skeleton`);
 - light and dark themes via the shadcn default contract;
 - `cn()` (`clsx` + `tailwind-merge`) from `src/lib/utils.ts`.
+
+A small transitional block of the old custom tokens (`--line`, `--ember`,
+`--surface`, `--success`) and their utilities remains in `globals.css` only
+until the marketing layout migration removes them; do not use them in new
+code.
 
 There is no custom token layer, no hand-rolled primitive set, and no bespoke
 styling vocabulary. The previous chanhdai/code-alchemy visual references are

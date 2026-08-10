@@ -3,6 +3,7 @@
   "includeEntryExports": true,
   "ignore": [
     "src/contracts/lamara-api/generated.ts",
-    "src/contracts/lamara-api/runtime.generated.ts"
+    "src/contracts/lamara-api/runtime.generated.ts",
+    "src/components/ui/**"
   ]
 }

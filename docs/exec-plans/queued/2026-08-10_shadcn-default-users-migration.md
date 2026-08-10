@@ -82,13 +82,13 @@ Human review remains required for visual and accessibility behavior.
 
 ## Verification Matrix
 
-| Acceptance              | Evidence                                        |
-| ----------------------- | ----------------------------------------------- |
-| Primitives used         | Grep for removed inline class strings           |
-| A11y wiring preserved   | Axe suite + focus-order e2e tests               |
-| Nested-form constraint  | Upload-plan + complete flow e2e tests           |
-| Baselines regenerated   | Updated PNGs inspected per page                 |
-| Repository health       | `pnpm verify` and `pnpm verify:runtime`         |
+| Acceptance             | Evidence                                |
+| ---------------------- | --------------------------------------- |
+| Primitives used        | Grep for removed inline class strings   |
+| A11y wiring preserved  | Axe suite + focus-order e2e tests       |
+| Nested-form constraint | Upload-plan + complete flow e2e tests   |
+| Baselines regenerated  | Updated PNGs inspected per page         |
+| Repository health      | `pnpm verify` and `pnpm verify:runtime` |
 
 ## Checklist
 

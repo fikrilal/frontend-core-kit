@@ -81,13 +81,13 @@ Human review remains required for visual behavior.
 
 ## Verification Matrix
 
-| Acceptance              | Evidence                                        |
-| ----------------------- | ----------------------------------------------- |
-| Primitives used         | Grep for removed custom primitives/utilities    |
-| Layout layer removed    | `src/components/layout/**` empty or shadcn-only |
-| Theme contract          | Light default + `.dark` toggle works            |
-| Baselines regenerated   | Updated PNGs inspected per page                 |
-| Repository health       | `pnpm verify` and `pnpm verify:runtime`         |
+| Acceptance            | Evidence                                        |
+| --------------------- | ----------------------------------------------- |
+| Primitives used       | Grep for removed custom primitives/utilities    |
+| Layout layer removed  | `src/components/layout/**` empty or shadcn-only |
+| Theme contract        | Light default + `.dark` toggle works            |
+| Baselines regenerated | Updated PNGs inspected per page                 |
+| Repository health     | `pnpm verify` and `pnpm verify:runtime`         |
 
 ## Checklist
 

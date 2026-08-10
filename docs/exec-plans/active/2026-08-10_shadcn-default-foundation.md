@@ -91,13 +91,13 @@ theme behavior.
 
 ## Verification Matrix
 
-| Acceptance                   | Evidence                                              |
-| ---------------------------- | ----------------------------------------------------- |
-| Primitives installed         | `src/components/ui/*` present via shadcn CLI          |
-| Custom tokens removed        | Grep for removed tokens returns no matches            |
-| `cn()` unified               | Imports use `@/lib/utils`; `cn.ts` deleted            |
-| Theme contract               | Light default + `.dark` toggle works; theme tests     |
-| Repository health            | `pnpm verify` and `pnpm verify:runtime`               |
+| Acceptance            | Evidence                                          |
+| --------------------- | ------------------------------------------------- |
+| Primitives installed  | `src/components/ui/*` present via shadcn CLI      |
+| Custom tokens removed | Grep for removed tokens returns no matches        |
+| `cn()` unified        | Imports use `@/lib/utils`; `cn.ts` deleted        |
+| Theme contract        | Light default + `.dark` toggle works; theme tests |
+| Repository health     | `pnpm verify` and `pnpm verify:runtime`           |
 
 ## Checklist
 
@@ -121,15 +121,42 @@ them.
 
 - 2026-08-10: Foundation is the first of four shadcn-default plans; features
   migrate in their owning plans.
+- 2026-08-10: The custom tokens (`--line`, `--ember`, `--surface`,
+  `--success`) and utilities are kept as a transitional block in
+  `globals.css` because the marketing layout still uses them; plan 4 removes
+  them.
+- 2026-08-10: The sessions status pill was migrated to the shadcn `Badge`
+  (secondary) within this plan — the default `--muted-foreground`/`--muted`
+  pair failed WCAG AA contrast on the old inline pill (128 axe violations).
+  This is forward-compatible with the users migration plan.
+- 2026-08-10: `src/components/ui/**` is added to knip's ignore list until the
+  feature migrations import the primitives (they are unused entry files now).
+- 2026-08-10: `pnpm-lock.yaml` added to `.prettierignore` — the pnpm 11
+  lockfile format is not prettier-compatible.
 
 ## Verification
 
-- Not run yet.
+- Static lanes passed under Node 24: `format:check`, `contracts:check`,
+  `lint`, `typecheck`, `harness:check` (knowledge, architecture,
+  maintainability, public-pages), and `pnpm build`.
+- Unit suite: 236 passed, 1 failed — the pre-existing `theme-toggle`
+  `React.act` failure, plus a pre-existing `session-service.test.ts` module
+  resolution error (`No such built-in module: node:`), both reproduced on the
+  clean base and unrelated to this change.
+- `pnpm verify:runtime`: 69 Chromium tests passed after regenerating the
+  sessions baseline (status pill → shadcn `Badge`).
 
 ## Runtime Evidence
 
-- Not run yet.
+- The axe accessibility suite passes across all page states after the Badge
+  migration; the token swap initially caused 128 contrast violations on the
+  sessions status pills, resolved by using the shadcn `Badge` secondary
+  variant.
+- The sessions visual baseline was regenerated (intended change) and inspected
+  before recording; other baselines were unchanged by the token swap.
 
 ## Follow-Up Debt
 
-- None yet.
+- Remove the transitional custom-token block and `src/components/ui/**` knip
+  ignore in the marketing migration plan.
+- Migrate the remaining features onto the primitives in plans 2 and 3.
