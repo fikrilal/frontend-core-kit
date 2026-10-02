@@ -112,7 +112,6 @@ export function runScaffoldFeature(
       pageComponentName,
       featureKebab: featureMeta.kebab,
       humanTitle,
-      kind,
     }),
     [indexPath]: indexStub({
       pageComponentName,
@@ -311,11 +310,10 @@ function wireMarketingRoute(root, routeUrlPath) {
 }
 
 /**
- * @param {{ pageComponentName: string, featureKebab: string, humanTitle: string, kind: string }} input
+ * @param {{ pageComponentName: string, featureKebab: string, humanTitle: string }} input
  */
-function routePageStub({ pageComponentName, featureKebab, humanTitle, kind }) {
-  const functionName =
-    kind === "marketing" ? `${pageComponentName}` : `${pageComponentName}Route`;
+function routePageStub({ pageComponentName, featureKebab, humanTitle }) {
+  const functionName = `${pageComponentName}Route`;
   return `import type { Metadata } from "next";
 
 import { ${pageComponentName} } from "@/features/${featureKebab}";

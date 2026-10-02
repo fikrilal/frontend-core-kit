@@ -315,6 +315,7 @@ test("handles scenario 2: scaffolding data adapter and collision preflight", () 
     const testContent = fs.readFileSync(testPath, "utf8");
     assert.ok(testContent.includes('describe("Order Tracking server API"'));
     assert.ok(testContent.includes("usersMeGet"));
+    assert.doesNotMatch(testContent, /UsersMeGetData/);
     assert.ok(testContent.includes("expect(result).toMatchObject({"));
 
     // Collision preflight
@@ -441,6 +442,7 @@ test("scaffolds plain responses, correct parameter ordering, and Prettier-canoni
     assert.ok(await checkPrettier(meApiSrc, { filepath: meApiPath }));
     assert.ok(await checkPrettier(meTestSrc, { filepath: meTestPath }));
     assert.ok(meApiSrc.includes("readApiResult("));
+    assert.doesNotMatch(meTestSrc, /UsersMeGetData/);
 
     // 2. health.get (plain response, unauthenticated)
     const healthResult = runScaffoldData(
@@ -463,6 +465,7 @@ test("scaffolds plain responses, correct parameter ordering, and Prettier-canoni
     assert.ok(await checkPrettier(healthApiSrc, { filepath: healthApiPath }));
     assert.ok(await checkPrettier(healthTestSrc, { filepath: healthTestPath }));
     assert.ok(healthApiSrc.includes("readPlainApiResult("));
+    assert.doesNotMatch(healthTestSrc, /HealthGetData/);
 
     // 3. admin.users.list (query + auth: required accessToken BEFORE optional queryParams)
     const adminResult = runScaffoldData(
@@ -490,6 +493,7 @@ test("scaffolds plain responses, correct parameter ordering, and Prettier-canoni
       "queryParams?: AdminUsersListQueryParams",
     );
     assert.ok(accessTokenIndex > 0 && queryParamsIndex > accessTokenIndex);
+    assert.doesNotMatch(adminTestSrc, /AdminUsersListData/);
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }

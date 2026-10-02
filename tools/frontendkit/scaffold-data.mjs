@@ -536,7 +536,6 @@ function generateServerAdapterTestSource({ featureMeta, operation }) {
   const importedTypes = [];
   if (hasRequestBody) importedTypes.push(`type ${opPascal}Input`);
   if (hasPathParams) importedTypes.push(`type ${opPascal}PathParams`);
-  if (!isVoid) importedTypes.push(`type ${opPascal}Data`);
 
   const allImports = [functionName, ...importedTypes];
   const singleLineImport = `import { ${allImports.join(", ")} } from "./${featureMeta.kebab}-api";`;

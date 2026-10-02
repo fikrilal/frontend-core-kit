@@ -95,5 +95,7 @@ The accepted direction is documented in the
    [Safe feature removal engine](completed/2026-10-03_frontendkit-remove-feature.md)
 4. **Completed:**
    [Feature lifecycle dogfood and documentation](completed/2026-10-03_frontendkit-feature-lifecycle-dogfood.md)
+5. **Completed:**
+   [Scaffold compatibility repairs](completed/2026-10-03_frontendkit-scaffold-compatibility-repairs.md)
 
 Do not introduce product workflows until a real product decision exists.

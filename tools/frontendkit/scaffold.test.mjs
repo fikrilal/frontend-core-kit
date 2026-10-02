@@ -227,6 +227,33 @@ test("wires marketing routes into site-metadata.ts when kind is marketing", () =
       fs.existsSync(path.join(root, "src/app/(marketing)/pricing/page.tsx")),
     );
 
+    const routeContent = fs.readFileSync(
+      path.join(root, "src/app/(marketing)/pricing/page.tsx"),
+      "utf8",
+    );
+    assert.match(
+      routeContent,
+      /import \{ PricingPage \} from "@\/features\/pricing"/,
+    );
+    assert.match(routeContent, /export default function PricingPageRoute\(\)/);
+
+    runScaffoldFeature(
+      { feature: "pricing", slice: "tiers", kind: "marketing" },
+      { root },
+    );
+    const sliceRouteContent = fs.readFileSync(
+      path.join(root, "src/app/(marketing)/pricing/tiers/page.tsx"),
+      "utf8",
+    );
+    assert.match(
+      sliceRouteContent,
+      /import \{ PricingTiersPage \} from "@\/features\/pricing"/,
+    );
+    assert.match(
+      sliceRouteContent,
+      /export default function PricingTiersPageRoute\(\)/,
+    );
+
     const metadataContent = fs.readFileSync(
       path.join(siteMetadataDir, "site-metadata.ts"),
       "utf8",
