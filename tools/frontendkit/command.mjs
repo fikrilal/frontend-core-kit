@@ -4,6 +4,7 @@ import { CliUsageError, passed } from "./result.mjs";
 import { runDoctor } from "./doctor.mjs";
 import { runOwnedCommand } from "./owned-commands.mjs";
 import { runVerificationProfile, verificationProfiles } from "./profiles.mjs";
+import { runScaffoldFeature } from "./scaffold.mjs";
 
 const helpLines = Object.freeze([
   "Usage: pnpm frontendkit -- <command> [options]",
@@ -17,13 +18,14 @@ const helpLines = Object.freeze([
   "task begin|status|verify|complete|recover — Control task lifecycle.",
   "handoff [options] — Run verified handoff preflight.",
   "improve check|analyze|shadow — Analyze controlled improvement.",
+  "scaffold feature <name> [options] — Scaffold a new feature skeleton.",
   "--json — Emit bounded structured output.",
 ]);
 
 /** @typedef {"human" | "json"} OutputFormat */
 
 /**
- * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").CommandOwner, args: readonly string[] }} ParsedCommand
+ * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").CommandOwner, args: readonly string[] } | { kind: "scaffold-feature", format: OutputFormat, options: import("./scaffold.mjs").ScaffoldFeatureOptions }} ParsedCommand
  */
 
 /**
@@ -126,6 +128,16 @@ export function parseCommand(args) {
       args: [],
     };
   }
+  if (values[0] === "scaffold") {
+    if (values[1] === "feature") {
+      return {
+        kind: "scaffold-feature",
+        format,
+        options: parseScaffoldFeatureArguments(values.slice(2)),
+      };
+    }
+    throw new CliUsageError("Use scaffold feature <name> [options].");
+  }
 
   throw new CliUsageError(`Unknown frontendkit command: ${values[0]}.`);
 }
@@ -162,13 +174,16 @@ export function executeCommand(command, options) {
           { name: "command-task", value: helpLines[8] },
           { name: "command-handoff", value: helpLines[9] },
           { name: "command-improve", value: helpLines[10] },
-          { name: "option-json", value: helpLines[11] },
+          { name: "command-scaffold", value: helpLines[11] },
+          { name: "option-json", value: helpLines[12] },
         ],
       });
     case "doctor":
       return runDoctor(options);
     case "verify":
       return runVerificationProfile(command.profile, options);
+    case "scaffold-feature":
+      return runScaffoldFeature(command.options, options);
     case "owned":
       return runOwnedCommand(command.owner, command.args, options);
   }
@@ -259,4 +274,55 @@ function parseHandoffArguments(values) {
     index += 1;
   }
   return output;
+}
+
+/**
+ * @param {readonly string[]} values
+ * @returns {import("./scaffold.mjs").ScaffoldFeatureOptions}
+ */
+function parseScaffoldFeatureArguments(values) {
+  let feature = "";
+  let slice;
+  /** @type {"authenticated" | "marketing"} */
+  let kind = "authenticated";
+  let dryRun = false;
+  let force = false;
+
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (value === "--dry-run") {
+      dryRun = true;
+    } else if (value === "--force") {
+      force = true;
+    } else if (value === "--slice") {
+      index += 1;
+      const next = values[index];
+      if (!next || next.startsWith("--")) {
+        throw new CliUsageError("The --slice option requires a value.");
+      }
+      slice = next;
+    } else if (value === "--kind") {
+      index += 1;
+      const next = values[index];
+      if (next !== "authenticated" && next !== "marketing") {
+        throw new CliUsageError(
+          "The --kind option must be authenticated or marketing.",
+        );
+      }
+      kind = next;
+    } else if (value.startsWith("--")) {
+      throw new CliUsageError(`Unknown scaffold feature option: ${value}.`);
+    } else {
+      if (feature) {
+        throw new CliUsageError("Unexpected multiple feature arguments.");
+      }
+      feature = value;
+    }
+  }
+
+  if (!feature) {
+    throw new CliUsageError("Missing required feature name.");
+  }
+
+  return { feature, slice, kind, dryRun, force };
 }

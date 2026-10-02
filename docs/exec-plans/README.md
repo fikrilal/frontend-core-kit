@@ -82,4 +82,18 @@ The accepted direction is documented in the
 8. **Completed:**
    [Dogfood and completion audit](completed/2026-08-11_frontendkit-dogfood-completion.md)
 
+## Feature Lifecycle Sequence
+
+The accepted direction is documented in the
+[feature scaffolding and removal proposal](../../_WIP/2026-10-03_frontend-feature-scaffold-and-remove-proposal.md).
+
+1. **Completed:**
+   [Feature scaffolding engine](completed/2026-10-03_frontendkit-scaffold-feature.md)
+2. **Queued:**
+   [OpenAPI data scaffolding engine](queued/2026-10-03_frontendkit-scaffold-data.md)
+3. **Queued:**
+   [Safe feature removal engine](queued/2026-10-03_frontendkit-remove-feature.md)
+4. **Queued:**
+   [Feature lifecycle dogfood and documentation](queued/2026-10-03_frontendkit-feature-lifecycle-dogfood.md)
+
 Do not introduce product workflows until a real product decision exists.
