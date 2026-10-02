@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { check as checkPrettier } from "prettier";
 
 import { parseCommand } from "./command.mjs";
 import { CliUsageError } from "./result.mjs";
@@ -408,6 +409,118 @@ test("handles scenario 3: composite scaffold all creates feature skeleton and da
       ),
     );
     assert.ok(actionContent.includes("void usersMeGet;"));
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("scaffolds plain responses, correct parameter ordering, and Prettier-canonical output", async () => {
+  const tempDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "frontendkit-scaffold-data-fmt-"),
+  );
+
+  try {
+    // 1. users.me.get (envelope response, auth)
+    const meResult = runScaffoldData(
+      { feature: "users", operation: "users.me.get" },
+      { root: tempDir },
+    );
+    assert.equal(meResult.status, "passed");
+
+    const meApiPath = path.join(
+      tempDir,
+      "src/features/users/server/users-api.ts",
+    );
+    const meTestPath = path.join(
+      tempDir,
+      "src/features/users/server/users-api.test.ts",
+    );
+    const meApiSrc = fs.readFileSync(meApiPath, "utf8");
+    const meTestSrc = fs.readFileSync(meTestPath, "utf8");
+
+    assert.ok(await checkPrettier(meApiSrc, { filepath: meApiPath }));
+    assert.ok(await checkPrettier(meTestSrc, { filepath: meTestPath }));
+    assert.ok(meApiSrc.includes("readApiResult("));
+
+    // 2. health.get (plain response, unauthenticated)
+    const healthResult = runScaffoldData(
+      { feature: "system-health", operation: "health.get" },
+      { root: tempDir },
+    );
+    assert.equal(healthResult.status, "passed");
+
+    const healthApiPath = path.join(
+      tempDir,
+      "src/features/system-health/server/system-health-api.ts",
+    );
+    const healthTestPath = path.join(
+      tempDir,
+      "src/features/system-health/server/system-health-api.test.ts",
+    );
+    const healthApiSrc = fs.readFileSync(healthApiPath, "utf8");
+    const healthTestSrc = fs.readFileSync(healthTestPath, "utf8");
+
+    assert.ok(await checkPrettier(healthApiSrc, { filepath: healthApiPath }));
+    assert.ok(await checkPrettier(healthTestSrc, { filepath: healthTestPath }));
+    assert.ok(healthApiSrc.includes("readPlainApiResult("));
+
+    // 3. admin.users.list (query + auth: required accessToken BEFORE optional queryParams)
+    const adminResult = runScaffoldData(
+      { feature: "admin-users", operation: "admin.users.list" },
+      { root: tempDir },
+    );
+    assert.equal(adminResult.status, "passed");
+
+    const adminApiPath = path.join(
+      tempDir,
+      "src/features/admin-users/server/admin-users-api.ts",
+    );
+    const adminTestPath = path.join(
+      tempDir,
+      "src/features/admin-users/server/admin-users-api.test.ts",
+    );
+    const adminApiSrc = fs.readFileSync(adminApiPath, "utf8");
+    const adminTestSrc = fs.readFileSync(adminTestPath, "utf8");
+
+    assert.ok(await checkPrettier(adminApiSrc, { filepath: adminApiPath }));
+    assert.ok(await checkPrettier(adminTestSrc, { filepath: adminTestPath }));
+    // Verify required accessToken precedes queryParams?
+    const accessTokenIndex = adminApiSrc.indexOf("accessToken: string");
+    const queryParamsIndex = adminApiSrc.indexOf(
+      "queryParams?: AdminUsersListQueryParams",
+    );
+    assert.ok(accessTokenIndex > 0 && queryParamsIndex > accessTokenIndex);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("scaffold all links resolved operation function when invoked with alias or method path", () => {
+  const tempDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "frontendkit-scaffold-all-alias-"),
+  );
+
+  try {
+    // Invoke with alias "users.profile.get"
+    const aliasResult = runScaffoldAll(
+      {
+        feature: "profile",
+        operation: "users.profile.get",
+        slice: "view",
+      },
+      { root: tempDir },
+    );
+
+    assert.equal(aliasResult.status, "passed");
+    const actionPath = path.join(
+      tempDir,
+      "src/features/profile/view/view-action.ts",
+    );
+    const actionSrc = fs.readFileSync(actionPath, "utf8");
+    assert.ok(
+      actionSrc.includes('import { usersMeGet } from "../server/profile-api";'),
+    );
+    assert.ok(actionSrc.includes("void usersMeGet;"));
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }

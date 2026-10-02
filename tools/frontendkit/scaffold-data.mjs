@@ -1,43 +1,15 @@
 // @ts-check
 
 import fs from "node:fs";
-import { createRequire } from "node:module";
 import path from "node:path";
 import process from "node:process";
+import YAML from "yaml";
 
 import { CliUsageError, failed, passed } from "./result.mjs";
 import { parseName, runScaffoldFeature } from "./scaffold.mjs";
 
 const defaultSpecPath = "src/contracts/example-api/openapi.yaml";
 const namePattern = /^[a-z][a-z0-9]*([_-][a-z0-9]+)*$/;
-
-/** @type {any} */
-let yamlParser = null;
-
-/**
- * Resolves the YAML parser from available repository dependencies.
- */
-function getYamlParser() {
-  if (yamlParser) return yamlParser;
-  try {
-    const orvalPkg = import.meta.resolve("orval");
-    const req = createRequire(orvalPkg);
-    yamlParser = req("yaml");
-    return yamlParser;
-  } catch {
-    // fallback
-  }
-  try {
-    const req = createRequire(import.meta.url);
-    yamlParser = req("yaml");
-    return yamlParser;
-  } catch (error) {
-    throw new Error(
-      "Unable to resolve YAML parser from repository dependencies.",
-      { cause: error },
-    );
-  }
-}
 
 /**
  * @typedef {object} OpenApiOperation
@@ -52,8 +24,82 @@ function getYamlParser() {
  * @property {boolean} hasRequestBody
  * @property {number} successStatus
  * @property {boolean} isVoidResponse
+ * @property {boolean} isEnvelope
  * @property {string} responseSchemaName
+ * @property {unknown} mockData
  */
+
+/**
+ * Resolves a JSON schema reference against the OpenAPI document.
+ *
+ * @param {string} ref
+ * @param {any} doc
+ */
+function resolveSchemaRef(ref, doc) {
+  const parts = ref.replace(/^#\//, "").split("/");
+  let curr = doc;
+  for (const part of parts) {
+    if (curr && typeof curr === "object") {
+      curr = curr[part];
+    } else {
+      return null;
+    }
+  }
+  return curr;
+}
+
+/**
+ * Generates a minimal valid mock fixture conforming to the given OpenAPI schema.
+ *
+ * @param {any} schema
+ * @param {any} doc
+ * @param {number} [depth]
+ * @returns {any}
+ */
+function mockSchema(schema, doc, depth = 0) {
+  if (!schema || depth > 8) return {};
+  if (schema.$ref) {
+    return mockSchema(resolveSchemaRef(schema.$ref, doc), doc, depth + 1);
+  }
+  if (schema.allOf) {
+    /** @type {Record<string, unknown>} */
+    const combined = {};
+    for (const sub of schema.allOf) {
+      Object.assign(combined, mockSchema(sub, doc, depth + 1));
+    }
+    return combined;
+  }
+  if (schema.example !== undefined) return schema.example;
+  if (schema.enum && schema.enum.length > 0) return schema.enum[0];
+  if (schema.type === "string") {
+    if (schema.format === "date-time") return "2026-01-01T00:00:00.000Z";
+    return "test";
+  }
+  if (schema.type === "boolean") return true;
+  if (schema.type === "integer" || schema.type === "number") return 0;
+  if (schema.type === "array") {
+    if (schema.items) {
+      const item = mockSchema(schema.items, doc, depth + 1);
+      return [item];
+    }
+    return [];
+  }
+  if (schema.type === "object" || schema.properties) {
+    /** @type {Record<string, unknown>} */
+    const obj = {};
+    const props = schema.properties || {};
+    const req = schema.required || Object.keys(props);
+    for (const key of req) {
+      if (props[key]) {
+        obj[key] = mockSchema(props[key], doc, depth + 1);
+      } else {
+        obj[key] = "test";
+      }
+    }
+    return obj;
+  }
+  return {};
+}
 
 /**
  * Parses an OpenAPI 3.0 specification from disk and extracts all operations.
@@ -71,9 +117,15 @@ export function parseOpenApiSpec(
     : path.join(root, specRelativePath);
 
   if (!fs.existsSync(fullPath)) {
-    const cwdFallback = path.join(process.cwd(), specRelativePath);
-    if (fs.existsSync(cwdFallback)) {
-      fullPath = cwdFallback;
+    if (specRelativePath === defaultSpecPath) {
+      const cwdFallback = path.join(process.cwd(), defaultSpecPath);
+      if (fs.existsSync(cwdFallback)) {
+        fullPath = cwdFallback;
+      } else {
+        throw new Error(
+          `OpenAPI specification not found at "${specRelativePath}".`,
+        );
+      }
     } else {
       throw new Error(
         `OpenAPI specification not found at "${specRelativePath}".`,
@@ -81,9 +133,8 @@ export function parseOpenApiSpec(
     }
   }
 
-  const parser = getYamlParser();
   const rawContent = fs.readFileSync(fullPath, "utf8");
-  const spec = parser.parse(rawContent);
+  const spec = YAML.parse(rawContent);
 
   if (
     !spec ||
@@ -145,9 +196,10 @@ export function parseOpenApiSpec(
         op.requestBody.content["application/json"],
       );
 
-      // Determine success status code
+      // Determine success status code & content schema
       let successStatus = 200;
       let has2xxContent = false;
+      let responseContentSchema = null;
       if (op.responses && typeof op.responses === "object") {
         for (const code of ["200", "201", "204", "202"]) {
           if (op.responses[code]) {
@@ -158,6 +210,8 @@ export function parseOpenApiSpec(
               op.responses[code].content["application/json"]
             ) {
               has2xxContent = true;
+              responseContentSchema =
+                op.responses[code].content["application/json"].schema;
             }
             break;
           }
@@ -193,6 +247,28 @@ export function parseOpenApiSpec(
         }
       }
 
+      // Check whether response is enveloped { data, meta? }
+      let isEnvelope = false;
+      if (responseContentSchema && !isVoidResponse) {
+        if (
+          responseContentSchema.$ref &&
+          responseContentSchema.$ref.includes("Envelope")
+        ) {
+          isEnvelope = true;
+        } else if (
+          responseContentSchema.properties &&
+          responseContentSchema.properties.data
+        ) {
+          isEnvelope = true;
+        }
+      }
+
+      // Construct mock fixture
+      let mockData = null;
+      if (!isVoidResponse && responseContentSchema) {
+        mockData = mockSchema(responseContentSchema, spec);
+      }
+
       operations.push({
         operationId,
         httpMethod: method.toUpperCase(),
@@ -205,7 +281,9 @@ export function parseOpenApiSpec(
         hasRequestBody,
         successStatus,
         isVoidResponse,
+        isEnvelope,
         responseSchemaName: expectedSchemaName,
+        mockData,
       });
     }
   }
@@ -310,28 +388,60 @@ function generateServerAdapterSource({ featureMeta, operation }) {
   const hasQueryParams = operation.parameters.query.length > 0;
   const hasRequestBody = operation.hasRequestBody;
   const isVoid = operation.isVoidResponse;
+  const isEnvelope = operation.isEnvelope;
 
   const runtimeImport = isVoid
     ? ""
     : `import { ${operation.responseSchemaName} } from "@/contracts/example-api/runtime";\n`;
 
-  const readerFn = isVoid ? "readEmptyApiResult" : "readApiResult";
+  const readerFn = isVoid
+    ? "readEmptyApiResult"
+    : isEnvelope
+      ? "readApiResult"
+      : "readPlainApiResult";
 
-  let typeSection = `type ${opPascal}Operation = operations["${operation.operationId}"];\n`;
+  const pathDecl = `const ${pathConstName} = "${operation.path}" as const;`;
+  const formattedPathDecl =
+    pathDecl.length > 80
+      ? `const ${pathConstName} =\n  "${operation.path}" as const;`
+      : pathDecl;
+
+  const opTypeDecl = `type ${opPascal}Operation = operations["${operation.operationId}"];`;
+  const formattedOpType =
+    opTypeDecl.length > 80
+      ? `type ${opPascal}Operation =\n  operations["${operation.operationId}"];\n`
+      : `${opTypeDecl}\n`;
+
+  let typeSection = formattedOpType;
   if (!isVoid) {
-    typeSection += `type ${opPascal}Envelope = ${opPascal}Operation["responses"][${operation.successStatus}]["content"]["application/json"];\n`;
-    typeSection += `export type ${opPascal}Data = ${opPascal}Envelope extends { data: infer TData } ? TData : ${opPascal}Envelope;\n`;
+    typeSection += `\ntype ${opPascal}Envelope =\n  ${opPascal}Operation["responses"][${operation.successStatus}]["content"]["application/json"];\n`;
+    if (isEnvelope) {
+      const line1 = `export type ${opPascal}Data = ${opPascal}Envelope extends {`;
+      if (line1.length <= 80) {
+        typeSection += `\nexport type ${opPascal}Data = ${opPascal}Envelope extends {\n  data: infer TData;\n}\n  ? TData\n  : ${opPascal}Envelope;\n`;
+      } else {
+        typeSection += `\nexport type ${opPascal}Data =\n  ${opPascal}Envelope extends {\n    data: infer TData;\n  }\n    ? TData\n    : ${opPascal}Envelope;\n`;
+      }
+    } else {
+      const plainDecl = `export type ${opPascal}Data = ${opPascal}Envelope;`;
+      if (plainDecl.length > 80) {
+        typeSection += `\nexport type ${opPascal}Data =\n  ${opPascal}Envelope;\n`;
+      } else {
+        typeSection += `\nexport type ${opPascal}Data = ${opPascal}Envelope;\n`;
+      }
+    }
   }
   if (hasRequestBody) {
-    typeSection += `export type ${opPascal}Input = ${opPascal}Operation["requestBody"]["content"]["application/json"];\n`;
+    typeSection += `\nexport type ${opPascal}Input =\n  ${opPascal}Operation["requestBody"]["content"]["application/json"];\n`;
   }
   if (hasPathParams) {
-    typeSection += `export type ${opPascal}PathParams = ${opPascal}Operation["parameters"]["path"];\n`;
+    typeSection += `\nexport type ${opPascal}PathParams =\n  ${opPascal}Operation["parameters"]["path"];\n`;
   }
   if (hasQueryParams) {
-    typeSection += `export type ${opPascal}QueryParams = ${opPascal}Operation["parameters"]["query"];\n`;
+    typeSection += `\nexport type ${opPascal}QueryParams =\n  ${opPascal}Operation["parameters"]["query"];\n`;
   }
 
+  // Parameter ordering: required (input, pathParams, accessToken) BEFORE optional (queryParams?)
   const paramList = [];
   if (hasRequestBody) {
     paramList.push(`input: ${opPascal}Input`);
@@ -339,11 +449,11 @@ function generateServerAdapterSource({ featureMeta, operation }) {
   if (hasPathParams) {
     paramList.push(`pathParams: ${opPascal}PathParams`);
   }
-  if (hasQueryParams) {
-    paramList.push(`queryParams?: ${opPascal}QueryParams`);
-  }
   if (requiresAuth) {
     paramList.push("accessToken: string");
+  }
+  if (hasQueryParams) {
+    paramList.push(`queryParams?: ${opPascal}QueryParams`);
   }
 
   const requestOptions = [];
@@ -370,7 +480,12 @@ function generateServerAdapterSource({ featureMeta, operation }) {
   const returnType = isVoid ? "undefined" : `${opPascal}Data`;
   const returnCall = isVoid
     ? "readEmptyApiResult(request);"
-    : `readApiResult(request, ${operation.responseSchemaName});`;
+    : `${readerFn}(request, ${operation.responseSchemaName});`;
+
+  const functionSignature =
+    paramList.length === 0
+      ? `export async function ${functionName}(): Promise<ApiResult<${returnType}>> {`
+      : `export async function ${functionName}(\n  ${paramList.join(",\n  ")},\n): Promise<ApiResult<${returnType}>> {`;
 
   return `import "server-only";
 
@@ -381,13 +496,11 @@ ${runtimeImport}import {
   type ApiResult,
 } from "@/server/api";
 
-const ${pathConstName} = "${operation.path}" as const;
+${formattedPathDecl}
 const ${timeoutConstName} = 10_000;
 
 ${typeSection}
-export async function ${functionName}(
-  ${paramList.join(",\n  ")}
-): Promise<ApiResult<${returnType}>> {
+${functionSignature}
   const client = createConfiguredExampleApiClient();
   const request = client.${operation.httpMethod}(${pathConstName}, {
     ${requestOptions.join("\n    ")}
@@ -421,9 +534,14 @@ function generateServerAdapterTestSource({ featureMeta, operation }) {
   if (hasPathParams) importedTypes.push(`type ${opPascal}PathParams`);
   if (!isVoid) importedTypes.push(`type ${opPascal}Data`);
 
-  const typeImports =
-    importedTypes.length > 0 ? `,\n  ${importedTypes.join(",\n  ")}` : "";
+  const allImports = [functionName, ...importedTypes];
+  const singleLineImport = `import { ${allImports.join(", ")} } from "./${featureMeta.kebab}-api";`;
+  const importStatement =
+    allImports.length <= 1 || singleLineImport.length <= 80
+      ? singleLineImport
+      : `import {\n  ${allImports.join(",\n  ")},\n} from "./${featureMeta.kebab}-api";`;
 
+  // Call arguments ordered: input, pathParams, accessToken, queryParams?
   const dummyArgs = [];
   let fixtures = "";
 
@@ -432,30 +550,54 @@ function generateServerAdapterTestSource({ featureMeta, operation }) {
     dummyArgs.push("testInput");
   }
   if (hasPathParams) {
-    const pathObj = Object.fromEntries(
-      operation.parameters.path.map((p) => [p, "test-id"]),
-    );
-    fixtures += `const testPathParams = ${JSON.stringify(pathObj)} as ${opPascal}PathParams;\n`;
+    const props = operation.parameters.path
+      .map((p) => `${p}: "test-id"`)
+      .join(", ");
+    const singleLine = `const testPathParams = { ${props} } as ${opPascal}PathParams;\n`;
+    if (singleLine.length <= 80) {
+      fixtures += singleLine;
+    } else {
+      const multiProps = operation.parameters.path
+        .map((p) => `  ${p}: "test-id",`)
+        .join("\n");
+      fixtures += `const testPathParams = {\n${multiProps}\n} as ${opPascal}PathParams;\n`;
+    }
     dummyArgs.push("testPathParams");
-  }
-  if (hasQueryParams) {
-    dummyArgs.push("undefined");
   }
   if (requiresAuth) {
     dummyArgs.push('"test-token"');
   }
+  if (hasQueryParams) {
+    dummyArgs.push("undefined");
+  }
 
   const callArgs = dummyArgs.join(", ");
-  const successResponseJson = isVoid ? "null" : "JSON.stringify({ data: {} })";
+  const singleLineResultCall = `const result = await ${functionName}(${callArgs});`;
+  const resultCall =
+    singleLineResultCall.length <= 80
+      ? singleLineResultCall
+      : `const result = await ${functionName}(\n      ${dummyArgs.join(",\n      ")},\n    );`;
+
+  let responseConstructor;
+  if (isVoid) {
+    responseConstructor = `new Response(null, {\n          status: ${operation.successStatus},\n        }),`;
+  } else {
+    const payloadStr = JSON.stringify(operation.mockData ?? { data: {} })
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'");
+    const singleLineStart = `        new Response('${payloadStr}', {`;
+    if (singleLineStart.length <= 80) {
+      responseConstructor = `new Response('${payloadStr}', {\n          status: ${operation.successStatus},\n          headers: { "Content-Type": "application/json" },\n        }),`;
+    } else {
+      responseConstructor = `new Response(\n          '${payloadStr}',\n          {\n            status: ${operation.successStatus},\n            headers: { "Content-Type": "application/json" },\n          },\n        ),`;
+    }
+  }
 
   return `import { afterEach, describe, expect, it, vi } from "vitest";
 
-import {
-  ${functionName}${typeImports},
-} from "./${featureMeta.kebab}-api";
+${importStatement}
 
-${fixtures}
-afterEach(() => {
+${fixtures}afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
@@ -467,17 +609,11 @@ describe("${featureMeta.human} server API", () => {
     vi.stubGlobal("fetch", (request: Request) => {
       captured = request;
       return Promise.resolve(
-        new Response(
-          ${successResponseJson},
-          {
-            status: ${operation.successStatus},
-            headers: { "Content-Type": "application/json" },
-          },
-        ),
+        ${responseConstructor}
       );
     });
 
-    const result = await ${functionName}(${callArgs});
+    ${resultCall}
 
     expect(result).toMatchObject({
       ok: true,
@@ -485,8 +621,7 @@ describe("${featureMeta.human} server API", () => {
     });
     expect(captured).toBeDefined();
     expect(captured?.method).toBe("${operation.httpMethod}");
-    expect(captured?.cache).toBe("no-store");
-    ${requiresAuth ? 'expect(captured?.headers.get("authorization")).toBe("Bearer test-token");' : ""}
+    expect(captured?.cache).toBe("no-store");${requiresAuth ? '\n    expect(captured?.headers.get("authorization")).toBe("Bearer test-token");' : ""}
   });
 
   it("handles ${functionName} failure response", async () => {
@@ -508,7 +643,7 @@ describe("${featureMeta.human} server API", () => {
       ),
     );
 
-    const result = await ${functionName}(${callArgs});
+    ${resultCall}
 
     expect(result).toMatchObject({
       ok: false,
@@ -571,13 +706,23 @@ export function runScaffoldData(options, { root = process.cwd() } = {}) {
         )
       : operations;
 
+    const maxDetails = 45;
+    const items = filtered.slice(0, maxDetails).map((op, index) => ({
+      name: `op-${index + 1}`,
+      value: `${op.operationId} [${op.httpMethod} ${op.path}] - ${op.summary || "No summary"}`,
+    }));
+
+    if (filtered.length > maxDetails) {
+      items.push({
+        name: "more-operations",
+        value: `... and ${filtered.length - maxDetails} more operations. Use --filter to narrow results.`,
+      });
+    }
+
     return passed({
       command: "scaffold:data",
       summary: `Found ${filtered.length} OpenAPI operation(s) in "${specPath}".`,
-      details: filtered.map((op, index) => ({
-        name: `op-${index + 1}`,
-        value: `${op.operationId} [${op.httpMethod} ${op.path}] - ${op.summary || "No summary"}`,
-      })),
+      details: items,
     });
   }
 
@@ -751,6 +896,48 @@ export function runScaffoldAll(options, { root = process.cwd() } = {}) {
     force = false,
   } = options;
 
+  const specPath =
+    openapiSpec && openapiSpec.trim().length > 0
+      ? openapiSpec.trim()
+      : defaultSpecPath;
+
+  let operations;
+  try {
+    operations = parseOpenApiSpec(specPath, { root });
+  } catch (error) {
+    return failed({
+      command: "scaffold:all",
+      summary: error instanceof Error ? error.message : String(error),
+      details: [
+        { name: "spec-path", value: specPath },
+        {
+          name: "remediation",
+          value: "Verify that the OpenAPI specification file exists.",
+        },
+      ],
+    });
+  }
+
+  const matchedOp = findOpenApiOperation(operations, operation);
+  if (!matchedOp) {
+    const available = operations
+      .slice(0, 10)
+      .map((op) => `${op.operationId} (${op.httpMethod} ${op.path})`);
+    return failed({
+      command: "scaffold:all",
+      summary: `OpenAPI operation "${operation}" not found in "${specPath}".`,
+      details: [
+        { name: "available-operations", value: available.join(", ") },
+        { name: "total-operations", value: String(operations.length) },
+        {
+          name: "remediation",
+          value:
+            "Use `frontendkit scaffold data --list` to browse all available operations.",
+        },
+      ],
+    });
+  }
+
   if (dryRun) {
     const featureDry = runScaffoldFeature(
       { feature, slice, kind, dryRun: true, force: true },
@@ -759,7 +946,13 @@ export function runScaffoldAll(options, { root = process.cwd() } = {}) {
     if (featureDry.status !== "passed") return featureDry;
 
     const dataDry = runScaffoldData(
-      { feature, operation, openapiSpec, dryRun: true, force: true },
+      {
+        feature,
+        operation: matchedOp.operationId,
+        openapiSpec,
+        dryRun: true,
+        force: true,
+      },
       { root },
     );
     if (dataDry.status !== "passed") return dataDry;
@@ -773,10 +966,10 @@ export function runScaffoldAll(options, { root = process.cwd() } = {}) {
 
     return passed({
       command: "scaffold:all",
-      summary: `Dry run: would scaffold feature "${feature}" and data adapter for "${operation}".`,
+      summary: `Dry run: would scaffold feature "${feature}" and data adapter for "${matchedOp.operationId}".`,
       details: [
         { name: "feature", value: feature },
-        { name: "operation", value: operation },
+        { name: "operation", value: matchedOp.operationId },
         { name: "kind", value: kind },
         ...featureDetails,
         ...dataDetails,
@@ -793,16 +986,22 @@ export function runScaffoldAll(options, { root = process.cwd() } = {}) {
     return featureResult;
   }
 
-  // 2. Scaffold data layer
+  // 2. Scaffold data layer with resolved operationId
   const dataResult = runScaffoldData(
-    { feature, operation, openapiSpec, force, dryRun: false },
+    {
+      feature,
+      operation: matchedOp.operationId,
+      openapiSpec,
+      force,
+      dryRun: false,
+    },
     { root },
   );
   if (dataResult.status !== "passed") {
     return dataResult;
   }
 
-  // 3. Link server adapter into slice action
+  // 3. Link server adapter into slice action using resolved function name
   const featureMeta = parseName(feature);
   const effectiveSlice =
     slice && slice.trim().length > 0 ? slice.trim() : feature;
@@ -812,7 +1011,7 @@ export function runScaffoldAll(options, { root = process.cwd() } = {}) {
     `src/features/${featureMeta.kebab}/${sliceMeta.kebab}/${sliceMeta.kebab}-action.ts`,
   );
 
-  const opMeta = parseOperationId(operation);
+  const opMeta = parseOperationId(matchedOp.operationId);
   const functionName = opMeta.camel;
 
   if (fs.existsSync(actionFile)) {
@@ -833,10 +1032,10 @@ export function runScaffoldAll(options, { root = process.cwd() } = {}) {
 
   return passed({
     command: "scaffold:all",
-    summary: `Feature "${featureMeta.kebab}" with OpenAPI data adapter for "${operation}" scaffolded successfully.`,
+    summary: `Feature "${featureMeta.kebab}" with OpenAPI data adapter for "${matchedOp.operationId}" scaffolded successfully.`,
     details: [
       { name: "feature", value: featureMeta.kebab },
-      { name: "operation", value: operation },
+      { name: "operation", value: matchedOp.operationId },
       { name: "slice", value: sliceMeta.kebab },
       { name: "kind", value: kind },
       {

@@ -79,6 +79,46 @@ export function readEmptyApiResult(
   });
 }
 
+export function readPlainApiResult<TData>(
+  request: Promise<OpenApiResponse>,
+  schema: z.ZodType,
+): Promise<ApiResult<TData>> {
+  return readResponse<TData>(request, (result, status, traceId) => {
+    if (!hasJsonMediaType(result.response)) {
+      return invalidResponse(
+        status,
+        traceId,
+        "Example API returned an unexpected success content type.",
+      );
+    }
+
+    const json = parseJson(result.data);
+    if (!json.ok) {
+      return invalidResponse(
+        status,
+        traceId,
+        "Example API returned an invalid response body.",
+      );
+    }
+
+    const parsed = schema.safeParse(json.value);
+    if (!parsed.success) {
+      return invalidResponse(
+        status,
+        traceId,
+        "Example API returned data that does not match the contract.",
+      );
+    }
+
+    return {
+      ok: true,
+      data: parsed.data as TData,
+      status,
+      traceId,
+    };
+  });
+}
+
 export function readOptionalApiResult<TData, TMeta = unknown>(
   request: Promise<OpenApiResponse>,
   schema: z.ZodType<ApiEnvelope<TData, TMeta>>,

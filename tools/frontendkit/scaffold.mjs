@@ -204,7 +204,11 @@ export function runScaffoldFeature(
 
   // Update site-metadata.ts if marketing kind
   if (kind === "marketing") {
-    wireMarketingRoute(root, featureMeta.kebab);
+    const routeUrlPath =
+      effectiveSlice === feature
+        ? `/${featureMeta.kebab}`
+        : `/${featureMeta.kebab}/${sliceMeta.kebab}`;
+    wireMarketingRoute(root, routeUrlPath);
   }
 
   return passed({
@@ -254,16 +258,16 @@ export function parseName(rawName) {
 
 /**
  * @param {string} root
- * @param {string} featureKebab
+ * @param {string} routeUrlPath
  */
-function wireMarketingRoute(root, featureKebab) {
+function wireMarketingRoute(root, routeUrlPath) {
   const siteMetadataPath = path.join(root, "src/app/site-metadata.ts");
   if (!fs.existsSync(siteMetadataPath)) return;
 
   const content = fs.readFileSync(siteMetadataPath, "utf8");
-  const routeEntry = `  {\n    path: "/${featureKebab}",\n    priority: 0.8,\n  },`;
+  const routeEntry = `  {\n    path: "${routeUrlPath}",\n    priority: 0.8,\n  },`;
 
-  if (content.includes(`path: "/${featureKebab}"`)) return;
+  if (content.includes(`path: "${routeUrlPath}"`)) return;
 
   const match = content.match(
     /(export\s+const\s+publicRoutes\s*=\s*\[)([\s\S]*?)(\]\s*as\s+const)/,
@@ -357,10 +361,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { ${sliceCamel}Action } from "./${sliceKebab}-action";
-import type {
-  ${slicePascal}ActionState,
-  ${slicePascal}Error,
-} from "./${sliceKebab}-state";
+import type { ${slicePascal}ActionState, ${slicePascal}Error } from "./${sliceKebab}-state";
 
 const initialState: ${slicePascal}ActionState = {
   error: null,
@@ -368,10 +369,7 @@ const initialState: ${slicePascal}ActionState = {
 };
 
 export function ${formComponentName}() {
-  const [state, action, pending] = useActionState(
-    ${sliceCamel}Action,
-    initialState,
-  );
+  const [state, action, pending] = useActionState(${sliceCamel}Action, initialState);
 
   return (
     <form action={action} className="grid gap-4">
@@ -388,11 +386,7 @@ export function ${formComponentName}() {
       </div>
 
       {state.error ? (
-        <Alert
-          aria-live="polite"
-          id="${sliceKebab}-error"
-          variant="destructive"
-        >
+        <Alert aria-live="polite" id="${sliceKebab}-error" variant="destructive">
           <AlertDescription className="text-destructive!">
             {messageFor${slicePascal}Error(state.error)}
           </AlertDescription>
@@ -480,9 +474,7 @@ function failureStub({ sliceKebab, slicePascal }) {
 
 import type { ${slicePascal}Error } from "./${sliceKebab}-state";
 
-export function map${slicePascal}Failure(
-  status: number | null,
-): ${slicePascal}Error {
+export function map${slicePascal}Failure(status: number | null): ${slicePascal}Error {
   switch (status) {
     case 400:
     case 422:

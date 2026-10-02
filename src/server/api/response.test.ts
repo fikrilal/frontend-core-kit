@@ -2,7 +2,7 @@ import { z } from "zod";
 import { describe, expect, it } from "vitest";
 
 import { createExampleApiClient } from "./client";
-import { readApiResult, readEmptyApiResult } from "./response";
+import { readApiResult, readEmptyApiResult, readPlainApiResult } from "./index";
 
 const loginPath = "/v1/auth/password/login";
 const loginInput = {
@@ -347,6 +347,65 @@ describe("readEmptyApiResult", () => {
         body: { refreshToken: "refresh-token" },
         parseAs: "text",
       }),
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      failure: { kind: "invalid-response" },
+      status: 200,
+    });
+  });
+});
+
+describe("readPlainApiResult", () => {
+  it("validates a plain non-enveloped json response", async () => {
+    const healthSchema = z.object({
+      status: z.string(),
+    });
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
+      requestId: () => "request-id",
+      fetch: () =>
+        Promise.resolve(
+          new Response(JSON.stringify({ status: "ok" }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+        ),
+    });
+
+    const result = await readPlainApiResult(
+      client.GET("/health", { parseAs: "text" }),
+      healthSchema,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: { status: "ok" },
+      status: 200,
+      traceId: "request-id",
+    });
+  });
+
+  it("rejects non-matching plain responses", async () => {
+    const healthSchema = z.object({
+      status: z.string(),
+    });
+    const client = createExampleApiClient({
+      baseUrl: "https://api.example.dev",
+      requestId: () => "request-id",
+      fetch: () =>
+        Promise.resolve(
+          new Response(JSON.stringify({ other: 123 }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+        ),
+    });
+
+    const result = await readPlainApiResult(
+      client.GET("/health", { parseAs: "text" }),
+      healthSchema,
     );
 
     expect(result).toMatchObject({
