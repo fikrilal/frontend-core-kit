@@ -5,6 +5,12 @@ import { runDoctor } from "./doctor.mjs";
 import { runOwnedCommand } from "./owned-commands.mjs";
 import { runVerificationProfile, verificationProfiles } from "./profiles.mjs";
 import { runScaffoldFeature } from "./scaffold.mjs";
+import {
+  parseScaffoldAllArguments,
+  parseScaffoldDataArguments,
+  runScaffoldAll,
+  runScaffoldData,
+} from "./scaffold-data.mjs";
 
 const helpLines = Object.freeze([
   "Usage: pnpm frontendkit -- <command> [options]",
@@ -19,13 +25,15 @@ const helpLines = Object.freeze([
   "handoff [options] — Run verified handoff preflight.",
   "improve check|analyze|shadow — Analyze controlled improvement.",
   "scaffold feature <name> [options] — Scaffold a new feature skeleton.",
+  "scaffold data [options] — Scaffold typed OpenAPI server client adapter.",
+  "scaffold all [options] — Scaffold feature and OpenAPI data layer end-to-end.",
   "--json — Emit bounded structured output.",
 ]);
 
 /** @typedef {"human" | "json"} OutputFormat */
 
 /**
- * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").CommandOwner, args: readonly string[] } | { kind: "scaffold-feature", format: OutputFormat, options: import("./scaffold.mjs").ScaffoldFeatureOptions }} ParsedCommand
+ * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").CommandOwner, args: readonly string[] } | { kind: "scaffold-feature", format: OutputFormat, options: import("./scaffold.mjs").ScaffoldFeatureOptions } | { kind: "scaffold-data", format: OutputFormat, options: import("./scaffold-data.mjs").ScaffoldDataOptions } | { kind: "scaffold-all", format: OutputFormat, options: import("./scaffold-data.mjs").ScaffoldAllOptions }} ParsedCommand
  */
 
 /**
@@ -136,7 +144,23 @@ export function parseCommand(args) {
         options: parseScaffoldFeatureArguments(values.slice(2)),
       };
     }
-    throw new CliUsageError("Use scaffold feature <name> [options].");
+    if (values[1] === "data") {
+      return {
+        kind: "scaffold-data",
+        format,
+        options: parseScaffoldDataArguments(values.slice(2)),
+      };
+    }
+    if (values[1] === "all") {
+      return {
+        kind: "scaffold-all",
+        format,
+        options: parseScaffoldAllArguments(values.slice(2)),
+      };
+    }
+    throw new CliUsageError(
+      "Use scaffold feature <name> [options], scaffold data [options], or scaffold all [options].",
+    );
   }
 
   throw new CliUsageError(`Unknown frontendkit command: ${values[0]}.`);
@@ -174,8 +198,10 @@ export function executeCommand(command, options) {
           { name: "command-task", value: helpLines[8] },
           { name: "command-handoff", value: helpLines[9] },
           { name: "command-improve", value: helpLines[10] },
-          { name: "command-scaffold", value: helpLines[11] },
-          { name: "option-json", value: helpLines[12] },
+          { name: "command-scaffold-feature", value: helpLines[11] },
+          { name: "command-scaffold-data", value: helpLines[12] },
+          { name: "command-scaffold-all", value: helpLines[13] },
+          { name: "option-json", value: helpLines[14] },
         ],
       });
     case "doctor":
@@ -184,6 +210,10 @@ export function executeCommand(command, options) {
       return runVerificationProfile(command.profile, options);
     case "scaffold-feature":
       return runScaffoldFeature(command.options, options);
+    case "scaffold-data":
+      return runScaffoldData(command.options, options);
+    case "scaffold-all":
+      return runScaffoldAll(command.options, options);
     case "owned":
       return runOwnedCommand(command.owner, command.args, options);
   }

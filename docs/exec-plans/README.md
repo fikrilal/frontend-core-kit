@@ -89,8 +89,8 @@ The accepted direction is documented in the
 
 1. **Completed:**
    [Feature scaffolding engine](completed/2026-10-03_frontendkit-scaffold-feature.md)
-2. **Queued:**
-   [OpenAPI data scaffolding engine](queued/2026-10-03_frontendkit-scaffold-data.md)
+2. **Completed:**
+   [OpenAPI data scaffolding engine](completed/2026-10-03_frontendkit-scaffold-data.md)
 3. **Queued:**
    [Safe feature removal engine](queued/2026-10-03_frontendkit-remove-feature.md)
 4. **Queued:**

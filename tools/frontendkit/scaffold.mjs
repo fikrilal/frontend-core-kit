@@ -132,7 +132,7 @@ export function runScaffoldFeature(
   ].toSorted();
 
   // Collision preflight
-  if (!force) {
+  if (!dryRun && !force) {
     const existing = filePaths.filter((relPath) => {
       if (relPath === indexPath) {
         const indexFile = path.join(root, indexPath);

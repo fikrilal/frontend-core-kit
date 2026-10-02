@@ -1,7 +1,7 @@
 # 2026-10-03 Frontendkit OpenAPI Data Scaffolding Engine
 
 **Plan version:** 2
-**Status:** queued
+**Status:** completed
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement OpenAPI data scaffolding and composite scaffold all commands in frontendkit CLI, write server adapter templates, add unit tests, verify, and commit; do not push, deploy, or mutate production
@@ -64,11 +64,11 @@ Risk is high because the task modifies canonical CLI tooling and contract consum
 
 ## Checklist
 
-- [ ] Add `scaffold data` and `scaffold all` CLI parser support.
-- [ ] Implement OpenAPI YAML schema parser and operation resolver.
-- [ ] Implement server API adapter and unit test template generators.
-- [ ] Add unit tests in `tools/frontendkit/scaffold-data.test.mjs`.
-- [ ] Verify test suite and run canonical gates.
+- [x] Add `scaffold data` and `scaffold all` CLI parser support.
+- [x] Implement OpenAPI YAML schema parser and operation resolver.
+- [x] Implement server API adapter and unit test template generators.
+- [x] Add unit tests in `tools/frontendkit/scaffold-data.test.mjs`.
+- [x] Verify test suite and run canonical gates.
 
 ## Rollout And Rollback
 
@@ -77,14 +77,18 @@ Contained within `tools/frontendkit/`. Can be cleanly rolled back with `git reve
 ## Decision And Deviation Log
 
 - 2026-10-03: Queued plan created from approved proposal `_WIP/2026-10-03_frontend-feature-scaffold-and-remove-proposal.md`.
+- 2026-10-03: Implemented `scaffold-data.mjs` and updated `command.mjs` to support `scaffold data` and `scaffold all` commands with `--dry-run`, `--force`, `--list`, and `--filter`. Added 11 unit tests in `scaffold-data.test.mjs`.
 
 ## Verification
 
-- Not run yet.
+- `pnpm typecheck:frontendkit`: Passed with 0 errors.
+- `pnpm test:frontendkit`: 44 tests passed (0 failures).
+- `pnpm maintainability:check`: Knip passed with 0 issues.
+- `pnpm verify:fast`: 10 steps passed in 39.4s.
 
 ## Runtime Evidence
 
-- Not run yet.
+- Verified dry run preview, unknown operation diagnostic message, and file generation in unit tests and manual execution.
 
 ## Follow-Up Debt
 
