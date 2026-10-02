@@ -6,7 +6,11 @@ import process from "node:process";
 import YAML from "yaml";
 
 import { CliUsageError, failed, passed } from "./result.mjs";
-import { parseName, runScaffoldFeature } from "./scaffold.mjs";
+import {
+  formatFilesWithPrettier,
+  parseName,
+  runScaffoldFeature,
+} from "./scaffold.mjs";
 
 const defaultSpecPath = "src/contracts/example-api/openapi.yaml";
 const namePattern = /^[a-z][a-z0-9]*([_-][a-z0-9]+)*$/;
@@ -250,14 +254,14 @@ export function parseOpenApiSpec(
       // Check whether response is enveloped { data, meta? }
       let isEnvelope = false;
       if (responseContentSchema && !isVoidResponse) {
-        if (
-          responseContentSchema.$ref &&
-          responseContentSchema.$ref.includes("Envelope")
-        ) {
+        const resolved = responseContentSchema.$ref
+          ? resolveSchemaRef(responseContentSchema.$ref, spec)
+          : responseContentSchema;
+        if (resolved && resolved.properties && resolved.properties.data) {
           isEnvelope = true;
         } else if (
-          responseContentSchema.properties &&
-          responseContentSchema.properties.data
+          responseContentSchema.$ref &&
+          responseContentSchema.$ref.includes("Envelope")
         ) {
           isEnvelope = true;
         }
@@ -851,6 +855,9 @@ export function runScaffoldData(options, { root = process.cwd() } = {}) {
     fs.writeFileSync(path.join(root, relPath), content, "utf8");
   }
 
+  const writtenFullPaths = filePaths.map((relPath) => path.join(root, relPath));
+  formatFilesWithPrettier(writtenFullPaths, root);
+
   return passed({
     command: "scaffold:data",
     summary: `OpenAPI data adapter for "${matchedOp.operationId}" scaffolded successfully (${filePaths.length} files).`,
@@ -1027,6 +1034,7 @@ export function runScaffoldAll(options, { root = process.cwd() } = {}) {
         `// Linked server API adapter\n  void ${functionName};\n\n  return { error: null, success: true };`,
       );
       fs.writeFileSync(actionFile, updated, "utf8");
+      formatFilesWithPrettier([actionFile], root);
     }
   }
 

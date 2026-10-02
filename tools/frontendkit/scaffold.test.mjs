@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { check as checkPrettier } from "prettier";
 
 import { parseCommand } from "./command.mjs";
 import { CliUsageError } from "./result.mjs";
@@ -239,5 +240,48 @@ test("appends second slice export to existing feature index.ts", () => {
     assert.match(indexContent, /export \{ BillingInvoicesPage \}/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("scaffolds feature output that is 100% Prettier-canonical across varied name shapes", async () => {
+  const testCases = [
+    { feature: "billing" },
+    { feature: "pricing", slice: "tiers", kind: "marketing" },
+    { feature: "invoicing" },
+    { feature: "order-tracking-details", slice: "invoice-summary" },
+  ];
+
+  for (const tc of testCases) {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "scaffold-fmt-check-"));
+    try {
+      // @ts-expect-error test arguments
+      const res = runScaffoldFeature(tc, { root });
+      assert.equal(res.status, "passed");
+
+      // Walk all files in root
+      /** @type {string[]} */
+      const files = [];
+      /** @param {string} dir */
+      function walk(dir) {
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+          const full = path.join(dir, entry.name);
+          if (entry.isDirectory()) walk(full);
+          else files.push(full);
+        }
+      }
+      walk(root);
+
+      assert.ok(files.length >= 8);
+      for (const file of files) {
+        const content = fs.readFileSync(file, "utf8");
+        const formatted = await checkPrettier(content, { filepath: file });
+        assert.ok(
+          formatted,
+          `File ${file} failed Prettier check for case ${tc.feature} ${tc.slice || ""}`,
+        );
+      }
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
   }
 });

@@ -1,10 +1,38 @@
 // @ts-check
-
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
 import { failed, passed } from "./result.mjs";
+
+/**
+ * Formats a list of files with Prettier in a single batch.
+ *
+ * @param {string[]} filePaths
+ * @param {string} [root]
+ */
+export function formatFilesWithPrettier(filePaths, root = process.cwd()) {
+  if (!filePaths || filePaths.length === 0) return;
+  const localBin = path.join(root, "node_modules/.bin/prettier");
+  const cwdBin = path.join(process.cwd(), "node_modules/.bin/prettier");
+  const bin = fs.existsSync(localBin)
+    ? localBin
+    : fs.existsSync(cwdBin)
+      ? cwdBin
+      : "prettier";
+  const repoConfig = path.join(process.cwd(), "prettier.config.mjs");
+  const args = ["--write"];
+  if (fs.existsSync(repoConfig)) {
+    args.push("--config", repoConfig);
+  }
+  args.push(...filePaths);
+  try {
+    execFileSync(bin, args, { stdio: "ignore" });
+  } catch {
+    // If Prettier is unavailable, files remain as generated
+  }
+}
 
 const namePattern = /^[a-z][a-z0-9]*([_-][a-z0-9]+)*$/;
 
@@ -201,6 +229,9 @@ export function runScaffoldFeature(
   for (const [relPath, content] of Object.entries(files)) {
     fs.writeFileSync(path.join(root, relPath), content, "utf8");
   }
+
+  const writtenFullPaths = filePaths.map((relPath) => path.join(root, relPath));
+  formatFilesWithPrettier(writtenFullPaths, root);
 
   // Update site-metadata.ts if marketing kind
   if (kind === "marketing") {
