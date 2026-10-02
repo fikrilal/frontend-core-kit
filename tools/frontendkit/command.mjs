@@ -4,6 +4,7 @@ import { CliUsageError, passed } from "./result.mjs";
 import { runDoctor } from "./doctor.mjs";
 import { runOwnedCommand } from "./owned-commands.mjs";
 import { runVerificationProfile, verificationProfiles } from "./profiles.mjs";
+import { runRemoveFeature } from "./remove.mjs";
 import { runScaffoldFeature } from "./scaffold.mjs";
 import {
   parseScaffoldAllArguments,
@@ -27,13 +28,14 @@ const helpLines = Object.freeze([
   "scaffold feature <name> [options] — Scaffold a new feature skeleton.",
   "scaffold data [options] — Scaffold typed OpenAPI server client adapter.",
   "scaffold all [options] — Scaffold feature and OpenAPI data layer end-to-end.",
+  "remove feature <name> [options] — Safely remove a feature and unwire it.",
   "--json — Emit bounded structured output.",
 ]);
 
 /** @typedef {"human" | "json"} OutputFormat */
 
 /**
- * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").CommandOwner, args: readonly string[] } | { kind: "scaffold-feature", format: OutputFormat, options: import("./scaffold.mjs").ScaffoldFeatureOptions } | { kind: "scaffold-data", format: OutputFormat, options: import("./scaffold-data.mjs").ScaffoldDataOptions } | { kind: "scaffold-all", format: OutputFormat, options: import("./scaffold-data.mjs").ScaffoldAllOptions }} ParsedCommand
+ * @typedef {{ kind: "help" | "doctor", format: OutputFormat } | { kind: "verify", format: OutputFormat, profile: import("./profiles.mjs").VerificationProfile } | { kind: "owned", format: OutputFormat, owner: import("./owned-commands.mjs").CommandOwner, args: readonly string[] } | { kind: "scaffold-feature", format: OutputFormat, options: import("./scaffold.mjs").ScaffoldFeatureOptions } | { kind: "scaffold-data", format: OutputFormat, options: import("./scaffold-data.mjs").ScaffoldDataOptions } | { kind: "scaffold-all", format: OutputFormat, options: import("./scaffold-data.mjs").ScaffoldAllOptions } | { kind: "remove-feature", format: OutputFormat, options: import("./remove.mjs").RemoveFeatureOptions }} ParsedCommand
  */
 
 /**
@@ -162,6 +164,16 @@ export function parseCommand(args) {
       "Use scaffold feature <name> [options], scaffold data [options], or scaffold all [options].",
     );
   }
+  if (values[0] === "remove") {
+    if (values[1] === "feature") {
+      return {
+        kind: "remove-feature",
+        format,
+        options: parseRemoveFeatureArguments(values.slice(2)),
+      };
+    }
+    throw new CliUsageError("Use remove feature <name> [options].");
+  }
 
   throw new CliUsageError(`Unknown frontendkit command: ${values[0]}.`);
 }
@@ -201,7 +213,8 @@ export function executeCommand(command, options) {
           { name: "command-scaffold-feature", value: helpLines[11] },
           { name: "command-scaffold-data", value: helpLines[12] },
           { name: "command-scaffold-all", value: helpLines[13] },
-          { name: "option-json", value: helpLines[14] },
+          { name: "command-remove-feature", value: helpLines[14] },
+          { name: "option-json", value: helpLines[15] },
         ],
       });
     case "doctor":
@@ -214,6 +227,8 @@ export function executeCommand(command, options) {
       return runScaffoldData(command.options, options);
     case "scaffold-all":
       return runScaffoldAll(command.options, options);
+    case "remove-feature":
+      return runRemoveFeature(command.options, options);
     case "owned":
       return runOwnedCommand(command.owner, command.args, options);
   }
@@ -355,4 +370,47 @@ function parseScaffoldFeatureArguments(values) {
   }
 
   return { feature, slice, kind, dryRun, force };
+}
+
+/**
+ * @param {readonly string[]} values
+ * @returns {import("./remove.mjs").RemoveFeatureOptions}
+ */
+function parseRemoveFeatureArguments(values) {
+  let feature = "";
+  let slice;
+  let dryRun = false;
+  let forceCore = false;
+  let yes = false;
+
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (value === "--dry-run") {
+      dryRun = true;
+    } else if (value === "--force-core") {
+      forceCore = true;
+    } else if (value === "--yes") {
+      yes = true;
+    } else if (value === "--slice") {
+      index += 1;
+      const next = values[index];
+      if (!next || next.startsWith("--")) {
+        throw new CliUsageError("The --slice option requires a value.");
+      }
+      slice = next;
+    } else if (value.startsWith("--")) {
+      throw new CliUsageError(`Unknown remove feature option: ${value}.`);
+    } else {
+      if (feature) {
+        throw new CliUsageError("Unexpected multiple feature arguments.");
+      }
+      feature = value;
+    }
+  }
+
+  if (!feature) {
+    throw new CliUsageError("Missing required feature name.");
+  }
+
+  return { feature, slice, dryRun, forceCore, yes };
 }

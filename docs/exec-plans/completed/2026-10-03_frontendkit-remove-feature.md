@@ -1,7 +1,7 @@
 # 2026-10-03 Frontendkit Safe Feature Removal Engine
 
 **Plan version:** 2
-**Status:** queued
+**Status:** completed
 **Owner:** primary implementation agent with human supervision
 **Risk:** high
 **Authority:** implement safe feature removal and unwiring command in frontendkit CLI, write dependency scanner, add unit tests, verify, and commit; do not push, deploy, or mutate production
@@ -63,13 +63,13 @@ Risk is high because the task introduces file deletion and unwiring logic in can
 
 ## Checklist
 
-- [ ] Add `remove feature` CLI argument parsing in `tools/frontendkit/command.mjs`.
-- [ ] Implement protected core checks for `auth`, `marketing`, `users`.
-- [ ] Implement dangling import scanner across `src/`.
-- [ ] Implement surgical unwiring for `src/app/site-metadata.ts` and `src/features/<feature>/index.ts`.
-- [ ] Implement file and directory deletion engine with `--dry-run`.
-- [ ] Add unit tests in `tools/frontendkit/remove.test.mjs`.
-- [ ] Verify test suite and run canonical gates.
+- [x] Add `remove feature` CLI argument parsing in `tools/frontendkit/command.mjs`.
+- [x] Implement protected core checks for `auth`, `marketing`, `users`.
+- [x] Implement dangling import scanner across `src/`.
+- [x] Implement surgical unwiring for `src/app/site-metadata.ts` and `src/features/<feature>/index.ts`.
+- [x] Implement file and directory deletion engine with `--dry-run`.
+- [x] Add unit tests in `tools/frontendkit/remove.test.mjs`.
+- [x] Verify test suite and run canonical gates.
 
 ## Rollout And Rollback
 
@@ -78,14 +78,21 @@ Contained within `tools/frontendkit/`. Can be cleanly rolled back with `git reve
 ## Decision And Deviation Log
 
 - 2026-10-03: Queued plan created from approved proposal `_WIP/2026-10-03_frontend-feature-scaffold-and-remove-proposal.md`.
+- 2026-10-03: Activated plan for implementation.
+- 2026-10-03: Implemented the removal engine in `tools/frontendkit/remove.mjs` as a flat module (matching the existing `scaffold.mjs`/`scaffold-data.mjs` layout) instead of the `tools/frontendkit/remove/` directory listed in Impact Areas.
+- 2026-10-03: `--yes` is accepted for forward compatibility but no interactive prompt is implemented; frontendkit commands are non-interactive and acceptance scenario 4 expects non-interactive removal.
+- 2026-10-03: First canonical verification run failed in `pnpm test` because the developer shell exported `NODE_ENV=production` (production React / Vite client conditions). Re-ran with `env -u NODE_ENV`, matching CI.
 
 ## Verification
 
-- Not run yet.
+- `pnpm typecheck:frontendkit`: passed with 0 errors.
+- `pnpm test:frontendkit`: 56 tests passed (0 failures), including 9 new removal tests.
+- `pnpm lint`, `pnpm format:check`, `pnpm knowledge:check`, `pnpm architecture:check`, `pnpm public-pages:check`, `pnpm maintainability:check`, `pnpm contracts:check`, `pnpm typecheck`: all passed.
+- Canonical `task verify`: passed full deterministic and runtime browser lanes in 101.5s; candidate handed off.
 
 ## Runtime Evidence
 
-- Not run yet.
+- CLI end-to-end on a scratch root: `scaffold feature billing` (9 files) → `remove feature billing --dry-run` (preview only, no mutation) → `remove feature billing` (feature and route directories removed).
 
 ## Follow-Up Debt
 
