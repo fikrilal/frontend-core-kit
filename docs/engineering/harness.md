@@ -11,6 +11,10 @@ pnpm frontendkit -- knowledge check
 pnpm frontendkit -- contracts check
 pnpm frontendkit -- risk classify --base <revision> --head <revision>
 pnpm frontendkit -- evidence report
+pnpm frontendkit -- scaffold feature <name> [options]
+pnpm frontendkit -- scaffold data [options]
+pnpm frontendkit -- scaffold all [options]
+pnpm frontendkit -- remove feature <name> [options]
 ```
 
 `doctor` is a read-only pre-task check. It reports stable blockers and warnings
@@ -45,6 +49,35 @@ public-pages:check
 
 `verify` adds the production build. `verify:runtime` runs Playwright separately
 because browser installation and runtime cost are machine-specific.
+
+## Feature lifecycle
+
+`frontendkit` generates and removes feature scaffolds while preserving the
+boundaries that `architecture:check`, `public-pages:check`, and Knip enforce:
+
+```bash
+pnpm frontendkit -- scaffold feature <name> [--slice <slice>] [--kind <authenticated|marketing>] [--dry-run] [--force]
+pnpm frontendkit -- scaffold data --feature <name> --operation <id> [--openapi-spec <path>] [--list] [--filter <text>] [--dry-run] [--force]
+pnpm frontendkit -- scaffold all --feature <name> --operation <id> [--slice <slice>] [--kind <authenticated|marketing>] [--dry-run]
+pnpm frontendkit -- remove feature <name> [--slice <slice>] [--dry-run] [--force-core] [--yes]
+```
+
+`scaffold feature` writes a thin route plus a slice (page, client form, Server
+Action, Zod state, failure mapper, and co-located tests), registers marketing
+routes in `publicRoutes`, refuses collisions unless `--force`, and formats all
+generated files with the repository Prettier configuration.
+
+`scaffold data` resolves an operation by `operationId`, `METHOD /path`, or the
+`users.profile.get` alias, derives types from the committed contract, and writes
+a typed server adapter and contract test with a schema-valid mock fixture.
+`--list` (optionally with `--filter`) prints available operations.
+
+`remove feature` deletes the feature and its route directories, prunes
+`publicRoutes` and slice exports, and refuses to run while another module still
+imports `@/features/<name>`. Protected core features (`auth`, `marketing`,
+`users`) require `--force-core`; `--dry-run` previews every deletion without
+touching disk. `--yes` is accepted for forward compatibility because the CLI is
+non-interactive.
 
 ## Task verification
 

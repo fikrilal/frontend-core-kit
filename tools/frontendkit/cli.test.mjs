@@ -17,6 +17,17 @@ test("parses help and a single global JSON option", () => {
   });
 });
 
+test("treats a subcommand --help request as global help", () => {
+  assert.deepEqual(parseCommand(["scaffold", "feature", "billing", "--help"]), {
+    kind: "help",
+    format: "human",
+  });
+  assert.deepEqual(parseCommand(["remove", "feature", "--help", "--json"]), {
+    kind: "help",
+    format: "json",
+  });
+});
+
 test("parses canonical verification profiles", () => {
   assert.deepEqual(parseCommand(["verify", "--profile", "fast"]), {
     kind: "verify",

@@ -93,7 +93,7 @@ The accepted direction is documented in the
    [OpenAPI data scaffolding engine](completed/2026-10-03_frontendkit-scaffold-data.md)
 3. **Completed:**
    [Safe feature removal engine](completed/2026-10-03_frontendkit-remove-feature.md)
-4. **Queued:**
-   [Feature lifecycle dogfood and documentation](queued/2026-10-03_frontendkit-feature-lifecycle-dogfood.md)
+4. **Completed:**
+   [Feature lifecycle dogfood and documentation](completed/2026-10-03_frontendkit-feature-lifecycle-dogfood.md)
 
 Do not introduce product workflows until a real product decision exists.

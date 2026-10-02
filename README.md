@@ -60,6 +60,30 @@ The auth routes also require the two server-only values documented in
 Sessions intentionally live in the single Next.js process. Restarting or
 redeploying that process signs in users out.
 
+## Feature lifecycle
+
+Generate and remove feature scaffolds with the harness CLI:
+
+```bash
+pnpm frontendkit -- scaffold feature billing --dry-run
+pnpm frontendkit -- scaffold feature billing
+pnpm frontendkit -- scaffold data --feature billing --operation users.me.get
+pnpm frontendkit -- scaffold all --feature billing --operation users.me.get
+pnpm frontendkit -- remove feature billing --dry-run
+pnpm frontendkit -- remove feature billing
+```
+
+`scaffold feature` writes a thin route under `src/app/` plus a feature slice
+(page, client form, Server Action, Zod state, failure mapper, and tests) under
+`src/features/`, and formats the output with the repository Prettier
+configuration. `scaffold data` generates a typed server adapter and contract
+test from the committed OpenAPI snapshot. `remove feature` deletes the feature
+and its route, prunes public route metadata and slice exports, checks for
+dangling imports, and refuses protected core features (`auth`, `marketing`,
+`users`) unless `--force-core` is passed. See the
+[engineering harness](docs/engineering/harness.md#feature-lifecycle) for all
+options.
+
 ## API contract
 
 The committed OpenAPI snapshot, generated TypeScript types, and generated Zod

@@ -60,6 +60,10 @@ export function parseCommand(args) {
     return { kind: "help", format };
   }
 
+  if (values.includes("--help")) {
+    return { kind: "help", format };
+  }
+
   if (values[0] === "doctor") {
     requireLength(values, 1, "The doctor command accepts no arguments.");
     return { kind: "doctor", format };

@@ -480,6 +480,7 @@ import {
   type ${slicePascal}ActionState,
 } from "./${sliceKebab}-state";
 
+// eslint-disable-next-line @typescript-eslint/require-await -- Server Actions must be async; replace this stub with the real data call.
 export async function ${sliceCamel}Action(
   _previousState: ${slicePascal}ActionState,
   formData: FormData,
@@ -510,6 +511,8 @@ export function map${slicePascal}Failure(status: number | null): ${slicePascal}E
     case 400:
     case 422:
       return "invalidInput";
+    case null:
+      return "unavailable";
     default:
       return "unavailable";
   }

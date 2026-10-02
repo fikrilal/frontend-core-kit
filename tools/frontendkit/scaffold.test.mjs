@@ -189,6 +189,18 @@ test("scaffolds a complete authenticated feature slice", () => {
     );
     assert.match(formContent, /"use client"/);
     assert.match(formContent, /useActionState/);
+
+    const actionContent = fs.readFileSync(
+      path.join(root, "src/features/billing/billing/billing-action.ts"),
+      "utf8",
+    );
+    assert.match(actionContent, /require-await/);
+
+    const failureContent = fs.readFileSync(
+      path.join(root, "src/features/billing/billing/billing-failure.ts"),
+      "utf8",
+    );
+    assert.match(failureContent, /case null:/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
