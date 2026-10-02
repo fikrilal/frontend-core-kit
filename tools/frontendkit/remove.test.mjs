@@ -279,3 +279,133 @@ test("fails for missing features, slices, and invalid names", () => {
     cleanup(root);
   }
 });
+
+test("aborts slice removal when an external consumer uses the slice export", () => {
+  const root = makeRoot();
+  try {
+    runScaffoldFeature({ feature: "billing", slice: "overview" }, { root });
+    runScaffoldFeature({ feature: "billing", slice: "invoices" }, { root });
+
+    const consumer = path.join(root, "src/features/other/consumer.ts");
+    fs.mkdirSync(path.dirname(consumer), { recursive: true });
+    fs.writeFileSync(
+      consumer,
+      'import { BillingInvoicesPage } from "@/features/billing";\n\nexport const consumer = BillingInvoicesPage;\n',
+      "utf8",
+    );
+
+    const result = runRemoveFeature(
+      { feature: "billing", slice: "invoices" },
+      { root },
+    );
+    assert.equal(result.status, "failed");
+    const reference = result.details.find(
+      (detail) => detail.name === "referencing-file-1",
+    );
+    assert.ok(reference);
+    assert.ok(String(reference.value).includes("consumer.ts"));
+    assert.ok(String(reference.value).includes("BillingInvoicesPage"));
+    assert.ok(fs.existsSync(path.join(root, "src/features/billing/invoices")));
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("allows slice removal when barrel consumers use only other slices", () => {
+  const root = makeRoot();
+  try {
+    runScaffoldFeature({ feature: "billing", slice: "overview" }, { root });
+    runScaffoldFeature({ feature: "billing", slice: "invoices" }, { root });
+
+    const consumer = path.join(root, "src/features/other/consumer.ts");
+    fs.mkdirSync(path.dirname(consumer), { recursive: true });
+    fs.writeFileSync(
+      consumer,
+      'import { BillingOverviewPage } from "@/features/billing";\n\nexport const consumer = BillingOverviewPage;\n',
+      "utf8",
+    );
+
+    const result = runRemoveFeature(
+      { feature: "billing", slice: "invoices" },
+      { root },
+    );
+    assert.equal(result.status, "passed");
+    assert.equal(
+      fs.existsSync(path.join(root, "src/features/billing/invoices")),
+      false,
+    );
+    assert.ok(fs.existsSync(consumer));
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("aborts when a relative import resolves into the removed feature", () => {
+  const root = makeRoot();
+  try {
+    runScaffoldFeature({ feature: "billing" }, { root });
+
+    const consumer = path.join(root, "src/features/zeta/consumer.ts");
+    fs.mkdirSync(path.dirname(consumer), { recursive: true });
+    fs.writeFileSync(
+      consumer,
+      'import { BillingPage } from "../billing";\n\nexport const consumer = BillingPage;\n',
+      "utf8",
+    );
+
+    const result = runRemoveFeature({ feature: "billing" }, { root });
+    assert.equal(result.status, "failed");
+    const reference = result.details.find(
+      (detail) => detail.name === "referencing-file-1",
+    );
+    assert.ok(reference);
+    assert.ok(String(reference.value).includes("consumer.ts"));
+    assert.ok(fs.existsSync(path.join(root, "src/features/billing")));
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("blocks on relative slice imports and ignores sibling slice imports", () => {
+  const root = makeRoot();
+  try {
+    runScaffoldFeature({ feature: "billing", slice: "overview" }, { root });
+    runScaffoldFeature({ feature: "billing", slice: "invoices" }, { root });
+
+    const zetaDir = path.join(root, "src/features/zeta");
+    fs.mkdirSync(zetaDir, { recursive: true });
+    const sliceConsumer = path.join(zetaDir, "slice-consumer.ts");
+    fs.writeFileSync(
+      sliceConsumer,
+      'import { BillingInvoicesPage } from "../billing/invoices/invoices-page";\n\nexport const consumer = BillingInvoicesPage;\n',
+      "utf8",
+    );
+    const siblingConsumer = path.join(zetaDir, "sibling-consumer.ts");
+    fs.writeFileSync(
+      siblingConsumer,
+      'import { BillingOverviewPage } from "../billing/overview/overview-page";\n\nexport const consumer = BillingOverviewPage;\n',
+      "utf8",
+    );
+
+    const blocked = runRemoveFeature(
+      { feature: "billing", slice: "invoices" },
+      { root },
+    );
+    assert.equal(blocked.status, "failed");
+    const reference = blocked.details.find(
+      (detail) => detail.name === "referencing-file-1",
+    );
+    assert.ok(reference);
+    assert.ok(String(reference.value).includes("slice-consumer.ts"));
+
+    fs.rmSync(sliceConsumer);
+    const allowed = runRemoveFeature(
+      { feature: "billing", slice: "invoices" },
+      { root },
+    );
+    assert.equal(allowed.status, "passed");
+    assert.ok(fs.existsSync(siblingConsumer));
+  } finally {
+    cleanup(root);
+  }
+});

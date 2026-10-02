@@ -5,3 +5,4 @@ export { PasswordResetConfirmationPage } from "./password-reset/password-reset-c
 export { EmailVerificationPage } from "./email-verification/email-verification-page";
 export { ChangePasswordPage } from "./password-change/change-password-page";
 export { AuthenticatedPage } from "./session/authenticated-page";
+export { loadAuthenticatedUser } from "./session/load-authenticated-user";

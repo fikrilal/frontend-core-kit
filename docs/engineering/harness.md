@@ -212,7 +212,7 @@ review responsibilities.
   `src/server/api/client.ts`; scripts and tests retain explicit allowances;
 - generic UI and library modules cannot depend on product/server layers;
 - Client Components cannot import server-only modules;
-- features are consumed through their public API;
+- features are consumed through their public API, and relative imports may not resolve into another feature;
 - route pages remain thin compositions.
 
 Keep allowlists narrow. Add a rule only when it protects a real boundary.

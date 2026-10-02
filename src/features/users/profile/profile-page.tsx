@@ -1,6 +1,6 @@
 import { AuthShell } from "@/components/layout/auth-shell";
+import { loadAuthenticatedUser } from "@/features/auth";
 
-import { loadAuthenticatedUser } from "../../auth/session/load-authenticated-user";
 import { ClearProfileImageForm } from "../profile-image/clear-profile-image-form";
 import { loadProfileImageUrl } from "../profile-image/load-profile-image-url";
 import { ProfileImageUploadPlanForm } from "../profile-image/upload-plan-form";

@@ -130,6 +130,7 @@ function checkImports(relativePath, source) {
 
   for (const specifier of imports) {
     checkFeatureDeepImport(relativePath, specifier);
+    checkRelativeFeatureCrossImport(relativePath, specifier);
   }
 }
 
@@ -158,6 +159,27 @@ function checkFeatureDeepImport(relativePath, specifier) {
 
   violations.push(
     `${relativePath} deep-imports feature internals via "${specifier}". Import the feature public API (@/features/${featureName}) instead.`,
+  );
+}
+
+/**
+ * Relative imports must not resolve into another feature.
+ * Cross-feature consumption goes through the `@/features/<name>` public API.
+ */
+function checkRelativeFeatureCrossImport(relativePath, specifier) {
+  if (!specifier.startsWith(".")) return;
+
+  const target = resolveImport(relativePath, specifier);
+  if (!target) return;
+
+  const targetFeature = featureNameFromPath(`${target}/`);
+  if (!targetFeature) return;
+
+  const sourceFeature = featureNameFromPath(relativePath);
+  if (sourceFeature === targetFeature) return;
+
+  violations.push(
+    `${relativePath} imports ${specifier}, which resolves into another feature ("${targetFeature}"). Use the feature public API (@/features/${targetFeature}) instead.`,
   );
 }
 

@@ -97,5 +97,7 @@ The accepted direction is documented in the
    [Feature lifecycle dogfood and documentation](completed/2026-10-03_frontendkit-feature-lifecycle-dogfood.md)
 5. **Completed:**
    [Scaffold compatibility repairs](completed/2026-10-03_frontendkit-scaffold-compatibility-repairs.md)
+6. **Completed:**
+   [Removal safety hardening](completed/2026-10-03_frontendkit-removal-safety-hardening.md)
 
 Do not introduce product workflows until a real product decision exists.

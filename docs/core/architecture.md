@@ -67,7 +67,9 @@ src/contracts/
 ```
 
 Features expose a small public API through `index.ts`. Routes import that public
-API; feature internals may import their own private modules. The session layer
+API; feature internals may import their own private modules. Imports crossing
+into another feature always use the `@/features/<name>` public API; relative
+paths may not resolve into another feature. The session layer
 does not depend on the auth feature, which prevents shared server
 infrastructure from depending upward on user-facing code.
 
@@ -91,9 +93,10 @@ src/features/auth/
 
 `server/` is intentionally small. It owns the shared `auth-api.ts` adapter and
 its transport-contract tests; a failure mapper stays beside the flow state it
-produces instead of becoming a generic server bucket. The root `index.ts` only
-exports route-level pages, so App Router files remain thin and flow internals
-stay private.
+produces instead of becoming a generic server bucket. The root `index.ts`
+exports route-level pages plus `loadAuthenticatedUser`, which is the deliberate
+public entry point other authenticated features use; the remaining flow
+internals stay private.
 
 ### Users feature layout
 

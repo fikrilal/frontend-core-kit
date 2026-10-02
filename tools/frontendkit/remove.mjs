@@ -128,29 +128,51 @@ export function runRemoveFeature(
     : [featureDir, ...routeDirs];
   const deletions = ownedDirs.filter((candidate) => fs.existsSync(candidate));
 
-  if (!effectiveSlice) {
-    const references = findExternalReferences(
+  const indexPath = path.join(featureDir, "index.ts");
+  const sliceDir = effectiveSlice
+    ? path.join(featureDir, effectiveSlice)
+    : undefined;
+  const sliceSymbols = effectiveSlice
+    ? readSliceExports(indexPath, effectiveSlice)
+    : [];
+  const scanExclusions = effectiveSlice ? [...ownedDirs, indexPath] : ownedDirs;
+  const references = findExternalReferences(
+    {
       root,
-      featureMeta.kebab,
-      ownedDirs,
-    );
-    if (references.length > 0) {
-      return failed({
-        command: "remove:feature",
-        summary: `Refusing to remove "${featureMeta.kebab}": ${references.length} external reference(s) found.`,
-        details: [
-          ...references.slice(0, 8).map((reference, index) => ({
-            name: `referencing-file-${index + 1}`,
-            value: reference,
-          })),
-          { name: "total-references", value: references.length },
-          {
-            name: "remediation",
-            value: "Remove the @/features imports first, then retry.",
-          },
-        ],
-      });
-    }
+      feature: featureMeta.kebab,
+      featureDir,
+      slice: effectiveSlice,
+      sliceDir,
+      sliceSymbols,
+    },
+    scanExclusions,
+  );
+  const blockingReferences = effectiveSlice
+    ? references.filter((reference) => reference.kind === "slice")
+    : references;
+  if (blockingReferences.length > 0) {
+    return failed({
+      command: "remove:feature",
+      summary: `Refusing to remove "${featureMeta.kebab}"${
+        effectiveSlice ? ` slice "${effectiveSlice}"` : ""
+      }: ${blockingReferences.length} external reference(s) found.`,
+      details: [
+        ...blockingReferences.slice(0, 8).map((reference, index) => ({
+          name: `referencing-file-${index + 1}`,
+          value:
+            reference.symbols.length > 0
+              ? `${reference.path} (${reference.symbols.join(", ")})`
+              : reference.path,
+        })),
+        { name: "total-references", value: blockingReferences.length },
+        {
+          name: "remediation",
+          value: effectiveSlice
+            ? "Update the referencing modules to stop using the removed slice, then retry."
+            : "Remove the @/features imports first, then retry.",
+        },
+      ],
+    });
   }
 
   const siteMetadataPath = path.join(root, "src/app/site-metadata.ts");
@@ -159,7 +181,6 @@ export function runRemoveFeature(
     featureMeta.kebab,
     effectiveSlice,
   );
-  const indexPath = path.join(featureDir, "index.ts");
   const indexPlan = effectiveSlice
     ? planSliceExportPrune(indexPath, effectiveSlice)
     : null;
@@ -227,23 +248,127 @@ export function runRemoveFeature(
 }
 
 /**
- * Collects source files that import the feature outside its owned directories.
- *
- * @param {string} root
- * @param {string} feature
- * @param {string[]} excludedDirs
- * @returns {string[]}
+ * @typedef {object} ExternalReference
+ * @property {string} path
+ * @property {"slice" | "feature"} kind
+ * @property {string[]} symbols
  */
-function findExternalReferences(root, feature, excludedDirs) {
+
+/**
+ * Collects external references to a feature, or to one of its slices.
+ *
+ * Whole-feature scans treat any alias or relative import that resolves into
+ * the feature as a reference. Slice scans block direct slice references and
+ * barrel imports that consume symbols the slice exports.
+ *
+ * @param {{
+ *   root: string,
+ *   feature: string,
+ *   featureDir: string,
+ *   slice?: string,
+ *   sliceDir?: string,
+ *   sliceSymbols?: string[],
+ * }} input
+ * @param {string[]} excludedDirs
+ * @returns {ExternalReference[]}
+ */
+function findExternalReferences(
+  { root, feature, featureDir, slice, sliceDir, sliceSymbols = [] },
+  excludedDirs,
+) {
   const srcRoot = path.join(root, "src");
   if (!fs.existsSync(srcRoot)) return [];
 
   const excluded = excludedDirs.map((directory) => path.resolve(directory));
-  const specifierPattern = new RegExp(
-    `["']@/features/${feature}(?:/[^"']*)?["']`,
-  );
-  /** @type {string[]} */
-  const references = [];
+  const featureDirResolved = path.resolve(featureDir);
+  const sliceDirResolved = sliceDir ? path.resolve(sliceDir) : null;
+  const aliasRoot = `@/features/${feature}`;
+  const sliceExported = sliceSymbols.length > 0;
+  /** @type {Map<string, { kind: "slice" | "feature", symbols: Set<string> }>} */
+  const references = new Map();
+
+  /**
+   * @param {string} filePath
+   * @param {"slice" | "feature"} kind
+   * @param {string[]} symbols
+   */
+  function record(filePath, kind, symbols) {
+    const existing = references.get(filePath);
+    if (!existing) {
+      references.set(filePath, { kind, symbols: new Set(symbols) });
+      return;
+    }
+    if (kind === "slice") existing.kind = "slice";
+    for (const symbol of symbols) existing.symbols.add(symbol);
+  }
+
+  /**
+   * @param {string} source
+   * @param {string} specifier
+   * @returns {{ kind: "slice" | "feature", symbols: string[] } | null}
+   */
+  function matchBarrelSymbols(source, specifier) {
+    const { symbols, namespace } = readImportedSymbols(source, specifier);
+    const matched = symbols.filter((symbol) => sliceSymbols.includes(symbol));
+    if (matched.length > 0) return { kind: "slice", symbols: matched };
+    if (namespace && sliceExported) return { kind: "slice", symbols: [] };
+    return null;
+  }
+
+  /**
+   * @param {string} source
+   * @param {string} fromDirectory
+   * @param {string} specifier
+   * @returns {{ kind: "slice" | "feature", symbols: string[] } | null}
+   */
+  function classifySpecifier(source, fromDirectory, specifier) {
+    if (specifier === aliasRoot || specifier === `${aliasRoot}/index`) {
+      if (!sliceDirResolved) return { kind: "feature", symbols: [] };
+      return matchBarrelSymbols(source, specifier);
+    }
+
+    if (specifier.startsWith(`${aliasRoot}/`)) {
+      if (!sliceDirResolved) return { kind: "feature", symbols: [] };
+      const rest = specifier.slice(aliasRoot.length + 1);
+      if (slice && (rest === slice || rest.startsWith(`${slice}/`))) {
+        return { kind: "slice", symbols: [] };
+      }
+      return null;
+    }
+
+    if (!specifier.startsWith(".")) return null;
+
+    const resolved = path.resolve(fromDirectory, specifier);
+    const insideFeature =
+      resolved === featureDirResolved ||
+      resolved.startsWith(`${featureDirResolved}${path.sep}`);
+    if (!insideFeature) return null;
+    if (!sliceDirResolved) return { kind: "feature", symbols: [] };
+
+    const insideSlice =
+      resolved === sliceDirResolved ||
+      resolved.startsWith(`${sliceDirResolved}${path.sep}`);
+    if (insideSlice) return { kind: "slice", symbols: [] };
+
+    if (resolved === featureDirResolved) {
+      return matchBarrelSymbols(source, specifier);
+    }
+
+    return null;
+  }
+
+  /**
+   * @param {string} source
+   * @param {string} fromDirectory
+   * @returns {{ kind: "slice" | "feature", symbols: string[] } | null}
+   */
+  function classify(source, fromDirectory) {
+    for (const specifier of importSpecifiers(source)) {
+      const match = classifySpecifier(source, fromDirectory, specifier);
+      if (match) return match;
+    }
+    return null;
+  }
 
   /** @param {string} directory */
   function walk(directory) {
@@ -270,14 +395,104 @@ function findExternalReferences(root, feature, excludedDirs) {
       }
 
       const source = fs.readFileSync(fullPath, "utf8");
-      if (specifierPattern.test(source)) {
-        references.push(toPosix(path.relative(root, fullPath)));
-      }
+      const match = classify(source, path.dirname(fullPath));
+      if (match) record(fullPath, match.kind, match.symbols);
     }
   }
 
   walk(srcRoot);
-  return references.toSorted();
+
+  return [...references.entries()]
+    .map(([filePath, reference]) => ({
+      path: toPosix(path.relative(root, filePath)),
+      kind: reference.kind,
+      symbols: [...reference.symbols].toSorted(),
+    }))
+    .toSorted((left, right) => left.path.localeCompare(right.path));
+}
+
+/**
+ * @param {string} indexPath
+ * @param {string} slice
+ * @returns {string[]}
+ */
+function readSliceExports(indexPath, slice) {
+  if (!fs.existsSync(indexPath)) return [];
+
+  const content = fs.readFileSync(indexPath, "utf8");
+  const pattern = new RegExp(
+    `export \\{([^}]*)\\} from "\\./${escapeRegex(slice)}/[^"]*";`,
+    "g",
+  );
+  /** @type {string[]} */
+  const symbols = [];
+  for (const match of content.matchAll(pattern)) {
+    for (const part of match[1].split(",")) {
+      const symbol = extractSymbolName(part);
+      if (symbol) symbols.push(symbol);
+    }
+  }
+  return symbols;
+}
+
+/**
+ * @param {string} source
+ * @param {string} specifier
+ * @returns {{ symbols: string[], namespace: boolean }}
+ */
+function readImportedSymbols(source, specifier) {
+  const escaped = escapeRegex(specifier);
+  const pattern = new RegExp(
+    `import\\s+(?:type\\s+)?\\{([^}]*)\\}\\s*from\\s*["']${escaped}["']`,
+    "g",
+  );
+  /** @type {string[]} */
+  const symbols = [];
+  for (const match of source.matchAll(pattern)) {
+    for (const part of match[1].split(",")) {
+      const symbol = extractSymbolName(part);
+      if (symbol) symbols.push(symbol);
+    }
+  }
+
+  const namespace = new RegExp(
+    `import\\s+\\*\\s+as\\s+\\w+\\s+from\\s*["']${escaped}["']`,
+  ).test(source);
+
+  return { symbols, namespace };
+}
+
+/**
+ * @param {string} source
+ * @returns {string[]}
+ */
+function importSpecifiers(source) {
+  /** @type {string[]} */
+  const specifiers = [];
+  const patterns = [
+    /\bimport\s+(?:type\s+)?(?:[^'"]*?\s+from\s+)?["']([^"']+)["']/g,
+    /\bexport\s+(?:type\s+)?[^'"]*?\s+from\s+["']([^"']+)["']/g,
+    /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g,
+  ];
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) {
+      specifiers.push(match[1]);
+    }
+  }
+  return specifiers;
+}
+
+/**
+ * @param {string} part
+ * @returns {string | null}
+ */
+function extractSymbolName(part) {
+  const cleaned = part
+    .trim()
+    .replace(/^type\s+/, "")
+    .split(/\s+as\s+/)[0]
+    .trim();
+  return cleaned.length > 0 ? cleaned : null;
 }
 
 /**

@@ -1,6 +1,6 @@
 import { AuthShell } from "@/components/layout/auth-shell";
+import { loadAuthenticatedUser } from "@/features/auth";
 
-import { loadAuthenticatedUser } from "../../auth/session/load-authenticated-user";
 import { CancelAccountDeletionForm } from "./cancel-account-deletion-form";
 import { RequestAccountDeletionForm } from "./request-account-deletion-form";
 
